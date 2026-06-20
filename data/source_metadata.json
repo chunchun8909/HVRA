@@ -1,0 +1,232 @@
+{
+  "230113-solution_booklet-building_envelope_retrofit.pdf": {
+    "source_id": "SMART_CITIES_MARKETPLACE_ENVELOPE_RETROFIT_2023",
+    "source_title": "Building Envelope Retrofit Solution Booklet",
+    "authors": "Smart Cities Marketplace, European Commission Directorate-General for Energy",
+    "year": 2023,
+    "document_type": "solution_booklet",
+    "citation": "Smart Cities Marketplace. Building Envelope Retrofit Solution Booklet. European Commission Directorate-General for Energy, January 2023.",
+    "doi_or_url": "https://smart-cities-marketplace.ec.europa.eu/",
+    "notes": "Primary retrofit-envelope solution source."
+  },
+  "55_2017_d_20200731.pdf": {
+    "source_id": "ASHRAE_55_2017_ADDENDUM_D_2020",
+    "source_title": "ANSI/ASHRAE Addendum d to ANSI/ASHRAE Standard 55-2017: Thermal Environmental Conditions for Human Occupancy",
+    "authors": "ASHRAE; American National Standards Institute",
+    "year": 2020,
+    "document_type": "thermal_comfort_standard_addendum",
+    "citation": "ASHRAE. ANSI/ASHRAE Addendum d to ANSI/ASHRAE Standard 55-2017: Thermal Environmental Conditions for Human Occupancy. Approved July 31, 2020.",
+    "doi_or_url": "https://www.ashrae.org/",
+    "notes": "Addendum only; not a full replacement for the complete ASHRAE 55 standard."
+  },
+  "assessment-of-the-first-long-term-renovation-strategies.pdf": {
+    "source_id": "JRC_LONG_TERM_RENOVATION_STRATEGIES_2022",
+    "source_title": "Assessment of the First Long-Term Renovation Strategies under the Energy Performance of Building Directive (Art. 2a)",
+    "authors": "L. Castellazzi; D. Paci; P. Zangheri; C. Maduta; M. Economidou; T. Ribeiro Serrenho; P. Zancanella; M. Ringel; M. Valentova; S. Tsemekidi Tzeiranaki",
+    "year": 2022,
+    "document_type": "policy_assessment",
+    "citation": "Castellazzi, L. et al. Assessment of the First Long-Term Renovation Strategies under the Energy Performance of Building Directive (Art. 2a). Joint Research Centre, European Commission, 2022.",
+    "doi_or_url": "",
+    "notes": "EU long-term renovation policy context."
+  },
+  "CIBSE TM59 2017 Overheating.pdf": {
+    "source_id": "CIBSE_TM59_2017",
+    "source_title": "TM59: Design Methodology for the Assessment of Overheating Risk in Homes",
+    "authors": "Chartered Institution of Building Services Engineers",
+    "year": 2017,
+    "document_type": "overheating_guidance",
+    "citation": "CIBSE. TM59: Design Methodology for the Assessment of Overheating Risk in Homes. Chartered Institution of Building Services Engineers, 2017.",
+    "doi_or_url": "https://www.cibse.org/",
+    "notes": "Useful for residential overheating assessment logic."
+  },
+  "D.B3--Handbook.pdf": {
+    "source_id": "IEA_SHC_TASK59_EBC_ANNEX76_HISTORIC_RETROFIT_HANDBOOK",
+    "source_title": "Planning Energy Retrofits of Historic Buildings: EN16883:2017 in Practice",
+    "authors": "IEA SHC Task 59; EBC Annex 76; Gustaf Leijonhufvud, editor",
+    "year": "",
+    "document_type": "retrofit_handbook",
+    "citation": "IEA SHC Task 59 / EBC Annex 76. Planning Energy Retrofits of Historic Buildings: EN16883:2017 in Practice.",
+    "doi_or_url": "",
+    "notes": "Historic-building retrofit planning handbook."
+  },
+  "DBHE.pdf": {
+    "source_id": "CTE_DB_HE_AHORRO_DE_ENERGIA",
+    "source_title": "Documento Basico HE: Ahorro de Energia",
+    "authors": "Ministerio de Vivienda y Agenda Urbana, Spain",
+    "year": "",
+    "document_type": "building_energy_regulation",
+    "citation": "Ministerio de Vivienda y Agenda Urbana. Documento Basico HE: Ahorro de energia.",
+    "doi_or_url": "https://www.codigotecnico.org/",
+    "notes": "Spanish CTE DB-HE energy-saving regulation source."
+  },
+  "EBC_Annex_50_Retrofit_Strategies_Design_Guide.pdf": {
+    "source_id": "IEA_EBC_ANNEX50_2011",
+    "source_title": "Retrofit Strategies Design Guide",
+    "authors": "IEA ECBCS Annex 50",
+    "year": 2011,
+    "document_type": "design_guide",
+    "citation": "IEA ECBCS Annex 50. Retrofit Strategies Design Guide. 2011.",
+    "doi_or_url": "",
+    "notes": "Prefab low-energy renovation and passive retrofit strategy source."
+  },
+  "edg_89_cp_edited_2.pdf": {
+    "source_id": "EDG_89_PASSIVHAUS_AUSTRALASIA_2017",
+    "source_title": "Passivhaus: A Pathway to Low Energy Buildings in Australasia",
+    "authors": "Clare Parry; Australian Passive House Association",
+    "year": 2017,
+    "document_type": "design_article",
+    "citation": "Parry, Clare. Passivhaus: A Pathway to Low Energy Buildings in Australasia. Environment Design Guide, EDG 89 CP, May 2017.",
+    "doi_or_url": "https://environmentdesignguide.com.au/",
+    "notes": "Passive House design and thermal comfort reference."
+  },
+  "en_ltserb.pdf": {
+    "source_id": "SPAIN_ERESEE_2020",
+    "source_title": "2020 Update of the Long-Term Strategy for Energy Renovation in the Building Sector in Spain (ERESEE)",
+    "authors": "Ministry of Transport, Mobility and the Urban Agenda, Spain",
+    "year": 2020,
+    "document_type": "renovation_policy",
+    "citation": "Ministry of Transport, Mobility and the Urban Agenda. 2020 Update of the Long-Term Strategy for Energy Renovation in the Building Sector in Spain (ERESEE). June 2020.",
+    "doi_or_url": "",
+    "notes": "Spanish building-sector renovation policy context."
+  },
+  "enerphit_renovating_with_passive_house_components (1).pdf": {
+    "source_id": "PHI_ENERPHIT_RENOVATING_WITH_PASSIVE_HOUSE_COMPONENTS",
+    "source_title": "EnerPHit: Renovating with Passive House Components",
+    "authors": "Passive House Institute",
+    "year": "",
+    "document_type": "retrofit_manual",
+    "citation": "Passive House Institute. EnerPHit: Renovating with Passive House Components.",
+    "doi_or_url": "https://passivehouse.com/",
+    "notes": "Requires cryptography>=3.1 for AES PDF handling with pypdf."
+  },
+  "ES2010-90036_final.pdf": {
+    "source_id": "ASME_ES2010_90036_PASSIVE_HOUSE_EL_SALVADOR",
+    "source_title": "Passive House Design Guidelines for Residential Buildings in El Salvador",
+    "authors": "Luis Aaron Martinez",
+    "year": 2010,
+    "document_type": "research_paper",
+    "citation": "Martinez, Luis Aaron. Passive House Design Guidelines for Residential Buildings in El Salvador. Proceedings of the 4th International Conference on Energy Sustainability, ES2010-90036, 2010.",
+    "doi_or_url": "",
+    "notes": "Passive-house design guidance in warm climate context."
+  },
+  "EuroPHit_brochure_final_PHI.pdf": {
+    "source_id": "EUROPHIT_DEEP_ENERGY_STEP_BY_STEP_RETROFITS",
+    "source_title": "Implementing Deep Energy Step-by-Step Retrofits",
+    "authors": "EuroPHit; Passive House Institute",
+    "year": "",
+    "document_type": "retrofit_brochure",
+    "citation": "EuroPHit. Implementing Deep Energy Step-by-Step Retrofits: Increasing the European Potential.",
+    "doi_or_url": "https://europhit.eu/",
+    "notes": "Step-by-step deep energy retrofit guidance."
+  },
+  "lbnl-6131e.pdf": {
+    "source_id": "LBNL_6131E_THERMAL_COMFORT_CRITERIA_2012",
+    "source_title": "Guide to Setting Thermal Comfort Criteria and Minimizing Energy Use in Delivering Thermal Comfort",
+    "authors": "Cindy Regnier; Lawrence Berkeley National Laboratory",
+    "year": 2012,
+    "document_type": "thermal_comfort_guide",
+    "citation": "Regnier, Cindy. Guide to Setting Thermal Comfort Criteria and Minimizing Energy Use in Delivering Thermal Comfort. Lawrence Berkeley National Laboratory, LBNL-6131E, August 2012.",
+    "doi_or_url": "",
+    "notes": "Thermal comfort criteria and energy-use reference."
+  },
+  "PassivhausDesignersManualHopfe.pdf": {
+    "source_id": "PASSIVHAUS_DESIGNERS_MANUAL",
+    "source_title": "The Passivhaus Designer's Manual",
+    "authors": "Christina J. Hopfe; Robert S. McLeod",
+    "year": "",
+    "document_type": "design_manual",
+    "citation": "Hopfe, Christina J., and Robert S. McLeod. The Passivhaus Designer's Manual.",
+    "doi_or_url": "",
+    "notes": "Passive House technical design manual."
+  },
+  "Renovation-Strategies-EU-BPIE-2014.pdf": {
+    "source_id": "BPIE_RENOVATION_STRATEGIES_EU_2014",
+    "source_title": "Renovation Strategies of Selected EU Countries: A Status Report on Compliance with Article 4 of the Energy Efficiency Directive",
+    "authors": "Buildings Performance Institute Europe; Dan Staniaszek; Oliver Rapf; Francesco Mariottini; Ralf Lottes",
+    "year": 2014,
+    "document_type": "renovation_policy_report",
+    "citation": "BPIE. Renovation Strategies of Selected EU Countries: A Status Report on Compliance with Article 4 of the Energy Efficiency Directive. 2014.",
+    "doi_or_url": "https://www.bpie.eu/",
+    "notes": "EU renovation strategy policy source."
+  },
+  "Retrofit-Playbook.pdf": {
+    "source_id": "RETROFIT_POLICY_PLAYBOOK_2021",
+    "source_title": "The Retrofit Playbook: Driving Retrofit of Existing Homes",
+    "authors": "Retrofit Policy Playbook authors / local and combined authority retrofit guidance",
+    "year": 2021,
+    "document_type": "retrofit_policy_playbook",
+    "citation": "The Retrofit Playbook: Driving Retrofit of Existing Homes. Version 2.1, February 2021.",
+    "doi_or_url": "",
+    "notes": "Policy and delivery guidance for existing-home retrofit."
+  },
+  "scis_solution_booklet_building_envelope_retrofit.pdf": {
+    "source_id": "SCIS_BUILDING_ENVELOPE_RETROFIT_2020",
+    "source_title": "Building Envelope Retrofit Solution Booklet",
+    "authors": "Yixiao Ma; Han Vandevyvere; EU Smart Cities Information System",
+    "year": 2020,
+    "document_type": "solution_booklet",
+    "citation": "EU Smart Cities Information System. Building Envelope Retrofit Solution Booklet. April 2020.",
+    "doi_or_url": "",
+    "notes": "Earlier SCIS version of building-envelope retrofit solution booklet."
+  },
+  "ta cctp 9imc fullpaper holisticstrategies final.pdf": {
+    "source_id": "IMC2014_HOLISTIC_RETROFIT_STRATEGIES",
+    "source_title": "Holistic Strategies for the Retrofit to Achieve Energy-Efficient Residential Buildings",
+    "authors": "Sonja Geier; Doris Ehrbar; Peter Schwehr",
+    "year": 2014,
+    "document_type": "research_paper",
+    "citation": "Geier, Sonja; Ehrbar, Doris; Schwehr, Peter. Holistic Strategies for the Retrofit to Achieve Energy-Efficient Residential Buildings. 9th International Masonry Conference, Guimaraes, 2014.",
+    "doi_or_url": "",
+    "notes": "Research evidence on holistic residential retrofit strategies."
+  },
+  "62_1_2013_p_20150707.pdf": {
+    "source_id": "ASHRAE_62_1_2013_ADDENDUM_P_2015",
+    "source_title": "ANSI/ASHRAE Addendum p to ANSI/ASHRAE Standard 62.1-2013: Ventilation for Acceptable Indoor Air Quality",
+    "authors": "ASHRAE; American National Standards Institute",
+    "year": 2015,
+    "document_type": "ventilation_standard_addendum",
+    "citation": "ASHRAE. ANSI/ASHRAE Addendum p to ANSI/ASHRAE Standard 62.1-2013: Ventilation for Acceptable Indoor Air Quality. Approved July 2015.",
+    "doi_or_url": "https://www.ashrae.org/",
+    "notes": "Ventilation and indoor air quality standard addendum; useful for ventilation logic and IAQ-related diagnosis assumptions."
+  },
+  "ASHRAE-Standard-55.pdf": {
+    "source_id": "ASHRAE_55_2023",
+    "source_title": "ANSI/ASHRAE Standard 55-2023: Thermal Environmental Conditions for Human Occupancy",
+    "authors": "ASHRAE; American National Standards Institute",
+    "year": 2023,
+    "document_type": "thermal_comfort_standard",
+    "citation": "ASHRAE. ANSI/ASHRAE Standard 55-2023: Thermal Environmental Conditions for Human Occupancy. ASHRAE, 2023.",
+    "doi_or_url": "https://www.ashrae.org/",
+    "notes": "Primary thermal comfort standard source for operative temperature, adaptive comfort, and comfort-zone checks."
+  },
+  "ISO-7243-2017.pdf": {
+    "source_id": "ISO_7243_2017",
+    "source_title": "ISO 7243:2017 Ergonomics of the Thermal Environment: Assessment of Heat Stress Using the WBGT Index",
+    "authors": "International Organization for Standardization",
+    "year": 2017,
+    "document_type": "heat_stress_standard",
+    "citation": "ISO. ISO 7243:2017 Ergonomics of the thermal environment: Assessment of heat stress using the WBGT (wet bulb globe temperature) index. International Organization for Standardization, 2017.",
+    "doi_or_url": "https://www.iso.org/standard/67188.html",
+    "notes": "Primary WBGT and heat-stress benchmark source."
+  },
+  "ISO-7726-1998.pdf": {
+    "source_id": "ISO_7726_1998",
+    "source_title": "ISO 7726:1998 Ergonomics of the Thermal Environment: Instruments for Measuring Physical Quantities",
+    "authors": "International Organization for Standardization",
+    "year": 1998,
+    "document_type": "thermal_environment_measurement_standard",
+    "citation": "ISO. ISO 7726:1998 Ergonomics of the thermal environment: Instruments for measuring physical quantities. International Organization for Standardization, 1998.",
+    "doi_or_url": "https://www.iso.org/standard/14562.html",
+    "notes": "Measurement standard for thermal environment variables. Ingested with pdfminer.six fallback because pypdf reports list index out of range on this local PDF."
+  },
+  "ilide.info-uni-en-16798-1-note-1-pr_df2e0b2e6672cb314bba3e706150d616.pdf": {
+    "source_id": "UNI_EN_16798_1_2019_NOTE",
+    "source_title": "UNI EN 16798-1:2019 Note: Energy Performance of Buildings, Ventilation for Buildings, Indoor Environmental Input Parameters",
+    "authors": "UNI / EN 16798-1 explanatory note source",
+    "year": 2019,
+    "document_type": "indoor_environment_standard_note",
+    "citation": "UNI EN 16798-1:2019 note on energy performance of buildings, ventilation for buildings, and indoor environmental input parameters.",
+    "doi_or_url": "",
+    "notes": "Short explanatory/reference document for EN 16798-1 indoor environmental categories and ventilation/comfort parameters; not the full standard text."
+  }
+}

@@ -1,0 +1,100 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HVRA Risk Map Checkpoint</title>
+  <script type="importmap">{"imports":{"three":"/vendor/three/build/three.module.js"}}</script>
+  <style>
+    :root{--ink:#11110f;--muted:#746d64;--panel:#faf8f2;--line:rgba(20,18,16,.14);--accent:#246b5a}*{box-sizing:border-box}body{margin:0;height:100vh;overflow:hidden;background:#e8e3d8;color:var(--ink);font:400 13px "DM Sans",Arial,sans-serif}.shell{display:grid;grid-template-columns:360px 1fr;height:100vh}.side{background:var(--panel);border-right:1px solid var(--line);padding:16px;overflow:auto}.viewer{position:relative;overflow:hidden;background:#e8e3d8}.label{font:400 10px "DM Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:#8d857b}.title{font-size:13px;margin:7px 0 12px}.note{margin:0 0 12px;color:var(--muted);line-height:1.45}.search{display:grid;grid-template-columns:1fr 42px;border:1px solid var(--line);background:white;height:42px;margin:12px 0}.search input{border:0;outline:0;background:transparent;padding:0 11px}.search button{border:0;border-left:1px solid var(--line);background:#17231f;color:white;cursor:pointer}.panel{border-top:1px solid var(--line);padding:13px 0}.control{display:grid;grid-template-columns:18px 1fr 76px;gap:8px;align-items:center;padding:7px 0}.control input[type=checkbox]{accent-color:var(--accent)}.control input[type=range]{width:76px}.row{display:grid;grid-template-columns:1fr auto;gap:10px;border-top:1px solid rgba(20,18,16,.08);padding:8px 0;color:var(--muted)}.row:first-child{border-top:0}.badge{font:400 10px "DM Mono",monospace;color:#8d857b}.floating{position:absolute;z-index:10;background:rgba(250,248,242,.94);border:1px solid var(--line);box-shadow:0 14px 34px rgba(20,18,16,.1);padding:10px 12px}.top{left:14px;top:14px;width:292px}.legend{right:14px;bottom:14px;width:252px}.compass{right:14px;top:14px;width:148px;text-align:center}.compassDial{position:relative;width:78px;height:78px;margin:8px auto;border:1px solid var(--line);border-radius:50%;background:rgba(255,255,255,.72);overflow:hidden}.compassRose{position:absolute;inset:0;transform-origin:50% 50%}.compassDial span{position:absolute;font:400 10px "DM Mono",monospace;color:#6f675c}.compassDial .n{top:5px;left:50%;transform:translateX(-50%);color:#9b302b}.compassDial .s{bottom:5px;left:50%;transform:translateX(-50%)}.compassDial .e{right:7px;top:50%;transform:translateY(-50%)}.compassDial .w{left:7px;top:50%;transform:translateY(-50%)}.needle{position:absolute;left:50%;top:15px;width:2px;height:28px;background:#9b302b;transform:translateX(-50%)}.needle:before{content:"";position:absolute;left:-4px;top:-3px;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:8px solid #9b302b}.crosshair{position:absolute;left:50%;top:50%;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:#6f675c}.bearing{font:400 10px "DM Mono",monospace;color:#8d857b}.viewButtons{display:grid;grid-template-columns:repeat(3,34px);justify-content:center;gap:5px;margin-top:9px}.viewButtons button{width:34px;height:28px;border:1px solid var(--line);border-radius:7px;background:rgba(255,255,255,.74);color:#4f473d;font:400 10px "DM Mono",monospace;cursor:pointer;box-shadow:0 1px 0 rgba(20,18,16,.05);transition:background .12s ease,color .12s ease,border-color .12s ease}.viewButtons button:hover{background:#fff;color:#11110f;border-color:rgba(20,18,16,.3)}.viewButtons button:active{background:#17231f;color:#fff}.scale{display:grid;grid-template-columns:repeat(5,1fr);height:8px;margin:8px 0;border:1px solid var(--line)}canvas{display:block;width:100%;height:100%}@media(max-width:900px){.shell{grid-template-columns:1fr}.side{height:44vh}.viewer{height:56vh}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <div class="label">risk map checkpoint</div>
+    <div class="title">Precomputed heat context</div>
+    <p class="note">This checkpoint displays backend-precomputed context. The interface does not run live analysis here; it only reviews the simplified result before the room stage.</p>
+    <div class="search"><input id="address" value="Barcelona, Carrer de Mallorca 401"><button id="choose">USE</button></div>
+    <div class="badge" id="status">loading checkpoint</div>
+
+    <section class="panel">
+      <div class="label">map layer</div>
+      <label class="control"><input data-layer="map" type="checkbox" checked><span>site map</span><input data-opacity="map" type="range" min="0" max="1" step="0.05" value="0.72"></label>
+      <label class="control"><input data-layer="boundary" type="checkbox" checked><span>500 m boundary</span><input data-opacity="boundary" type="range" min="0" max="1" step="0.05" value="1"></label>
+    </section>
+
+    <section class="panel">
+      <div class="label">analysis layers</div>
+      <label class="control"><input data-layer="utci" type="checkbox" checked><span>outdoor heat stress</span><input data-opacity="utci" type="range" min="0" max="1" step="0.05" value="0.78"></label>
+      <label class="control"><input data-layer="temperature" type="checkbox"><span>air temperature</span><input data-opacity="temperature" type="range" min="0" max="1" step="0.05" value="0.66"></label>
+      <label class="control"><input data-layer="solar" type="checkbox"><span>solar radiation</span><input data-opacity="solar" type="range" min="0" max="1" step="0.05" value="0.66"></label>
+      <label class="control"><input data-layer="directSun" type="checkbox"><span>direct sun hours</span><input data-opacity="directSun" type="range" min="0" max="1" step="0.05" value="0.66"></label>
+      <label class="control"><input data-layer="wind" type="checkbox"><span>low wind relief</span><input data-opacity="wind" type="range" min="0" max="1" step="0.05" value="0.66"></label>
+      <label class="control"><input data-layer="skyView" type="checkbox"><span>sky-view obstruction</span><input data-opacity="skyView" type="range" min="0" max="1" step="0.05" value="0.62"></label>
+      <label class="control"><input data-layer="canopy" type="checkbox"><span>tree-canopy relief</span><input data-opacity="canopy" type="range" min="0" max="1" step="0.05" value="0.62"></label>
+    </section>
+
+    <section class="panel">
+      <div class="label">3d buildings</div>
+      <label class="control"><input data-layer="buildings" type="checkbox" checked><span>after site chosen</span><input data-opacity="buildings" type="range" min="0" max="1" step="0.05" value="0.84"></label>
+      <label class="control"><input data-layer="footprints" type="checkbox" checked><span>footprint check</span><input data-opacity="footprints" type="range" min="0" max="1" step="0.05" value="0.42"></label>
+      <p class="note" id="buildingNote">Hidden until the site is chosen. The map is fixed north-up; use the compass to understand orientation.</p>
+    </section>
+
+    <section class="panel">
+      <div class="label">analysis result</div>
+      <div id="resultRows"></div>
+    </section>
+  </aside>
+
+  <main class="viewer" id="viewer">
+    <div class="floating top"><div class="label">checkpoint view</div><div id="viewNote">Map and analysis are precomputed. Choose the site to reveal vector-aligned 3D buildings.</div></div>
+    <div class="floating compass"><div class="label">view control</div><div class="compassDial"><div class="compassRose" id="compassRose"><div class="needle"></div><span class="n">N</span><span class="e">E</span><span class="s">S</span><span class="w">W</span></div><div class="crosshair"></div></div><div class="bearing" id="bearingText">north-up map</div><div class="viewButtons"><button data-view="north">N</button><button data-view="top">Top</button><button data-view="east">E</button><button data-view="west">W</button><button data-view="iso">Iso</button><button data-view="south">S</button></div></div>
+    <div class="floating legend"><div class="label">heat scale</div><div class="scale"><span style="background:#4e8d68"></span><span style="background:#c9b765"></span><span style="background:#df8a3b"></span><span style="background:#c96048"></span><span style="background:#8f2f34"></span></div><p class="note">Low to high relative exposure. Layers stay separate.</p></div>
+  </main>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from '/vendor/three/examples/jsm/controls/OrbitControls.js';
+const STUDY=500, HALF=250, MAP_CONTEXT=1000, MAP_HALF=500, MAP_LINE_Y=.18, MAP_FILL_Y=.12, ANALYSIS_Y=.42;
+const BUILDING_CALIBRATION={x:0,z:0};
+const groups={map:new THREE.Group(),boundary:new THREE.Group(),buildings:new THREE.Group(),footprints:new THREE.Group(),utci:new THREE.Group(),solar:new THREE.Group(),directSun:new THREE.Group(),wind:new THREE.Group(),temperature:new THREE.Group(),skyView:new THREE.Group(),canopy:new THREE.Group()};
+const palettes={utci:[0xd6c2df,0xb64740],solar:[0xf2d98b,0xdf8a3b],directSun:[0xf7e5a5,0xc85f31],wind:[0xcbd8df,0x5f6f89],temperature:[0x92b6cf,0xc96048],skyView:[0xd8d2c7,0x75675b],canopy:[0xe6dfd3,0x3f8b5a]};
+let scene,camera,renderer,controls,payload=null,siteChosen=false,renderQueued=false;
+const fmt=(v,s='')=>v===null||v===undefined||v===''?'n/a':`${Number(v).toPrecision(3).replace(/\.0+$/,'')}${s}`;
+function clear(g){while(g.children.length){const o=g.children.pop();o.geometry?.dispose?.();if(Array.isArray(o.material))o.material.forEach(m=>m.dispose?.());else o.material?.dispose?.();}}
+function init(){const el=document.getElementById('viewer');scene=new THREE.Scene();scene.background=new THREE.Color(0xe8e3d8);camera=new THREE.PerspectiveCamera(45,el.clientWidth/el.clientHeight,.1,5000);camera.position.set(430,480,540);renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(el.clientWidth,el.clientHeight);el.prepend(renderer.domElement);controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=false;controls.target.set(0,0,0);controls.minDistance=150;controls.maxDistance=2200;scene.add(new THREE.HemisphereLight(0xfff8ea,0x70665a,1.7));const sun=new THREE.DirectionalLight(0xffedc8,2.1);sun.position.set(-380,700,460);scene.add(sun);Object.values(groups).forEach(g=>scene.add(g));controls.addEventListener('change',requestRender);window.addEventListener('resize',()=>{camera.aspect=el.clientWidth/el.clientHeight;camera.updateProjectionMatrix();renderer.setSize(el.clientWidth,el.clientHeight);requestRender()});requestRender();}
+function updateCompass(){const rose=document.getElementById('compassRose'),text=document.getElementById('bearingText');if(!rose||!camera)return;const north=new THREE.Vector3(0,0,-1);const forward=new THREE.Vector3();camera.getWorldDirection(forward);forward.y=0;forward.normalize();if(!Number.isFinite(forward.x)||!Number.isFinite(forward.z))return;const angle=Math.atan2(north.x*forward.z-north.z*forward.x,north.x*forward.x+north.z*forward.z);const deg=angle*180/Math.PI;rose.style.transform=`rotate(${deg}deg)`;if(text)text.textContent=`view bearing ${Math.round((deg+360)%360)} deg | north = up`}function setView(name){const d=720;if(name==='top')camera.position.set(0,900,.01);else if(name==='north')camera.position.set(0,430,-720);else if(name==='south')camera.position.set(0,430,720);else if(name==='east')camera.position.set(720,430,0);else if(name==='west')camera.position.set(-720,430,0);else camera.position.set(430,480,540);controls.target.set(0,0,0);camera.lookAt(controls.target);controls.update();requestRender()}function requestRender(){if(renderQueued)return;renderQueued=true;requestAnimationFrame(()=>{renderQueued=false;controls.update();updateCompass();renderer.render(scene,camera)})}
+function opacity(id){return Number(document.querySelector(`[data-opacity="${id}"]`)?.value||.7)}
+function makeLine(points,color,alpha,y){const pts=points.map(([x,z])=>new THREE.Vector3(Number(x),y,Number(z))).filter(p=>Number.isFinite(p.x)&&Number.isFinite(p.z));if(pts.length<2)return null;return new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color,transparent:true,opacity:alpha}))}
+function transformPt([x,z]){return [Number(x),Number(z)]}function makeShape(points){const pts=points.map(transformPt).filter(([x,z])=>Number.isFinite(x)&&Number.isFinite(z));if(pts.length<3)return null;return new THREE.Shape(pts.map(([x,z])=>new THREE.Vector2(x,-z)))}
+function makeRawShape(points){const pts=points.map(([x,z])=>[Number(x),Number(z)]).filter(([x,z])=>Number.isFinite(x)&&Number.isFinite(z));if(pts.length<3)return null;return new THREE.Shape(pts.map(([x,z])=>new THREE.Vector2(x,-z)))}
+function addMapLine(points,color,alpha,y){const pts=(points||[]).map(([x,z])=>new THREE.Vector3(Number(x),y,Number(z))).filter(p=>Number.isFinite(p.x)&&Number.isFinite(p.z));if(pts.length<2)return;const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color,transparent:true,opacity:alpha,depthWrite:false,depthTest:true}));line.renderOrder=5;groups.map.add(line)}
+function addMapFill(points,color,alpha,y){const shape=makeRawShape(points||[]);if(!shape)return;const mesh=new THREE.Mesh(new THREE.ShapeGeometry(shape),new THREE.MeshBasicMaterial({color,transparent:true,opacity:alpha,side:THREE.DoubleSide,depthWrite:false,depthTest:true,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1}));mesh.rotation.x=-Math.PI/2;mesh.position.y=y;mesh.renderOrder=4;groups.map.add(mesh)}
+async function buildMap(data){clear(groups.map);const geom=data.visual_context?.geometry||{},context=geom.context_contours||{},local=geom.local_contours||{};const ground=new THREE.Mesh(new THREE.PlaneGeometry(MAP_CONTEXT,MAP_CONTEXT),new THREE.MeshBasicMaterial({color:0xf4f0e7,transparent:true,opacity:opacity('map'),side:THREE.DoubleSide,depthWrite:false}));ground.rotation.x=-Math.PI/2;ground.position.y=-.12;groups.map.add(ground);for(const b of (context.building_outlines||[])){addMapFill(b.points_m,0xd8d0c0,Math.min(.34,opacity('map')*.48),MAP_FILL_Y)}for(const r of (context.roads||[])){addMapLine(r.points_m,0xffffff,Math.min(.86,opacity('map')*.95),MAP_LINE_Y)}for(const r of (context.roads||[])){addMapLine(r.points_m,0xcfc6b8,Math.min(.38,opacity('map')*.5),MAP_LINE_Y+.012)}for(const b of (local.building_outlines||[])){addMapLine(b.points_m,0x8f8678,Math.min(.58,opacity('map')*.7),MAP_LINE_Y+.024)}const edge=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(MAP_CONTEXT,1,MAP_CONTEXT)),new THREE.LineBasicMaterial({color:0x8d857b,transparent:true,opacity:.45}));edge.position.y=.15;groups.map.add(edge)}
+function buildBoundary(){clear(groups.boundary);const edges=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(STUDY,1,STUDY)),new THREE.LineBasicMaterial({color:0x155f4d,transparent:true,opacity:1}));edges.position.y=.78;groups.boundary.add(edges)}
+function buildGrid(id,grid){clear(groups[id]);const cells=grid?.cells||[],n=grid?.grid_size||50,cell=STUDY/n,c0=new THREE.Color(palettes[id][0]),c1=new THREE.Color(palettes[id][1]);for(const item of cells){const v=Math.max(0,Math.min(1,Number(item.value)||0));const mat=new THREE.MeshBasicMaterial({color:c0.clone().lerp(c1,v),transparent:true,opacity:opacity(id),side:THREE.DoubleSide,depthWrite:false,depthTest:true,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});const mesh=new THREE.Mesh(new THREE.PlaneGeometry(cell,cell),mat);mesh.rotation.x=-Math.PI/2;mesh.position.set(-HALF+(item.x+.5)*cell,ANALYSIS_Y,-HALF+(item.y+.5)*cell);mesh.renderOrder=8;groups[id].add(mesh)}}
+function buildAnalysis(data){const grids=data.visual_context?.contextual_grids||{};buildGrid('utci',grids.utci);buildGrid('temperature',grids.temperature);buildGrid('solar',grids.solar);buildGrid('directSun',grids.direct_sun);buildGrid('wind',grids.wind_stagnation);buildGrid('skyView',grids.sky_view);buildGrid('canopy',grids.canopy)}
+function buildFootprints(data){clear(groups.footprints);if(!siteChosen)return;const source=data.visual_context?.geometry?.osm_aligned_buildings||{};for(const b of (source.buildings||[])){const shape=makeShape(b.footprint_m||[]);if(!shape)continue;const mesh=new THREE.Mesh(new THREE.ShapeGeometry(shape),new THREE.MeshBasicMaterial({color:0x0f6b55,transparent:true,opacity:opacity('footprints'),side:THREE.DoubleSide,depthWrite:false}));mesh.rotation.x=-Math.PI/2;mesh.position.y=.9;groups.footprints.add(mesh)}}function buildBuildings(data){clear(groups.buildings);if(!siteChosen)return;const source=data.visual_context?.geometry?.osm_aligned_buildings||{};for(const b of (source.buildings||[])){const shape=makeShape(b.footprint_m||[]);if(!shape)continue;const h=Math.max(2,Math.min(55,Number(b.height_m)||9));const geo=new THREE.ExtrudeGeometry(shape,{depth:h,bevelEnabled:false});geo.rotateX(-Math.PI/2);const mat=new THREE.MeshStandardMaterial({color:0xaaa193,roughness:.86,transparent:true,opacity:opacity('buildings')});const mesh=new THREE.Mesh(geo,mat);mesh.renderOrder=30;groups.buildings.add(mesh);const edge=new THREE.LineSegments(new THREE.EdgesGeometry(geo),new THREE.LineBasicMaterial({color:0x3b352e,transparent:true,opacity:.22}));edge.renderOrder=31;groups.buildings.add(edge)}groups.buildings.userData.drawn=(source.buildings||[]).length}
+function sync(){for(const id of Object.keys(groups)){const box=document.querySelector(`[data-layer="${id}"]`);if(box)groups[id].visible=box.checked;if(id==='buildings')groups[id].visible=siteChosen&&(box?.checked??true);groups[id].children.forEach(o=>{if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.opacity=opacity(id));else o.material.opacity=opacity(id)}})}requestRender()}
+function renderText(data){const m=data.metrics||{},ia=data.visual_context?.infrared_analysis||{},geom=data.visual_context?.geometry||{},raw=ia.raw_grid_status||{};document.getElementById('resultRows').innerHTML=[['Infrared analysis',ia.available?'available':'missing'],['raw raster cells',Object.values(raw).some(v=>v.has_raw_cells)?'available':'summary only'],['Infrared heat',fmt(ia.heat_exposure_score)],['UTCI mean',fmt(m.utci_mean_c,' C')],['UTCI max',fmt(raw.utci?.max,' C')],['solar mean',fmt(raw.solar_radiation?.mean,' W/m2')],['direct sun',fmt(raw.direct_sun_hours?.mean,' h')],['wind mean',fmt(raw.wind_speed?.mean,' m/s')],['sky view',fmt(raw.sky_view_factor?.mean)],['map layer','OSM vector site map'],['3D buildings',siteChosen?(geom.osm_aligned_buildings?.buildings||[]).length:'hidden'],['alignment','shared OSM vector frame']].map(([a,b])=>`<div class="row"><span>${a}</span><strong>${b}</strong></div>`).join('');document.getElementById('viewNote').textContent=siteChosen?'Site chosen. Roads, map outlines, and 3D buildings now use one OSM vector frame.':'Map and analysis are precomputed. Choose the site to reveal vector-aligned 3D buildings.';document.getElementById('buildingNote').textContent=siteChosen?'3D buildings are shown on a fixed north-up site map.':'Hidden until the site is chosen.';document.getElementById('status').textContent=data.backend?.source||'precomputed visual checkpoint'}
+async function render(data){payload=data;await buildMap(data);buildBoundary();buildAnalysis(data);buildFootprints(data);buildBuildings(data);sync();renderText(data);requestRender()}
+async function loadCheckpoint(){const res=await fetch('/interface/risk_map_3d_test/risk_map_context.json?v=checkpoint');return await res.json()}
+document.getElementById('choose').onclick=async()=>{siteChosen=true;if(payload){payload.site={...(payload.site||{}),address:document.getElementById('address').value};await render(payload)}};document.querySelectorAll('input').forEach(i=>i.addEventListener('input',()=>sync()));document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));init();loadCheckpoint().then(data=>render(data));
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

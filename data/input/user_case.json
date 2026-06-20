@@ -1,0 +1,22 @@
+{
+  "case_id": "CASE_001",
+  "vulnerability_type": "elderly_heat_risk",
+  "user_intention": "Find low-cost retrofit options to reduce bedroom overheating at night.",
+  "occupant_profile": {
+    "age_group": "75_plus",
+    "has_ac": false,
+    "mobility_level": "limited",
+    "income_sensitivity": "high",
+    "time_spent_at_home": "most_of_day",
+    "sleep_sensitivity": "high"
+  },
+  "priority": {
+    "main_goal": "reduce_night_heat_risk",
+    "secondary_goal": "low_cost",
+    "avoid": [
+      "high_disruption",
+      "major_structural_work"
+    ]
+  },
+  "latest_user_message": "pls continue"
+}

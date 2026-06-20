@@ -1,0 +1,176 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>type hierarchy check</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=DM+Sans:wght@400&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --ink-primary: #0a0a0a;
+        --ink-tertiary: #8a8a8a;
+        --surface-primary: #ffffff;
+        --surface-secondary: #f5f4f2;
+        --surface-tertiary: #e8e6e1;
+        --border: rgba(0, 0, 0, 0.1);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--surface-secondary);
+        color: var(--ink-primary);
+        font: 400 13px "DM Sans", Arial, sans-serif;
+      }
+
+      .level-1 {
+        color: var(--ink-tertiary);
+        font: 400 10.5px "DM Mono", monospace;
+        letter-spacing: 0.1em;
+        text-transform: lowercase;
+      }
+
+      .level-2 {
+        color: var(--ink-primary);
+        font: 400 13px "DM Sans", Arial, sans-serif;
+      }
+
+      .level-3 {
+        color: var(--ink-tertiary);
+        font: 400 10px "DM Mono", monospace;
+      }
+
+      main {
+        display: grid;
+        gap: 16px;
+        margin: 0 auto;
+        max-width: 980px;
+        padding: 28px;
+      }
+
+      .panel {
+        background: var(--surface-primary);
+        border: 1px solid var(--border);
+        display: grid;
+        gap: 14px;
+        padding: 18px;
+      }
+
+      .row {
+        align-items: start;
+        border-top: 1px solid var(--border);
+        display: grid;
+        gap: 12px;
+        grid-template-columns: 160px 1fr 220px;
+        padding-top: 14px;
+      }
+
+      .sample-ui {
+        background: var(--surface-secondary);
+        border: 1px solid var(--border);
+        display: grid;
+        gap: 12px;
+        padding: 14px;
+      }
+
+      .viewer-panel {
+        background: var(--surface-secondary);
+        border: 1px solid var(--border);
+        display: grid;
+        gap: 12px;
+        padding: 12px;
+      }
+
+      .fold-section {
+        background: var(--surface-primary);
+        border-bottom: 1px solid var(--border);
+        padding: 10px 12px;
+      }
+
+      .fold-header {
+        align-items: center;
+        background: transparent;
+        border: 0;
+        color: var(--ink-tertiary);
+        display: flex;
+        font: 400 10.5px "DM Mono", monospace;
+        justify-content: space-between;
+        letter-spacing: 0.1em;
+        padding: 0;
+        text-transform: lowercase;
+        width: 100%;
+      }
+
+      .fold-body {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .badge {
+        background: var(--surface-tertiary);
+        border: 1px solid var(--border);
+        display: inline-flex;
+        padding: 4px 6px;
+        width: fit-content;
+      }
+
+      @media (max-width: 760px) {
+        main { padding: 16px; }
+        .row { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="panel">
+        <div class="level-1">type hierarchy</div>
+        <div class="level-2">Use only these three text levels across the interface, room viewer, links viewer, risk map view, validation view, and report preview.</div>
+        <div class="level-3">DM Mono / DM Sans check page</div>
+
+        <div class="row">
+          <div class="level-1">level 1</div>
+          <div class="level-2">Section names such as site map, room, links, check, report, orientation, room check, and surfaces.</div>
+          <div class="level-3">DM Mono 10.5px / tertiary / 0.10em</div>
+        </div>
+
+        <div class="row">
+          <div class="level-1">level 2</div>
+          <div class="level-2">Body copy, chat messages, diagnosis descriptions, report explanations, and user-facing instructions.</div>
+          <div class="level-3">DM Sans 13px / primary</div>
+        </div>
+
+        <div class="row">
+          <div class="level-1">level 3</div>
+          <div class="level-2"><span class="level-3 badge">pending</span> <span class="level-3 badge">12:40</span> <span class="level-3 badge">confidence 0.82</span></div>
+          <div class="level-3">DM Mono 10px / tertiary</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="level-1">foldable section</div>
+        <div class="viewer-panel">
+          <section class="fold-section">
+            <button class="fold-header" type="button">
+              <span>site map</span>
+              <span>&#9662;</span>
+            </button>
+            <div class="fold-body">
+              <span class="level-3 badge">500 m boundary</span>
+              <span class="level-3 badge">3d buildings</span>
+              <span class="level-3 badge">analysis layers</span>
+            </div>
+          </section>
+          <div class="level-2">This sample shows the separated/foldable panel style now used by Phase 1.5.</div>
+          <div class="level-3">same hierarchy, separated panel, no boxed tab</div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
+

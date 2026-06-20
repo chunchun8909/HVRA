@@ -1,0 +1,135 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>phase 1.5 site check</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=DM+Sans:wght@400&display=swap" rel="stylesheet" />
+    <style>
+      :root{--ink-primary:#0a0a0a;--ink-secondary:#4d4d4d;--ink-tertiary:#8a8a8a;--surface-primary:#fff;--surface-secondary:#f5f4f2;--surface-tertiary:#e8e6e1;--border:rgba(0,0,0,.1);--border-strong:rgba(0,0,0,.24);--accent:#17231f}*{box-sizing:border-box}body{margin:0;height:100vh;overflow:hidden;background:var(--surface-primary);color:var(--ink-primary);font:400 13px "DM Sans",Arial,sans-serif}.type-level-1{color:var(--ink-tertiary);font:400 10.5px "DM Mono",monospace;letter-spacing:.1em;text-transform:lowercase}.type-level-2{color:var(--ink-primary);font:400 13px "DM Sans",Arial,sans-serif}.type-level-3{color:var(--ink-tertiary);font:400 10px "DM Mono",monospace}.shell{display:grid;height:100vh;grid-template-columns:var(--left-width,46%) 8px calc(100% - var(--left-width,46%) - 8px)}.chat-panel{background:var(--surface-primary);border-right:1px solid var(--border);display:flex;min-width:0;overflow:hidden}.chat-inner{display:flex;flex-direction:column;height:100%;min-width:0;width:100%}.status{background:var(--surface-primary);border-bottom:1px solid var(--border);padding:8px 20px}.status-row{align-items:center;display:flex;gap:16px;justify-content:space-between}.stage-pill{background:var(--surface-secondary);border:1px solid var(--border);border-radius:999px;padding:4px 12px}.tasks{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px}.task{align-items:center;display:flex;gap:8px}.task-dot{border:1px solid var(--border-strong);border-radius:50%;height:12px;width:12px}.task.done .task-dot{background:var(--surface-secondary);border-color:var(--border)}.messages{flex:1;min-height:0;overflow:auto;padding:20px}.message-stack{display:grid;gap:16px}.message-row{display:flex}.message-row.agent{justify-content:flex-start}.message-row.user{justify-content:flex-end}.message-wrap{max-width:90%}.message-label{margin:0 0 8px}.bubble{line-height:1.65;padding:12px}.agent .bubble{background:var(--surface-secondary);border-radius:3px 7px 7px 7px}.user .bubble{background:var(--ink-primary);border-radius:7px 3px 7px 7px;color:var(--surface-primary)}.composer{background:var(--surface-primary);border-top:1px solid var(--border);padding:12px 20px}.mini-fields{display:grid;gap:8px;grid-template-columns:repeat(3,1fr);margin-bottom:8px}.mini-fields input,.composer textarea{background:var(--surface-secondary);border:1px solid var(--border);border-radius:2px;color:var(--ink-primary);font:400 10px "DM Mono",monospace;min-width:0;outline:none;padding:8px}.uploads{display:flex;flex-wrap:wrap;gap:8px}.upload{align-items:center;background:var(--surface-secondary);border:1px dashed var(--border-strong);border-radius:2px;display:inline-flex;flex:1 1 148px;gap:8px;height:40px;justify-content:space-between;max-width:168px;padding:0 12px}.compose-row{align-items:flex-end;display:flex;gap:8px;margin-top:12px}.composer textarea{font:400 13px "DM Sans",Arial,sans-serif;min-height:40px;max-height:106px;resize:none;width:100%}.send{align-items:center;background:var(--ink-primary);border:0;border-radius:2px;color:var(--surface-primary);display:inline-flex;flex-shrink:0;height:40px;justify-content:center;width:40px}.divider{background:var(--surface-tertiary);cursor:col-resize}.viewer-panel{background:var(--surface-primary);display:flex;min-width:0;overflow:hidden}.viewer-inner{display:flex;flex-direction:column;height:100%;min-width:0;width:100%}.site-section{background:var(--surface-primary);border-bottom:1px solid var(--border);padding:10px 20px}.site-section.is-collapsed{padding:5px 20px}.site-header{align-items:center;background:transparent;border:0;color:var(--ink-tertiary);display:flex;font:400 10.5px "DM Mono",monospace;gap:12px;justify-content:space-between;letter-spacing:.1em;padding:0;text-align:left;text-transform:lowercase;width:100%}.site-section.is-collapsed .site-header{background:var(--surface-secondary);border:1px solid var(--border);border-radius:100px;padding:5px 10px;width:82px}.site-section.is-collapsed .site-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.site-body{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.site-pill{background:var(--surface-secondary);border:1px solid var(--border);border-radius:100px;padding:5px 8px}.viewer-body{background:var(--surface-secondary);flex:1;min-height:0;overflow:hidden;padding:12px}.viewer-frame{background:var(--surface-primary);border:1px solid var(--border);height:100%;overflow:hidden}iframe{border:0;height:100%;width:100%}@media(max-width:1000px){.shell{grid-template-columns:1fr}.divider{display:none}.viewer-panel{height:58vh}.chat-panel{height:42vh}}
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="chat-panel" aria-label="llm site checkpoint">
+        <div class="chat-inner">
+          <div class="status">
+            <div class="status-row">
+              <p class="type-level-1">status</p>
+              <span class="type-level-3 stage-pill">site context</span>
+            </div>
+            <div class="tasks">
+              <div class="task done"><span class="task-dot"></span><p class="type-level-3">location</p></div>
+              <div class="task"><span class="task-dot"></span><p class="type-level-3">site context</p></div>
+              <div class="task"><span class="task-dot"></span><p class="type-level-3">room type</p></div>
+              <div class="task"><span class="task-dot"></span><p class="type-level-3">area</p></div>
+              <div class="task"><span class="task-dot"></span><p class="type-level-3">height</p></div>
+              <div class="task"><span class="task-dot"></span><p class="type-level-3">pano image</p></div>
+              <div class="task"><span class="task-dot"></span><p class="type-level-3">window view</p></div>
+              <div class="task"><span class="task-dot"></span><p class="type-level-3">resident profile</p></div>
+            </div>
+          </div>
+
+          <div class="messages">
+            <div class="message-stack">
+              <div class="message-row agent">
+                <div class="message-wrap">
+                  <p class="type-level-3 message-label">hvra agent</p>
+                  <div class="type-level-2 bubble">I have prepared the site risk map from the selected location. Please check whether the 500 m boundary, site map, and 3D building context look reasonable before we continue.</div>
+                </div>
+              </div>
+              <div class="message-row agent">
+                <div class="message-wrap">
+                  <p class="type-level-3 message-label">hvra agent</p>
+                  <div class="type-level-2 bubble">Use the analysis layers to inspect outdoor heat stress, air temperature, solar radiation, direct sun hours, low wind relief, sky-view obstruction, and tree-canopy relief.</div>
+                </div>
+              </div>
+              <div class="message-row user">
+                <div class="message-wrap">
+                  <p class="type-level-3 message-label">you</p>
+                  <div class="type-level-2 bubble">If the location or site context looks wrong, I will describe the correction. If it looks correct, I will confirm the site context and continue to the room check.</div>
+                </div>
+              </div>
+              <div class="message-row agent">
+                <div class="message-wrap">
+                  <p class="type-level-3 message-label">hvra agent</p>
+                  <div class="type-level-2 bubble">Required checkpoint: confirm site context before Phase 2. This feeds the diagnosis engine with climate, outdoor heat, shading, vegetation, wind, and surrounding-building assumptions.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="composer">
+            <div class="mini-fields">
+              <input value="" placeholder="room" aria-label="room" />
+              <input value="" placeholder="m2" aria-label="area" />
+              <input value="" placeholder="height" aria-label="height" />
+            </div>
+            <div class="uploads">
+              <div class="upload type-level-3"><span>pano image</span><span>choose</span></div>
+              <div class="upload type-level-3"><span>window view</span><span>choose</span></div>
+            </div>
+            <div class="compose-row">
+              <textarea rows="1" placeholder="type revision request or confirm site context"></textarea>
+              <button class="send" type="button" aria-label="send">
+                <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h13"/><path d="m13 6 6 6-6 6"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="divider" id="dragDivider" aria-hidden="true"></div>
+
+      <section class="viewer-panel" aria-label="risk map review">
+        <div class="viewer-inner">
+          <section class="site-section" id="siteMapSection">
+            <button class="site-header" id="siteMapToggle" type="button" aria-expanded="true" aria-controls="siteMapBody">
+              <span class="site-title">site map</span>
+              <span id="siteMapArrow">&#9662;</span>
+            </button>
+            <div class="site-body" id="siteMapBody">
+              <span class="type-level-3 site-pill">500 m boundary</span>
+              <span class="type-level-3 site-pill">3d buildings</span>
+              <span class="type-level-3 site-pill">analysis layers</span>
+            </div>
+          </section>
+          <div class="viewer-body">
+            <div class="viewer-frame">
+              <iframe title="risk map view" src="risk_map_3d_test.html?embedded=1"></iframe>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+      <script>
+      const shell = document.querySelector(".shell");
+      const divider = document.getElementById("dragDivider");
+      const siteSection = document.getElementById("siteMapSection");
+      const siteToggle = document.getElementById("siteMapToggle");
+      const siteBody = document.getElementById("siteMapBody");
+      const siteArrow = document.getElementById("siteMapArrow");
+      let dragging = false;
+      siteToggle.addEventListener("click", () => {
+        const collapsed = !siteBody.hidden;
+        siteBody.hidden = collapsed;
+        siteSection.classList.toggle("is-collapsed", collapsed);
+        siteToggle.setAttribute("aria-expanded", String(!collapsed));
+        siteArrow.textContent = collapsed ? "\u25b8" : "\u25be";
+      });
+      divider.addEventListener("mousedown", () => { dragging = true; });
+      window.addEventListener("mouseup", () => { dragging = false; });
+      window.addEventListener("mousemove", (event) => {
+        if (!dragging) return;
+        const pct = (event.clientX / window.innerWidth) * 100;
+        shell.style.setProperty("--left-width", `${Math.min(70, Math.max(30, pct))}%`);
+      });
+    </script>
+  </body>
+</html>
+
+
+
+

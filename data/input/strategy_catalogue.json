@@ -1,0 +1,844 @@
+{
+  "catalogue_id": "HVRA_STRATEGY_LIBRARY_V1",
+  "source_reference": "HVRA_build_reference_4.md",
+  "notes": [
+    "Static strategy catalogue used before LLM ranking.",
+    "LLM should rank and explain only strategies supplied by this catalogue/evidence stage.",
+    "Delta temperature values are screening ranges, not simulation outputs."
+  ],
+  "strategies": [
+    {
+      "strategy_id": "external_shading_louvers",
+      "strategy_name": "External louvers / brise-soleil",
+      "category": "shading",
+      "scope": "room",
+      "target_components": [
+        "window",
+        "external_wall"
+      ],
+      "applicable_facades": [
+        "SW",
+        "SE",
+        "S"
+      ],
+      "delta_t_min_c": 2.0,
+      "delta_t_max_c": 4.0,
+      "cost_eur_m2_min": 150,
+      "cost_eur_m2_max": 250,
+      "carbon_kgco2e_m2_min": 10,
+      "carbon_kgco2e_m2_max": 15,
+      "applicability_conditions": [
+        "solar_gain_score > 0.6",
+        "SW/SE/S facade",
+        "no heritage protection flag"
+      ],
+      "constraint_tags": [
+        "facade_modification",
+        "permission_likely",
+        "medium_cost"
+      ],
+      "keywords": [
+        "solar",
+        "shading",
+        "external",
+        "louvers",
+        "brise soleil",
+        "window",
+        "facade"
+      ],
+      "restriction": "May be restricted when facade modification, heritage protection, or external permissions are not allowed.",
+      "notes": "Intercepts radiation before it enters glazing; normally more effective than internal shading.",
+      "literature_source": "IDAE (2011); Henze et al. (2004), Energy and Buildings",
+      "effect_profile_id": "external_shading"
+    },
+    {
+      "strategy_id": "internal_blinds",
+      "strategy_name": "Internal roller blinds",
+      "category": "shading",
+      "scope": "room",
+      "target_components": [
+        "window"
+      ],
+      "applicable_facades": [
+        "N",
+        "NE",
+        "E",
+        "SE",
+        "S",
+        "SW",
+        "W",
+        "NW"
+      ],
+      "delta_t_min_c": 0.5,
+      "delta_t_max_c": 1.0,
+      "cost_eur_m2_min": 20,
+      "cost_eur_m2_max": 50,
+      "carbon_kgco2e_m2_min": 2,
+      "carbon_kgco2e_m2_max": 4,
+      "applicability_conditions": [
+        "always eligible as low-cost fallback"
+      ],
+      "constraint_tags": [
+        "low_cost",
+        "reversible",
+        "renter_friendly",
+        "low_disruption"
+      ],
+      "keywords": [
+        "solar",
+        "shading",
+        "internal",
+        "blind",
+        "window",
+        "low cost",
+        "renter"
+      ],
+      "restriction": "Lower cooling effectiveness than external shading because radiation has already entered the room.",
+      "notes": "Rank last among shading options when external options are feasible.",
+      "literature_source": "ASHRAE Fundamentals Handbook, internal shading SHGC reduction tables",
+      "effect_profile_id": "internal_blinds"
+    },
+    {
+      "strategy_id": "solar_control_glazing",
+      "strategy_name": "Solar control glazing replacement",
+      "category": "glazing",
+      "scope": "room",
+      "target_components": [
+        "window"
+      ],
+      "applicable_facades": [
+        "SW",
+        "SE",
+        "S",
+        "W"
+      ],
+      "delta_t_min_c": 1.0,
+      "delta_t_max_c": 2.0,
+      "cost_eur_m2_min": 200,
+      "cost_eur_m2_max": 400,
+      "carbon_kgco2e_m2_min": 18,
+      "carbon_kgco2e_m2_max": 25,
+      "applicability_conditions": [
+        "solar_gain_score > 0.5",
+        "glazing era pre-2000"
+      ],
+      "constraint_tags": [
+        "full_window_replacement",
+        "higher_cost",
+        "permission_possible"
+      ],
+      "keywords": [
+        "solar",
+        "glazing",
+        "window",
+        "SHGC",
+        "low g",
+        "replacement"
+      ],
+      "restriction": "May be unsuitable where full window replacement is excluded or tenancy restrictions apply.",
+      "notes": "Best when existing glazing has high solar heat gain coefficient.",
+      "literature_source": "CTE DB-HE 2022; Perez-Lombard et al. (2008), Energy and Buildings",
+      "effect_profile_id": "solar_control_glazing"
+    },
+    {
+      "strategy_id": "green_pergola",
+      "strategy_name": "Green pergola / climbing vegetation",
+      "category": "green_shading",
+      "scope": "room",
+      "target_components": [
+        "external_wall",
+        "window",
+        "balcony"
+      ],
+      "applicable_facades": [
+        "SW",
+        "SE",
+        "S"
+      ],
+      "delta_t_min_c": 1.0,
+      "delta_t_max_c": 2.0,
+      "cost_eur_m2_min": 80,
+      "cost_eur_m2_max": 150,
+      "carbon_kgco2e_m2_min": -1,
+      "carbon_kgco2e_m2_max": 0,
+      "applicability_conditions": [
+        "ground floor or accessible terrace/balcony required"
+      ],
+      "constraint_tags": [
+        "facade_modification",
+        "maintenance_required",
+        "permission_likely"
+      ],
+      "keywords": [
+        "green",
+        "pergola",
+        "vegetation",
+        "climbing",
+        "facade",
+        "shading"
+      ],
+      "restriction": "Requires outdoor access, maintenance, and permission for facade or balcony intervention.",
+      "notes": "Adds shading plus local evaporative cooling benefit.",
+      "literature_source": "Perez et al. (2011), Energy and Buildings",
+      "effect_profile_id": "green_pergola"
+    },
+    {
+      "strategy_id": "window_enlargement",
+      "strategy_name": "Window enlargement",
+      "category": "ventilation",
+      "scope": "room",
+      "target_components": [
+        "window",
+        "external_wall"
+      ],
+      "applicable_facades": [
+        "N",
+        "NE",
+        "E",
+        "SE",
+        "S",
+        "SW",
+        "W",
+        "NW"
+      ],
+      "delta_t_min_c": 1.0,
+      "delta_t_max_c": 3.0,
+      "cost_eur_m2_min": 300,
+      "cost_eur_m2_max": 600,
+      "carbon_kgco2e_m2_min": 25,
+      "carbon_kgco2e_m2_max": 40,
+      "applicability_conditions": [
+        "cross_ventilation_direct = false",
+        "exterior_facades >= 1",
+        "structural feasibility"
+      ],
+      "constraint_tags": [
+        "major_structural_change",
+        "facade_modification",
+        "higher_cost",
+        "permission_likely"
+      ],
+      "keywords": [
+        "ventilation",
+        "window enlargement",
+        "opening",
+        "cross ventilation",
+        "structural"
+      ],
+      "restriction": "Requires structural check and is unsuitable when major structural change is excluded.",
+      "notes": "Only useful when it creates or improves a meaningful ventilation path.",
+      "literature_source": "EN 15242; Givoni (1992), Energy and Buildings",
+      "effect_profile_id": "window_enlargement"
+    },
+    {
+      "strategy_id": "interior_opening_improvement",
+      "strategy_name": "Interior opening / transom addition",
+      "category": "ventilation",
+      "scope": "room",
+      "target_components": [
+        "door",
+        "interior_partition"
+      ],
+      "applicable_facades": [],
+      "delta_t_min_c": 0.5,
+      "delta_t_max_c": 1.5,
+      "cost_eur_m2_min": 15,
+      "cost_eur_m2_max": 30,
+      "carbon_kgco2e_m2_min": 1,
+      "carbon_kgco2e_m2_max": 3,
+      "applicability_conditions": [
+        "secondary_path_possible = true"
+      ],
+      "constraint_tags": [
+        "low_cost",
+        "low_disruption",
+        "interior_work"
+      ],
+      "keywords": [
+        "ventilation",
+        "interior opening",
+        "transom",
+        "door",
+        "secondary path",
+        "stack effect"
+      ],
+      "restriction": "Only applies when a secondary internal airflow path can be made safely.",
+      "notes": "Creates partial stack-effect ventilation path with low disruption.",
+      "literature_source": "Allard (1998), Natural Ventilation in Buildings",
+      "effect_profile_id": "interior_opening_improvement"
+    },
+    {
+      "strategy_id": "stack_effect_roof_vent",
+      "strategy_name": "Stack-effect roof vent",
+      "category": "ventilation",
+      "scope": "room",
+      "target_components": [
+        "roof",
+        "ceiling"
+      ],
+      "applicable_facades": [],
+      "delta_t_min_c": 1.0,
+      "delta_t_max_c": 2.0,
+      "cost_eur_m2_min": 100,
+      "cost_eur_m2_max": 200,
+      "carbon_kgco2e_m2_min": 5,
+      "carbon_kgco2e_m2_max": 8,
+      "applicability_conditions": [
+        "roof_exposed = true",
+        "top floor or upper floors"
+      ],
+      "constraint_tags": [
+        "roof_work",
+        "permission_possible"
+      ],
+      "keywords": [
+        "ventilation",
+        "stack effect",
+        "roof vent",
+        "top floor",
+        "chimney"
+      ],
+      "restriction": "Only applies to roof-exposed or upper-floor rooms with feasible vertical exhaust path.",
+      "notes": "Can improve buoyancy-driven ventilation during warm periods.",
+      "literature_source": "Santamouris and Asimakopoulos (1996), Passive Cooling of Buildings",
+      "effect_profile_id": "stack_effect_roof_vent"
+    },
+    {
+      "strategy_id": "night_purge_ventilation",
+      "strategy_name": "Night purge ventilation behavioural protocol",
+      "category": "ventilation",
+      "scope": "room",
+      "target_components": [
+        "window"
+      ],
+      "applicable_facades": [
+        "N",
+        "NE",
+        "E",
+        "SE",
+        "S",
+        "SW",
+        "W",
+        "NW"
+      ],
+      "delta_t_min_c": 1.0,
+      "delta_t_max_c": 2.0,
+      "cost_eur_m2_min": 0,
+      "cost_eur_m2_max": 0,
+      "carbon_kgco2e_m2_min": 0,
+      "carbon_kgco2e_m2_max": 0,
+      "applicability_conditions": [
+        "nocturnal_recovery_fail = true",
+        "EPW July overnight minimum < 22 C"
+      ],
+      "constraint_tags": [
+        "low_cost",
+        "reversible",
+        "behavioural",
+        "renter_friendly"
+      ],
+      "keywords": [
+        "ventilation",
+        "night",
+        "purge",
+        "nocturnal",
+        "behaviour",
+        "low cost"
+      ],
+      "restriction": "Exclude when outdoor heatwave night air remains too warm, or security/noise constraints prevent safe opening.",
+      "notes": "Targets nocturnal recovery more than daytime peak temperature.",
+      "literature_source": "Blondeau et al. (1997), Solar Energy",
+      "effect_profile_id": "night_purge_ventilation"
+    },
+    {
+      "strategy_id": "external_wall_insulation_etics",
+      "strategy_name": "External wall insulation - ETICS system",
+      "category": "envelope",
+      "scope": "room",
+      "target_components": [
+        "external_wall"
+      ],
+      "applicable_facades": [
+        "N",
+        "NE",
+        "E",
+        "SE",
+        "S",
+        "SW",
+        "W",
+        "NW"
+      ],
+      "delta_t_min_c": 1.0,
+      "delta_t_max_c": 2.0,
+      "cost_eur_m2_min": 80,
+      "cost_eur_m2_max": 150,
+      "carbon_kgco2e_m2_min": 8,
+      "carbon_kgco2e_m2_max": 12,
+      "applicability_conditions": [
+        "wall_U_value > 1.2",
+        "exterior facade"
+      ],
+      "constraint_tags": [
+        "facade_modification",
+        "permission_likely",
+        "medium_cost"
+      ],
+      "keywords": [
+        "insulation",
+        "external wall",
+        "ETICS",
+        "envelope",
+        "U-value"
+      ],
+      "restriction": "Usually restricted by heritage, facade permission, or community approval.",
+      "notes": "Improves conductive heat transfer but may not solve solar gain alone.",
+      "literature_source": "IDAE (2016); CTE DB-HE 2022",
+      "effect_profile_id": "external_wall_insulation"
+    },
+    {
+      "strategy_id": "roof_insulation",
+      "strategy_name": "Roof insulation membrane",
+      "category": "envelope",
+      "scope": "room",
+      "target_components": [
+        "roof",
+        "ceiling"
+      ],
+      "applicable_facades": [],
+      "delta_t_min_c": 1.0,
+      "delta_t_max_c": 3.0,
+      "cost_eur_m2_min": 40,
+      "cost_eur_m2_max": 80,
+      "carbon_kgco2e_m2_min": 6,
+      "carbon_kgco2e_m2_max": 10,
+      "applicability_conditions": [
+        "roof_exposed = true",
+        "roof_U_value > 1.5"
+      ],
+      "constraint_tags": [
+        "roof_work",
+        "medium_cost"
+      ],
+      "keywords": [
+        "roof",
+        "insulation",
+        "membrane",
+        "top floor",
+        "U-value",
+        "envelope"
+      ],
+      "restriction": "Only relevant for roof-exposed/top-floor rooms.",
+      "notes": "Can be combined with cool roof coating.",
+      "literature_source": "IDAE (2016); Synnefa et al. (2007), Energy and Buildings",
+      "effect_profile_id": "roof_insulation"
+    },
+    {
+      "strategy_id": "cool_roof_coating",
+      "strategy_name": "Cool roof reflective coating",
+      "category": "cool_surface",
+      "scope": "room",
+      "target_components": [
+        "roof",
+        "ceiling"
+      ],
+      "applicable_facades": [],
+      "delta_t_min_c": 1.0,
+      "delta_t_max_c": 2.0,
+      "cost_eur_m2_min": 15,
+      "cost_eur_m2_max": 30,
+      "carbon_kgco2e_m2_min": 2,
+      "carbon_kgco2e_m2_max": 4,
+      "applicability_conditions": [
+        "roof_exposed = true",
+        "flat roof confirmed"
+      ],
+      "constraint_tags": [
+        "roof_work",
+        "low_cost"
+      ],
+      "keywords": [
+        "cool roof",
+        "reflective",
+        "coating",
+        "albedo",
+        "roof",
+        "solar"
+      ],
+      "restriction": "Requires roof access and suitable roof surface.",
+      "notes": "High cost-effectiveness for top-floor rooms.",
+      "literature_source": "Synnefa et al. (2007); Santamouris et al. (2011), Solar Energy",
+      "effect_profile_id": "cool_roof_coating"
+    },
+    {
+      "strategy_id": "phase_change_materials",
+      "strategy_name": "Phase-change materials in wall assembly",
+      "category": "thermal_mass",
+      "scope": "room",
+      "target_components": [
+        "wall",
+        "ceiling"
+      ],
+      "applicable_facades": [],
+      "delta_t_min_c": 0.5,
+      "delta_t_max_c": 1.5,
+      "cost_eur_m2_min": 50,
+      "cost_eur_m2_max": 120,
+      "carbon_kgco2e_m2_min": 10,
+      "carbon_kgco2e_m2_max": 18,
+      "applicability_conditions": [
+        "nocturnal_recovery_fail = true",
+        "best combined with night purge ventilation"
+      ],
+      "constraint_tags": [
+        "interior_work",
+        "medium_cost"
+      ],
+      "keywords": [
+        "PCM",
+        "phase change",
+        "thermal mass",
+        "wall",
+        "nocturnal recovery"
+      ],
+      "restriction": "Shifts peak timing rather than fully removing heat; needs compatible night cooling strategy.",
+      "notes": "LLM should clearly state peak-shift behavior.",
+      "literature_source": "Kuznik et al. (2011), Renewable and Sustainable Energy Reviews",
+      "effect_profile_id": "phase_change_materials"
+    },
+    {
+      "strategy_id": "courtyard_greening",
+      "strategy_name": "Courtyard greening",
+      "category": "urban_greening",
+      "scope": "building_shared",
+      "target_components": [
+        "courtyard"
+      ],
+      "applicable_facades": [],
+      "delta_t_min_c": 0.5,
+      "delta_t_max_c": 1.0,
+      "cost_eur_m2_min": 200,
+      "cost_eur_m2_max": 500,
+      "carbon_kgco2e_m2_min": -1,
+      "carbon_kgco2e_m2_max": 0,
+      "applicability_conditions": [
+        "building has interior courtyard"
+      ],
+      "constraint_tags": [
+        "shared_intervention",
+        "maintenance_required"
+      ],
+      "keywords": [
+        "courtyard",
+        "greening",
+        "vegetation",
+        "urban heat",
+        "ambient cooling"
+      ],
+      "restriction": "Building-level intervention; needs shared ownership or municipal coordination.",
+      "notes": "Ambient cooling benefit for adjacent rooms.",
+      "literature_source": "Santamouris et al. (2001), Solar Energy",
+      "effect_profile_id": "courtyard_greening"
+    },
+    {
+      "strategy_id": "shared_cooling_refuge",
+      "strategy_name": "Shared ground-floor cooling refuge",
+      "category": "resilience",
+      "scope": "portfolio",
+      "target_components": [
+        "shared_space"
+      ],
+      "applicable_facades": [],
+      "delta_t_min_c": null,
+      "delta_t_max_c": null,
+      "cost_eur_m2_min": null,
+      "cost_eur_m2_max": null,
+      "carbon_kgco2e_m2_min": null,
+      "carbon_kgco2e_m2_max": null,
+      "applicability_conditions": [
+        "portfolio-level intervention",
+        "not room-level"
+      ],
+      "constraint_tags": [
+        "shared_intervention",
+        "portfolio_only"
+      ],
+      "keywords": [
+        "cooling refuge",
+        "heat health",
+        "shared",
+        "resilience",
+        "vulnerable occupants"
+      ],
+      "restriction": "Not a direct room retrofit; should be shown as resilience support, not room performance improvement.",
+      "notes": "Improves health resilience rather than room thermal benchmark directly.",
+      "literature_source": "WHO (2011), Heat and Health",
+      "effect_profile_id": "shared_cooling_refuge"
+    },
+    {
+      "strategy_id": "street_tree_canopy",
+      "strategy_name": "Street tree canopy on SW elevation",
+      "category": "urban_greening",
+      "scope": "urban_context",
+      "target_components": [
+        "street",
+        "facade_context"
+      ],
+      "applicable_facades": [
+        "SW",
+        "S",
+        "W"
+      ],
+      "delta_t_min_c": 0.5,
+      "delta_t_max_c": 1.0,
+      "cost_eur_m2_min": null,
+      "cost_eur_m2_max": null,
+      "carbon_kgco2e_m2_min": -1,
+      "carbon_kgco2e_m2_max": 0,
+      "applicability_conditions": [
+        "urban context intervention",
+        "municipal coordination required"
+      ],
+      "constraint_tags": [
+        "municipal_coordination",
+        "urban_context"
+      ],
+      "keywords": [
+        "tree canopy",
+        "street trees",
+        "urban greening",
+        "shade",
+        "ambient cooling"
+      ],
+      "restriction": "Municipal or streetscape intervention; not controlled by individual room occupant.",
+      "notes": "May reduce ambient exposure at facade scale.",
+      "literature_source": "Bowler et al. (2010), Landscape and Urban Planning",
+      "effect_profile_id": "street_tree_canopy"
+    },
+    {
+      "strategy_id": "internal_wall_insulation",
+      "strategy_name": "Internal wall insulation",
+      "category": "envelope",
+      "scope": "room",
+      "target_components": [
+        "external_wall"
+      ],
+      "applicable_facades": [
+        "N",
+        "NE",
+        "E",
+        "SE",
+        "S",
+        "SW",
+        "W",
+        "NW"
+      ],
+      "delta_t_min_c": 0.5,
+      "delta_t_max_c": 1.5,
+      "cost_eur_m2_min": 30,
+      "cost_eur_m2_max": 60,
+      "carbon_kgco2e_m2_min": 5,
+      "carbon_kgco2e_m2_max": 8,
+      "applicability_conditions": [
+        "wall_U_value > 1.2",
+        "external facade",
+        "especially when heritage protection blocks ETICS"
+      ],
+      "constraint_tags": [
+        "interior_work",
+        "medium_cost"
+      ],
+      "keywords": [
+        "internal wall insulation",
+        "insulation",
+        "heritage",
+        "envelope",
+        "U-value"
+      ],
+      "restriction": "Reduces room area and requires careful cold bridge/detailing review.",
+      "notes": "More feasible than ETICS where external facade changes are restricted.",
+      "literature_source": "IDAE (2016); CTE DB-HE 2022",
+      "effect_profile_id": "internal_wall_insulation"
+    },
+    {
+      "strategy_id": "wall_insulation_reinforcement_layer",
+      "strategy_name": "Wall insulation reinforcement layer",
+      "category": "envelope",
+      "scope": "room",
+      "target_components": [
+        "external_wall"
+      ],
+      "applicable_facades": [
+        "N",
+        "NE",
+        "E",
+        "SE",
+        "S",
+        "SW",
+        "W",
+        "NW"
+      ],
+      "delta_t_min_c": 0.7,
+      "delta_t_max_c": 1.8,
+      "cost_eur_m2_min": 45,
+      "cost_eur_m2_max": 90,
+      "carbon_kgco2e_m2_min": 6,
+      "carbon_kgco2e_m2_max": 12,
+      "applicability_conditions": [
+        "wall_U_value > 1.2",
+        "external facade heat-transfer problem",
+        "interior-side intervention preferred or external ETICS restricted",
+        "surface can accept reinforced thermal lining without moisture/thermal-bridge conflict"
+      ],
+      "constraint_tags": [
+        "interior_work",
+        "medium_cost",
+        "low_disruption"
+      ],
+      "keywords": [
+        "wall insulation",
+        "reinforcement layer",
+        "thermal lining",
+        "reinforced insulation",
+        "internal insulation",
+        "envelope",
+        "U-value",
+        "thermal bridge"
+      ],
+      "restriction": "Requires moisture, condensation, and thermal-bridge detailing review before specification.",
+      "notes": "Interior-side reinforced thermal lining for walls where full ETICS is restricted or too disruptive; stronger than light lining but less invasive than external facade retrofit.",
+      "literature_source": "IDAE (2016); CTE DB-HE 2022; EN ISO 13788 moisture/condensation risk logic",
+      "effect_profile_id": "wall_insulation_reinforcement_layer"
+    },
+    {
+      "strategy_id": "cool_facade_paint",
+      "strategy_name": "Cool / reflective facade paint",
+      "category": "cool_surface",
+      "scope": "room",
+      "target_components": [
+        "external_wall"
+      ],
+      "applicable_facades": [
+        "SW",
+        "SE",
+        "S",
+        "W"
+      ],
+      "delta_t_min_c": 0.5,
+      "delta_t_max_c": 2.0,
+      "cost_eur_m2_min": 8,
+      "cost_eur_m2_max": 20,
+      "carbon_kgco2e_m2_min": 1,
+      "carbon_kgco2e_m2_max": 3,
+      "applicability_conditions": [
+        "solar_gain_score > 0.5",
+        "exterior wall exposed to direct solar radiation",
+        "heritage/regulation check"
+      ],
+      "constraint_tags": [
+        "facade_modification",
+        "permission_likely",
+        "low_cost"
+      ],
+      "keywords": [
+        "cool facade",
+        "reflective paint",
+        "albedo",
+        "solar",
+        "facade",
+        "coating"
+      ],
+      "restriction": "Heritage zones, community approval, or colour rules may restrict this option.",
+      "notes": "Potentially high cost-effectiveness for dark solar-exposed walls.",
+      "literature_source": "Synnefa et al. (2007); Santamouris et al. (2011), Solar Energy",
+      "effect_profile_id": "cool_facade_paint"
+    },
+    {
+      "strategy_id": "window_external_shutters",
+      "strategy_name": "External shutters",
+      "category": "shading",
+      "scope": "room",
+      "target_components": [
+        "window"
+      ],
+      "applicable_facades": [
+        "SW",
+        "SE",
+        "S"
+      ],
+      "delta_t_min_c": 1.5,
+      "delta_t_max_c": 3.0,
+      "cost_eur_m2_min": 80,
+      "cost_eur_m2_max": 150,
+      "carbon_kgco2e_m2_min": 6,
+      "carbon_kgco2e_m2_max": 10,
+      "applicability_conditions": [
+        "solar_gain_score > 0.6",
+        "SW/SE/S facade",
+        "existing shutter box confirmed"
+      ],
+      "constraint_tags": [
+        "facade_modification",
+        "permission_possible",
+        "medium_cost"
+      ],
+      "keywords": [
+        "external shutters",
+        "persianes",
+        "shading",
+        "window",
+        "solar",
+        "shutter box"
+      ],
+      "restriction": "Most suitable when a shutter box already exists or facade rules allow shutters.",
+      "notes": "Common in Barcelona and may be more accepted than new louvers.",
+      "literature_source": "IDAE (2011)",
+      "effect_profile_id": "external_shutters"
+    },
+    {
+      "strategy_id": "cross_ventilation_behaviour",
+      "strategy_name": "Cross-ventilation behavioural protocol",
+      "category": "ventilation",
+      "scope": "room",
+      "target_components": [
+        "window",
+        "door"
+      ],
+      "applicable_facades": [
+        "N",
+        "NE",
+        "E",
+        "SE",
+        "S",
+        "SW",
+        "W",
+        "NW"
+      ],
+      "delta_t_min_c": 0.5,
+      "delta_t_max_c": 1.5,
+      "cost_eur_m2_min": 0,
+      "cost_eur_m2_max": 0,
+      "carbon_kgco2e_m2_min": 0,
+      "carbon_kgco2e_m2_max": 0,
+      "applicability_conditions": [
+        "cross_ventilation_direct = true"
+      ],
+      "constraint_tags": [
+        "low_cost",
+        "reversible",
+        "behavioural",
+        "renter_friendly"
+      ],
+      "keywords": [
+        "cross ventilation",
+        "behaviour",
+        "window opening",
+        "airflow",
+        "low cost"
+      ],
+      "restriction": "Only eligible when the room/apartment already has a usable cross-ventilation path.",
+      "notes": "Protocol intervention: which windows to open, when, and in what sequence.",
+      "literature_source": "Givoni (1992); Allard (1998)",
+      "effect_profile_id": "cross_ventilation_behaviour"
+    }
+  ]
+}

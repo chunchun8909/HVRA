@@ -1,0 +1,22 @@
+{
+  "building_id": "BLD_001",
+  "room_id": "ROOM_001",
+  "room_type": "s",
+  "floor": 4,
+  "is_top_floor": true,
+  "room_area_m2": 34.0,
+  "room_height_m": 5.0,
+  "facing_direction": "N",
+  "external_facades": 1,
+  "window_area_m2": null,
+  "wall_area_m2": null,
+  "glazing_type": "single_glazing",
+  "construction_era": "1960_1979",
+  "roof_exposed": true,
+  "has_external_shading": false,
+  "has_balcony": false,
+  "known_limitations": [
+    "no_ifc_model",
+    "image_based_estimation"
+  ]
+}

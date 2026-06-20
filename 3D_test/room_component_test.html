@@ -1,0 +1,250 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HVRA 3D Room Component Test</title>
+  <style>
+    :root {
+      --bg: #f4f2ec;
+      --panel: rgba(250, 248, 242, 0.96);
+      --ink: #181713;
+      --muted: #817b70;
+      --line: rgba(24, 23, 19, 0.16);
+      --accent: #2f8197;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; overflow: hidden; background: var(--bg); color: var(--ink); }
+    body { font-family: Arial, sans-serif; font-size: 13px; }
+    #view { width: 100vw; height: 100vh; display: block; cursor: grab; }
+    .panel {
+      position: absolute;
+      left: 18px;
+      top: 18px;
+      width: 310px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 14px;
+      box-shadow: 0 16px 36px rgba(28, 24, 18, 0.10);
+    }
+    .controls {
+      position: absolute;
+      right: 18px;
+      top: 18px;
+      width: 180px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+    h1, h2, .mono {
+      font-family: Consolas, "DM Mono", monospace;
+      font-size: 10.5px;
+      font-weight: 400;
+      letter-spacing: 0.10em;
+      text-transform: lowercase;
+      color: var(--muted);
+      margin: 0 0 8px;
+    }
+    p { margin: 0 0 10px; line-height: 1.45; }
+    button {
+      height: 32px;
+      border: 1px solid var(--line);
+      background: #fffdfa;
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .item { display: flex; justify-content: space-between; border-top: 1px solid var(--line); padding: 6px 0; }
+    .swatch { width: 10px; height: 10px; display: inline-block; margin-right: 6px; border: 1px solid rgba(0,0,0,0.18); }
+  </style>
+</head>
+<body>
+  <canvas id="view"></canvas>
+  <section class="panel">
+    <h1>3d room test</h1>
+    <p>Standalone test view. Components are assigned directly in the code, using LGTNet-style room points and simple placeholder geometry.</p>
+    <div class="item"><span><span class="swatch" style="background:#a99f8b"></span>walls</span><span>8</span></div>
+    <div class="item"><span><span class="swatch" style="background:#87aab8"></span>window</span><span>wall 03</span></div>
+    <div class="item"><span><span class="swatch" style="background:#e8dfcc"></span>shading</span><span>wall 03</span></div>
+    <div class="item"><span><span class="swatch" style="background:#7a5a3a"></span>door</span><span>wall 06</span></div>
+    <div class="item"><span><span class="swatch" style="background:#6f6554"></span>furniture</span><span>floor</span></div>
+    <div class="item"><span><span class="swatch" style="background:#4f7f55"></span>plant</span><span>corner</span></div>
+  </section>
+  <section class="controls">
+    <h2>view control</h2>
+    <div class="row"><button id="iso">iso</button><button id="top">top</button></div>
+    <div class="row"><button id="front">front</button><button id="reset">reset</button></div>
+    <p class="mono">drag rotate<br>right drag pan<br>wheel zoom</p>
+  </section>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "../interface/public/vendor/three/build/three.module.js",
+        "three/addons/": "../interface/public/vendor/three/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const canvas = document.getElementById('view');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xf4f2ec);
+
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.05, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+    renderer.shadowMap.enabled = true;
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xb8b0a2, 2.4));
+    const sun = new THREE.DirectionalLight(0xffffff, 1.4);
+    sun.position.set(4, 7, 5);
+    sun.castShadow = true;
+    scene.add(sun);
+
+    const roomPoints = [
+      { x: 2.710, z: -3.917 },
+      { x: 2.710, z: 1.021 },
+      { x: 1.077, z: 1.021 },
+      { x: 1.077, z: 1.875 },
+      { x: -0.149, z: 1.875 },
+      { x: -0.149, z: 3.843 },
+      { x: -1.318, z: 3.843 },
+      { x: -1.318, z: -3.917 }
+    ];
+    const roomHeight = 2.8;
+
+    function shapeFromPoints(points) {
+      const shape = new THREE.Shape();
+      shape.moveTo(points[0].x, points[0].z);
+      for (let i = 1; i < points.length; i += 1) shape.lineTo(points[i].x, points[i].z);
+      shape.closePath();
+      return shape;
+    }
+
+    function wallMid(index) {
+      const a = roomPoints[index];
+      const b = roomPoints[(index + 1) % roomPoints.length];
+      return {
+        x: (a.x + b.x) / 2,
+        z: (a.z + b.z) / 2,
+        angle: -Math.atan2(b.z - a.z, b.x - a.x),
+        length: Math.hypot(b.x - a.x, b.z - a.z)
+      };
+    }
+
+    function addRoom() {
+      const floorGeometry = new THREE.ShapeGeometry(shapeFromPoints(roomPoints));
+      floorGeometry.rotateX(Math.PI / 2);
+      const floor = new THREE.Mesh(floorGeometry, new THREE.MeshStandardMaterial({ color: 0xd8d0bd, roughness: 0.78, side: THREE.DoubleSide }));
+      floor.receiveShadow = true;
+      scene.add(floor);
+
+      const ceiling = floor.clone();
+      ceiling.position.y = roomHeight;
+      ceiling.material = new THREE.MeshStandardMaterial({ color: 0xf8f6ee, transparent: true, opacity: 0.24, side: THREE.DoubleSide });
+      scene.add(ceiling);
+
+      const wallMaterial = new THREE.MeshStandardMaterial({ color: 0xa99f8b, transparent: true, opacity: 0.58, roughness: 0.7 });
+      for (let i = 0; i < roomPoints.length; i += 1) {
+        const wall = wallMid(i);
+        const mesh = new THREE.Mesh(new THREE.BoxGeometry(wall.length, roomHeight, 0.08), wallMaterial.clone());
+        mesh.position.set(wall.x, roomHeight / 2, wall.z);
+        mesh.rotation.y = wall.angle;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        scene.add(mesh);
+      }
+
+      const outlinePoints = roomPoints.map((p) => new THREE.Vector3(p.x, 0.025, p.z));
+      outlinePoints.push(new THREE.Vector3(roomPoints[0].x, 0.025, roomPoints[0].z));
+      scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(outlinePoints), new THREE.LineBasicMaterial({ color: 0x2f8197 })));
+    }
+
+    function box(name, color, size, position, rotationY = 0) {
+      const mesh = new THREE.Mesh(new THREE.BoxGeometry(size.x, size.y, size.z), new THREE.MeshStandardMaterial({ color, roughness: 0.72 }));
+      mesh.name = name;
+      mesh.position.set(position.x, position.y, position.z);
+      mesh.rotation.y = rotationY;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      scene.add(mesh);
+      return mesh;
+    }
+
+    function cylinder(name, color, radiusTop, radiusBottom, height, position) {
+      const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radiusTop, radiusBottom, height, 18), new THREE.MeshStandardMaterial({ color, roughness: 0.72 }));
+      mesh.name = name;
+      mesh.position.set(position.x, position.y, position.z);
+      mesh.castShadow = true;
+      scene.add(mesh);
+      return mesh;
+    }
+
+    function addComponents() {
+      const windowWall = wallMid(3);
+      box('window wall 03', 0x87aab8, { x: 1.05, y: 0.85, z: 0.06 }, { x: windowWall.x, y: 1.35, z: windowWall.z }, windowWall.angle);
+      box('shading wall 03', 0xe8dfcc, { x: 1.15, y: 0.16, z: 0.08 }, { x: windowWall.x, y: 1.88, z: windowWall.z }, windowWall.angle);
+
+      const doorWall = wallMid(6);
+      box('door wall 06', 0x7a5a3a, { x: 0.78, y: 1.85, z: 0.08 }, { x: doorWall.x, y: 0.93, z: doorWall.z }, doorWall.angle);
+
+      box('table floor', 0x6f6554, { x: 0.9, y: 0.12, z: 0.65 }, { x: 0.45, y: 0.72, z: -0.85 }, 0.2);
+      cylinder('table leg', 0x4a4338, 0.055, 0.055, 0.68, { x: 0.45, y: 0.34, z: -0.85 });
+      box('chair 01', 0x6f6554, { x: 0.42, y: 0.16, z: 0.42 }, { x: -0.25, y: 0.45, z: -0.82 }, 0.2);
+      box('chair back 01', 0x6f6554, { x: 0.42, y: 0.75, z: 0.08 }, { x: -0.32, y: 0.78, z: -1.08 }, 0.2);
+      box('cabinet', 0x8b806c, { x: 0.9, y: 0.85, z: 0.35 }, { x: 1.95, y: 0.43, z: -2.45 }, 0);
+
+      cylinder('plant pot', 0x8a5a3f, 0.18, 0.24, 0.28, { x: -0.85, y: 0.14, z: 3.2 });
+      const crown = new THREE.Mesh(new THREE.SphereGeometry(0.38, 18, 12), new THREE.MeshStandardMaterial({ color: 0x4f7f55, roughness: 0.65 }));
+      crown.position.set(-0.85, 0.62, 3.2);
+      crown.castShadow = true;
+      scene.add(crown);
+    }
+
+    function setView(mode) {
+      const target = new THREE.Vector3(0.7, 1.2, -0.04);
+      controls.target.copy(target);
+      if (mode === 'top') camera.position.set(target.x, 11, target.z + 0.001);
+      else if (mode === 'front') camera.position.set(target.x, 1.8, target.z + 9);
+      else camera.position.set(5.2, 4.8, 7.2);
+      camera.lookAt(target);
+      controls.update();
+    }
+
+    function resize() {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      renderer.setSize(width, height, false);
+      camera.aspect = width / Math.max(height, 1);
+      camera.updateProjectionMatrix();
+    }
+
+    function animate() {
+      controls.update();
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+
+    scene.add(new THREE.GridHelper(12, 24, 0xbab3a7, 0xded8cc));
+    addRoom();
+    addComponents();
+    resize();
+    setView('iso');
+    animate();
+
+    window.addEventListener('resize', resize);
+    document.getElementById('iso').addEventListener('click', () => setView('iso'));
+    document.getElementById('top').addEventListener('click', () => setView('top'));
+    document.getElementById('front').addEventListener('click', () => setView('front'));
+    document.getElementById('reset').addEventListener('click', () => setView('iso'));
+  </script>
+</body>
+</html>

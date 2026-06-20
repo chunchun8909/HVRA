@@ -1,0 +1,240 @@
+{
+  "test_name": "lgtnet_asset_registry_integration",
+  "interactive": false,
+  "source_lgtnet_json": "C:\\Users\\Morris\\OneDrive\\Desktop\\hvra_test_run\\data\\output\\spatial\\lgtnet\\demo1_pred.json",
+  "registry_url": null,
+  "api_key_env": "ASSET_REGISTRY_API_KEY",
+  "api_key_loaded": false,
+  "dry_run": false,
+  "room_geometry": {
+    "wall_count": 8,
+    "layout_height_m_raw": 2.9792428016662598,
+    "bbox": {
+      "min_x": -1.318,
+      "max_x": 2.71,
+      "min_z": -3.917,
+      "max_z": 3.843,
+      "center_x": 0.696,
+      "center_z": -0.037
+    },
+    "walls": [
+      {
+        "wall_index": 0,
+        "id": "LGTNET_WALL_00",
+        "start": {
+          "x": 2.7103572520529684,
+          "z": -3.917023883778499
+        },
+        "end": {
+          "x": 2.7103576837509027,
+          "z": 1.0210248842650191
+        },
+        "length_m_raw": 4.938,
+        "midpoint": {
+          "x": 2.71,
+          "z": -1.448
+        }
+      },
+      {
+        "wall_index": 1,
+        "id": "LGTNET_WALL_01",
+        "start": {
+          "x": 2.7103576837509027,
+          "z": 1.0210248842650191
+        },
+        "end": {
+          "x": 1.0767174898116936,
+          "z": 1.0210250270823809
+        },
+        "length_m_raw": 1.634,
+        "midpoint": {
+          "x": 1.894,
+          "z": 1.021
+        }
+      },
+      {
+        "wall_index": 2,
+        "id": "LGTNET_WALL_02",
+        "start": {
+          "x": 1.0767174898116936,
+          "z": 1.0210250270823809
+        },
+        "end": {
+          "x": 1.0767175644662235,
+          "z": 1.8749733102778765
+        },
+        "length_m_raw": 0.854,
+        "midpoint": {
+          "x": 1.077,
+          "z": 1.448
+        }
+      },
+      {
+        "wall_index": 3,
+        "id": "LGTNET_WALL_03",
+        "start": {
+          "x": 1.0767175644662235,
+          "z": 1.8749733102778765
+        },
+        "end": {
+          "x": -0.14851258098818343,
+          "z": 1.8749734173908978
+        },
+        "length_m_raw": 1.225,
+        "midpoint": {
+          "x": 0.464,
+          "z": 1.875
+        }
+      },
+      {
+        "wall_index": 4,
+        "id": "LGTNET_WALL_04",
+        "start": {
+          "x": -0.14851258098818343,
+          "z": 1.8749734173908978
+        },
+        "end": {
+          "x": -0.1485124089581796,
+          "z": 3.842767287363127
+        },
+        "length_m_raw": 1.968,
+        "midpoint": {
+          "x": -0.149,
+          "z": 2.859
+        }
+      },
+      {
+        "wall_index": 5,
+        "id": "LGTNET_WALL_05",
+        "start": {
+          "x": -0.1485124089581796,
+          "z": 3.842767287363127
+        },
+        "end": {
+          "x": -1.3180502750737497,
+          "z": 3.842767389607374
+        },
+        "length_m_raw": 1.17,
+        "midpoint": {
+          "x": -0.733,
+          "z": 3.843
+        }
+      },
+      {
+        "wall_index": 6,
+        "id": "LGTNET_WALL_06",
+        "start": {
+          "x": -1.3180502750737497,
+          "z": 3.842767389607374
+        },
+        "end": {
+          "x": -1.3180509534562177,
+          "z": -3.917023531603869
+        },
+        "length_m_raw": 7.76,
+        "midpoint": {
+          "x": -1.318,
+          "z": -0.037
+        }
+      },
+      {
+        "wall_index": 7,
+        "id": "LGTNET_WALL_07",
+        "start": {
+          "x": -1.3180509534562177,
+          "z": -3.917023531603869
+        },
+        "end": {
+          "x": 2.7103572520529684,
+          "z": -3.917023883778499
+        },
+        "length_m_raw": 4.028,
+        "midpoint": {
+          "x": 0.696,
+          "z": -3.917
+        }
+      }
+    ]
+  },
+  "asset_candidates": [
+    {
+      "category": "window_dressing",
+      "query": "web optimized low poly interior window curtain blinds glb",
+      "placement_hint": {
+        "target": "longest_wall",
+        "wall_id": "LGTNET_WALL_06",
+        "position": {
+          "x": -1.318,
+          "y": 1.35,
+          "z": -0.037
+        },
+        "reason": "placeholder target until SAM/window metadata is linked"
+      },
+      "registry_status": "skipped_missing_registry_config",
+      "asset_id": null,
+      "asset_name": null,
+      "asset_url": null,
+      "raw_registry_item": null,
+      "error": null
+    },
+    {
+      "category": "interior_shading",
+      "query": "web optimized roller blind venetian blind glb",
+      "placement_hint": {
+        "target": "longest_wall",
+        "wall_id": "LGTNET_WALL_06",
+        "position": {
+          "x": -1.318,
+          "y": 1.35,
+          "z": -0.037
+        },
+        "reason": "placeholder target until SAM/window metadata is linked"
+      },
+      "registry_status": "skipped_missing_registry_config",
+      "asset_id": null,
+      "asset_name": null,
+      "asset_url": null,
+      "raw_registry_item": null,
+      "error": null
+    },
+    {
+      "category": "furniture",
+      "query": "web optimized low poly room chair table glb",
+      "placement_hint": {
+        "target": "open_floor_area",
+        "position": {
+          "x": 0.696,
+          "y": 0.0,
+          "z": -0.037
+        },
+        "reason": "simple non-interactive placement for smoke test"
+      },
+      "registry_status": "skipped_missing_registry_config",
+      "asset_id": null,
+      "asset_name": null,
+      "asset_url": null,
+      "raw_registry_item": null,
+      "error": null
+    },
+    {
+      "category": "plant",
+      "query": "web optimized low poly indoor plant glb",
+      "placement_hint": {
+        "target": "near_window_or_corner",
+        "position": {
+          "x": 2.26,
+          "y": 0.0,
+          "z": -3.4669999999999996
+        },
+        "reason": "simple non-interactive placement for smoke test"
+      },
+      "registry_status": "skipped_missing_registry_config",
+      "asset_id": null,
+      "asset_name": null,
+      "asset_url": null,
+      "raw_registry_item": null,
+      "error": null
+    }
+  ],
+  "next_integration_target": "spatial_index_with_assets.json"
+}

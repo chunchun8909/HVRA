@@ -1,0 +1,20 @@
+{
+  "constraint_id": "CONSTRAINT_001",
+  "budget_level": "low",
+  "max_budget_eur": 1500,
+  "disruption_tolerance": "low",
+  "ownership_status": "renter",
+  "facade_modification_allowed": false,
+  "heritage_restriction": "unknown",
+  "construction_permission_required": true,
+  "preferred_strategy_type": [
+    "low_cost",
+    "reversible",
+    "low_disruption"
+  ],
+  "excluded_strategy_type": [
+    "major_structural_change",
+    "full_window_replacement"
+  ]
+}
+

@@ -1,0 +1,270 @@
+{
+  "available": true,
+  "source": "infrared_city_live",
+  "provider": "infrared_city",
+  "metrics": {
+    "solar_radiation": {
+      "available": true,
+      "min": 0.0,
+      "mean": 78.621,
+      "max": 105.438,
+      "grid_shape": [
+        256,
+        256
+      ],
+      "legend_min": null,
+      "legend_max": null,
+      "succeeded_jobs": 1,
+      "total_jobs": 1,
+      "bounds": [
+        2.158042105408943,
+        41.38828135106001,
+        2.1611073681003248,
+        41.390581027667984
+      ]
+    },
+    "direct_sun_hours": {
+      "available": true,
+      "min": 0.0,
+      "mean": 143.579,
+      "max": 155.0,
+      "grid_shape": [
+        256,
+        256
+      ],
+      "legend_min": null,
+      "legend_max": null,
+      "succeeded_jobs": 1,
+      "total_jobs": 1,
+      "bounds": [
+        2.158042105408943,
+        41.38828135106001,
+        2.1611073681003248,
+        41.390581027667984
+      ]
+    },
+    "sky_view_factor": {
+      "available": true,
+      "min": 0.0,
+      "mean": 57.159,
+      "max": 88.75,
+      "grid_shape": [
+        256,
+        256
+      ],
+      "legend_min": null,
+      "legend_max": null,
+      "succeeded_jobs": 1,
+      "total_jobs": 1,
+      "bounds": [
+        2.158042105408943,
+        41.38828135106001,
+        2.1611073681003248,
+        41.390581027667984
+      ]
+    },
+    "wind_speed": {
+      "available": true,
+      "min": 0.659,
+      "mean": 7.541,
+      "max": 13.0,
+      "grid_shape": [
+        256,
+        256
+      ],
+      "legend_min": null,
+      "legend_max": null,
+      "succeeded_jobs": 1,
+      "total_jobs": 1,
+      "bounds": [
+        2.158042105408943,
+        41.38828135106001,
+        2.1611073681003248,
+        41.390581027667984
+      ]
+    },
+    "utci": {
+      "available": true,
+      "min": 23.625,
+      "mean": 28.965,
+      "max": 31.156,
+      "grid_shape": [
+        256,
+        256
+      ],
+      "legend_min": null,
+      "legend_max": null,
+      "succeeded_jobs": 1,
+      "total_jobs": 1,
+      "bounds": [
+        2.158042105408943,
+        41.38828135106001,
+        2.1611073681003248,
+        41.390581027667984
+      ]
+    }
+  },
+  "heat_exposure_score": 0.092,
+  "urban_context_updates": {
+    "sky_view_factor": 57.159,
+    "mean_wind_speed_m_s": 7.541,
+    "infrared_city_utci_mean_c": 28.965,
+    "infrared_city_solar_radiation_mean": 78.621,
+    "infrared_city_direct_sun_hours_mean": 143.579
+  },
+  "climate_updates": {
+    "infrared_city_utci_max_c": 31.156,
+    "infrared_city_mean_wind_speed_m_s": 7.541,
+    "infrared_city_solar_radiation_max": 105.438
+  },
+  "raw_summary": {
+    "source": "infrared_city_live",
+    "location": {
+      "latitude": 41.389,
+      "longitude": 2.159
+    },
+    "polygon": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            2.158042105408943,
+            41.38828135106001
+          ],
+          [
+            2.1599578945910567,
+            41.38828135106001
+          ],
+          [
+            2.1599578945910567,
+            41.38971864894
+          ],
+          [
+            2.158042105408943,
+            41.38971864894
+          ],
+          [
+            2.158042105408943,
+            41.38828135106001
+          ]
+        ]
+      ]
+    },
+    "time_period": {
+      "start_month": 7,
+      "start_day": 1,
+      "start_hour": 12,
+      "end_month": 7,
+      "end_day": 31,
+      "end_hour": 16
+    },
+    "layers": {
+      "building_count": 446,
+      "tree_count": 523,
+      "ground_material_feature_count": 13,
+      "weather_station_id": "310ae5f1-75f8-477b-bedc-85a262de0c4e"
+    },
+    "results": {
+      "wind_speed": {
+        "available": true,
+        "min": 0.659,
+        "mean": 7.541,
+        "max": 13.0,
+        "grid_shape": [
+          256,
+          256
+        ],
+        "legend_min": null,
+        "legend_max": null,
+        "succeeded_jobs": 1,
+        "total_jobs": 1,
+        "bounds": [
+          2.158042105408943,
+          41.38828135106001,
+          2.1611073681003248,
+          41.390581027667984
+        ]
+      },
+      "sky_view_factor": {
+        "available": true,
+        "min": 0.0,
+        "mean": 57.159,
+        "max": 88.75,
+        "grid_shape": [
+          256,
+          256
+        ],
+        "legend_min": null,
+        "legend_max": null,
+        "succeeded_jobs": 1,
+        "total_jobs": 1,
+        "bounds": [
+          2.158042105408943,
+          41.38828135106001,
+          2.1611073681003248,
+          41.390581027667984
+        ]
+      },
+      "direct_sun_hours": {
+        "available": true,
+        "min": 0.0,
+        "mean": 143.579,
+        "max": 155.0,
+        "grid_shape": [
+          256,
+          256
+        ],
+        "legend_min": null,
+        "legend_max": null,
+        "succeeded_jobs": 1,
+        "total_jobs": 1,
+        "bounds": [
+          2.158042105408943,
+          41.38828135106001,
+          2.1611073681003248,
+          41.390581027667984
+        ]
+      },
+      "solar_radiation": {
+        "available": true,
+        "min": 0.0,
+        "mean": 78.621,
+        "max": 105.438,
+        "grid_shape": [
+          256,
+          256
+        ],
+        "legend_min": null,
+        "legend_max": null,
+        "succeeded_jobs": 1,
+        "total_jobs": 1,
+        "bounds": [
+          2.158042105408943,
+          41.38828135106001,
+          2.1611073681003248,
+          41.390581027667984
+        ]
+      },
+      "utci": {
+        "available": true,
+        "min": 23.625,
+        "mean": 28.965,
+        "max": 31.156,
+        "grid_shape": [
+          256,
+          256
+        ],
+        "legend_min": null,
+        "legend_max": null,
+        "succeeded_jobs": 1,
+        "total_jobs": 1,
+        "bounds": [
+          2.158042105408943,
+          41.38828135106001,
+          2.1611073681003248,
+          41.390581027667984
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "region_id": "REGION_001",
+  "city": "Barcelona",
+  "district": "Eixample",
+  "neighbourhood": "Left Eixample",
+  "coordinates": {
+    "lat": 41.389,
+    "lon": 2.159
+  },
+  "facing_direction": "N",
+  "context_resolution": "neighbourhood_tile",
+  "context_source_mode": "future_lookup_database",
+  "current_stage_note": "Now active: provides location & orientation to risk_map builder",
+  "address": "Carrer de Mallorca",
+  "location_source": "chat_message"
+}

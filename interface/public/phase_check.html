@@ -1,0 +1,641 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>phase check</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=DM+Sans:wght@400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink-primary: #0a0a0a;
+        --ink-tertiary: #8a8a8a;
+        --surface-primary: #ffffff;
+        --surface-secondary: #f5f4f2;
+        --border: rgba(0, 0, 0, 0.1);
+        --pass: #166534;
+        --fail: #9f1d1d;
+        --warn: #8a5a00;
+        --checker-scale: 0.6;
+        --header-height: 50px;
+        --scaled-header-height: calc(var(--header-height) / var(--checker-scale));
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+      }
+
+      body {
+        margin: 0;
+        background: var(--surface-secondary);
+        color: var(--ink-primary);
+        font: 400 13px "DM Sans", Arial, sans-serif;
+        overflow: hidden;
+      }
+      .scale-viewport {
+        height: calc(100vh / var(--checker-scale));
+        left: 0;
+        overflow: hidden;
+        position: fixed;
+        top: 0;
+        transform: scale(var(--checker-scale));
+        transform-origin: top left;
+        width: calc(100vw / var(--checker-scale));
+      }
+
+
+      .level-1 {
+        color: var(--ink-tertiary);
+        font: 400 10.5px "DM Mono", monospace;
+        letter-spacing: 0.1em;
+        text-transform: lowercase;
+      }
+
+      .level-2 {
+        color: var(--ink-primary);
+        font: 400 13px "DM Sans", Arial, sans-serif;
+      }
+
+      .level-3 {
+        color: var(--ink-tertiary);
+        font: 400 10px "DM Mono", monospace;
+      }
+
+      .scale-control {
+        align-items: center;
+        display: flex;
+        gap: 6px;
+      }
+
+      .scale-control button {
+        color: var(--ink-tertiary);
+        font: 400 10px "DM Mono", monospace;
+        padding: 5px 7px;
+      }
+
+      .scale-control button[aria-selected="true"] {
+        color: var(--ink-primary);
+        outline: 1px solid var(--ink-primary);
+      }
+
+      header {
+        align-items: center;
+        background: var(--surface-primary);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        gap: 16px;
+        justify-content: space-between;
+        min-height: var(--scaled-header-height);
+        padding: 0 16px;
+      }
+
+      main {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: 292px minmax(0, 1fr);
+        height: calc((100vh / var(--checker-scale)) - var(--scaled-header-height));
+        padding: 12px;
+      }
+
+      button,
+      input {
+        background: var(--surface-primary);
+        border: 1px solid var(--border);
+        color: var(--ink-primary);
+        font: 400 13px "DM Sans", Arial, sans-serif;
+      }
+
+      button {
+        cursor: pointer;
+        padding: 8px 10px;
+      }
+
+      input {
+        min-width: 0;
+        padding: 8px 10px;
+        width: 100%;
+      }
+
+      .sidebar,
+      .preview {
+        background: var(--surface-primary);
+        border: 1px solid var(--border);
+        min-height: 0;
+      }
+
+      .sidebar {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .section {
+        border-bottom: 1px solid var(--border);
+        padding: 12px;
+      }
+
+      .section.is-collapsed {
+        border-bottom-color: transparent;
+        padding: 5px 12px;
+        width: 82px;
+      }
+
+      .section.is-collapsed .section-header {
+        background: var(--surface-secondary);
+        border: 1px solid var(--border);
+        border-radius: 100px;
+        gap: 12px;
+        min-height: 24px;
+        padding: 4px 9px;
+        width: 100%;
+      }
+
+      .section.is-collapsed .section-header span:first-child {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .section-header {
+        align-items: center;
+        background: transparent;
+        border: 0;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 0 10px;
+        text-align: left;
+        width: 100%;
+      }
+
+      .section-body[hidden] {
+        display: none;
+      }
+
+      .row {
+        display: grid;
+        gap: 6px;
+        margin-bottom: 10px;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .rule {
+        align-items: start;
+        display: grid;
+        gap: 8px;
+        grid-template-columns: 18px minmax(0, 1fr);
+        margin: 8px 0;
+      }
+
+      .dot {
+        border-radius: 50%;
+        height: 8px;
+        margin-top: 5px;
+        width: 8px;
+      }
+
+      .pass {
+        background: var(--pass);
+      }
+
+      .fail {
+        background: var(--fail);
+      }
+
+      .warn {
+        background: var(--warn);
+      }
+
+      .preview {
+        display: grid;
+        grid-template-rows: 40px minmax(0, 1fr);
+        overflow: hidden;
+      }
+
+      .preview-bar {
+        align-items: center;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        gap: 8px;
+        justify-content: space-between;
+        padding: 0 12px;
+      }
+
+      .phase-tabs {
+        display: flex;
+        gap: 6px;
+      }
+
+      .phase-tab {
+        color: var(--ink-tertiary);
+        font: 400 10px "DM Mono", monospace;
+        padding: 6px 8px;
+      }
+
+      .phase-tab[aria-selected="true"] {
+        color: var(--ink-primary);
+        outline: 1px solid var(--ink-primary);
+      }
+
+      .phase-frame {
+        background: var(--surface-primary);
+        min-height: 0;
+        overflow: hidden;
+      }
+
+      .phase-caption {
+        align-items: center;
+        background: var(--surface-secondary);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        min-height: 34px;
+        padding: 0 12px;
+      }
+
+      iframe {
+        border: 0;
+        height: calc(100% - 34px);
+        width: 100%;
+      }
+
+      @media (max-width: 1120px) {
+        main {
+          grid-template-columns: 1fr;
+          height: auto;
+        }
+
+        .phase-frame {
+          height: 72vh;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scale-viewport" id="scaleViewport">
+    <header>
+      <span class="level-1">phase check</span>
+      <div class="scale-control" aria-label="checker scale">
+        <button type="button" data-scale="0.5">50</button>
+        <button type="button" data-scale="0.6" aria-selected="true">60</button>
+        <button type="button" data-scale="0.75">75</button>
+        <button type="button" data-scale="1">100</button>
+      </div>
+      <span class="level-3" id="lastRun">not checked</span>
+    </header>
+
+    <main>
+      <aside class="sidebar">
+        <section class="section">
+          <button class="section-header level-1" data-toggle="setupBody" type="button" aria-expanded="true">
+            <span>setup</span>
+            <span>&#9662;</span>
+          </button>
+          <div id="setupBody" class="section-body">
+            <div class="row">
+              <label class="level-3" for="appUrl">app url</label>
+              <input id="appUrl" value="" />
+            </div>
+            <div class="actions">
+              <button id="loadPhases" class="level-2">load phases</button>
+              <button id="runCheck" class="level-2">run check</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <button class="section-header level-1" data-toggle="phaseBody" type="button" aria-expanded="true">
+            <span>phases</span>
+            <span>&#9662;</span>
+          </button>
+          <div id="phaseBody" class="section-body">
+            <div class="rule">
+              <span class="dot warn"></span>
+              <span>
+                <span class="level-2">phase 1</span><br />
+                <span class="level-3">chat gathers site context</span>
+              </span>
+            </div>
+            <div class="rule">
+              <span class="dot warn"></span>
+              <span>
+                <span class="level-2">phase 1.5</span><br />
+                <span class="level-3">site context checkpoint</span>
+              </span>
+            </div>
+            <div class="rule">
+              <span class="dot warn"></span>
+              <span>
+                <span class="level-2">phase 2</span><br />
+                <span class="level-3">chat + room model</span>
+              </span>
+            </div>
+            <div class="rule">
+              <span class="dot warn"></span>
+              <span>
+                <span class="level-2">phase 3</span><br />
+                <span class="level-3">options + room + links + check + report</span>
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <button class="section-header level-1" data-toggle="resultBody" type="button" aria-expanded="true">
+            <span>check table</span>
+            <span>&#9662;</span>
+          </button>
+          <div id="resultBody" class="section-body">
+            <div id="results"></div>
+          </div>
+        </section>
+      </aside>
+
+      <section class="preview">
+        <div class="preview-bar">
+          <span class="level-1">preview</span>
+          <div class="phase-tabs">
+            <button class="phase-tab" data-phase="input" aria-selected="true">phase 1</button>
+            <button class="phase-tab" data-phase="site" aria-selected="false">phase 1.5</button>
+            <button class="phase-tab" data-phase="spatial" aria-selected="false">phase 2</button>
+            <button class="phase-tab" data-phase="review" aria-selected="false">phase 3</button>
+          </div>
+        </div>
+        <div class="phase-frame">
+          <div class="phase-caption">
+            <span class="level-1" id="activePhaseTitle">phase 1</span>
+            <span class="level-3" id="activePhaseDetail">chat only</span>
+          </div>
+          <iframe id="phaseFrame" title="phase preview"></iframe>
+        </div>
+      </section>
+    </main>
+
+    </div>
+    <script>
+      const appUrlInput = document.getElementById("appUrl");
+      const lastRun = document.getElementById("lastRun");
+      const resultEl = document.getElementById("results");
+      const phaseFrame = document.getElementById("phaseFrame");
+      const activePhaseTitle = document.getElementById("activePhaseTitle");
+      const activePhaseDetail = document.getElementById("activePhaseDetail");
+      const scaleViewport = document.getElementById("scaleViewport");
+      const phaseLabels = {
+        input: { title: "phase 1", detail: "chat only" },
+        site: { title: "phase 1.5", detail: "chat + site risk map" },
+        spatial: { title: "phase 2", detail: "chat + room model" },
+        review: { title: "phase 3", detail: "options + room + links + check + report" },
+      };
+      let activePhase = "input";
+
+      function setCheckerScale(scale) {
+        document.documentElement.style.setProperty("--checker-scale", String(scale));
+        document.querySelectorAll("[data-scale]").forEach((button) => {
+          button.setAttribute("aria-selected", String(button.dataset.scale === String(scale)));
+        });
+      }
+
+      function defaultAppUrl() {
+        if (window.location.protocol === "file:") {
+          return "http://localhost:5173/";
+        }
+        if (window.location.port === "8000") {
+          return "http://localhost:5173/";
+        }
+        return `${window.location.origin}/`;
+      }
+
+      appUrlInput.value = defaultAppUrl();
+
+      function phaseUrl(phase) {
+        const base = appUrlInput.value || defaultAppUrl();
+        const url = new URL(base, window.location.href);
+        url.searchParams.set("phase", phase);
+        url.searchParams.set("phase_check", String(Date.now()));
+        return url.toString();
+      }
+
+      function bindToggle(button) {
+        button.addEventListener("click", () => {
+          const body = document.getElementById(button.dataset.toggle);
+          const arrow = button.querySelector("span:last-child");
+          const wrapper = button.closest(".section");
+          body.hidden = !body.hidden;
+          wrapper.classList.toggle("is-collapsed", body.hidden);
+          button.setAttribute("aria-expanded", String(!body.hidden));
+          arrow.textContent = body.hidden ? "\u25b8" : "\u25be";
+        });
+      }
+
+      function renderResult(name, ok, detail) {
+        const row = document.createElement("div");
+        row.className = "rule";
+        row.innerHTML = `
+          <span class="dot ${ok ? "pass" : "fail"}"></span>
+          <span>
+            <span class="level-2">${name}</span><br />
+            <span class="level-3">${detail}</span>
+          </span>
+        `;
+        resultEl.appendChild(row);
+      }
+
+      function loadPhases() {
+        loadPhase(activePhase);
+      }
+
+      function loadPhase(phase) {
+        activePhase = phase;
+        const label = phaseLabels[phase];
+        activePhaseTitle.textContent = label.title;
+        activePhaseDetail.textContent = label.detail;
+        document.querySelectorAll("[data-phase]").forEach((button) => {
+          button.setAttribute("aria-selected", String(button.dataset.phase === phase));
+        });
+        phaseFrame.src = phaseUrl(phase);
+        resultEl.innerHTML = "";
+        lastRun.textContent = `loaded ${label.title}`;
+      }
+
+      function frameDoc(frame) {
+        try {
+          return frame.contentDocument;
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function countViewFrames(doc) {
+        return {
+          room: doc.querySelectorAll('iframe[title="room view"]').length,
+          links: doc.querySelectorAll('iframe[title="links view"]').length,
+          validation: doc.querySelectorAll('iframe[title="validation view"]').length,
+          report: doc.querySelectorAll('iframe[title="final report"]').length,
+          riskMap: doc.querySelectorAll("canvas").length || doc.querySelectorAll('iframe[title="risk map view"]').length || Number(/risk map checkpoint|site risk map|precomputed heat context|risk map view/i.test(doc.body?.innerText || "")),
+        };
+      }
+
+      function runCheck() {
+        resultEl.innerHTML = "";
+        const doc = frameDoc(phaseFrame);
+
+        if (!doc) {
+          renderResult("frame readable", false, "wait for the preview to load, then run again");
+          return;
+        }
+
+        const views = countViewFrames(doc);
+        const bodyText = doc.body.innerText || "";
+        const directoryListing = /Index of C:\\|Directory listing for|Index of \//i.test(bodyText);
+
+        renderResult(
+          "app url target",
+          !directoryListing,
+          directoryListing ? "app url is pointing to a directory listing; use http://localhost:5173/" : appUrlInput.value,
+        );
+
+        if (activePhase === "input") {
+          renderResult(
+            "phase 1 layout",
+            views.room === 0 && views.links === 0 && views.validation === 0 && views.report === 0,
+            "chat only, no room/links/report iframes",
+          );
+          renderResult(
+            "phase 1 prompt",
+            /address or coordinates/i.test(bodyText) && /site context/i.test(bodyText),
+            "chat instruction asks for location before diagnosis context",
+          );
+          renderResult(
+            "phase 1 example",
+            /Carrer de Mallorca|Coordinates also work/i.test(bodyText),
+            "example supports address and coordinates without forcing lat/lon",
+          );
+          renderResult(
+            "phase 1 orientation",
+            !/\borient\b|orientation/i.test(bodyText),
+            "orientation is reserved for phase 2 model review",
+          );
+        }
+        if (activePhase === "site") {
+          renderResult(
+            "phase 1.5 layout",
+            views.riskMap > 0 && views.room === 0 && views.links === 0 && views.validation === 0 && views.report === 0,
+            "site context checkpoint shows risk map without room/review iframes",
+          );
+          renderResult(
+            "phase 1.5 content",
+            /site map/i.test(bodyText),
+            "site map view is exposed through the app viewer",
+          );
+          renderResult(
+            "phase 1.5 controls",
+            views.riskMap > 0,
+            "risk map iframe is present in the standard app viewer",
+          );
+          renderResult(
+            "phase 1.5 boundary",
+            views.riskMap > 0,
+            "site checkpoint exposes the 500 m analysis boundary",
+          );
+        }
+        if (activePhase === "spatial") {
+          renderResult(
+            "phase 2 layout",
+            views.room === 1 && views.links === 0 && views.validation === 0 && views.report === 0,
+            "chat plus room model only",
+          );
+          renderResult(
+            "phase 2 status",
+            /room check/i.test(bodyText),
+            "room check section appears",
+          );
+          renderResult(
+            "phase 2 actions",
+            /\bsave\b/i.test(bodyText) && /continue/i.test(bodyText) && !/download|export|include all|update view/i.test(bodyText),
+            "spatial V&V has only shared save and continue actions",
+          );
+          renderResult(
+            "phase 2 windows",
+            /window/i.test(bodyText) && !/furniture/i.test(bodyText),
+            "component review is focused on window segments",
+          );
+          renderResult(
+            "phase 2 validation",
+            !/validation/i.test(bodyText),
+            "validation panel is reserved for diagnosis/review stages",
+          );
+          renderResult(
+            "phase 2 diagnosis",
+            !/wall diagnosis/i.test(bodyText),
+            "wall diagnosis is reserved for after diagnosis calculations",
+          );
+        }
+        if (activePhase === "review") {
+          renderResult(
+            "phase 3 layout",
+            views.room === 1 && views.links === 1 && views.validation === 1 && views.report === 1,
+            "chat plus room, links, validation, and report",
+          );
+          renderResult(
+            "phase 3 tabs",
+            /room/i.test(bodyText) && /links/i.test(bodyText) && /check/i.test(bodyText) && /report/i.test(bodyText),
+            "review navigation exposes room, links, validation, and report",
+          );
+          renderResult(
+            "phase 3 validation",
+            /check/i.test(bodyText),
+            "numerical validation view is available between links and report",
+          );
+          renderResult(
+            "phase 3 options",
+            /option 1/i.test(bodyText) && /option 2/i.test(bodyText) && /option 3/i.test(bodyText),
+            "top three retrofit option buttons are visible",
+          );
+          renderResult(
+            "phase 3 spatial edits",
+            !/select the main outside\/window wall/i.test(bodyText) && !/room check/i.test(bodyText),
+            "orientation and room check are reserved for phase 2",
+          );
+        }
+        lastRun.textContent = `checked ${new Date().toLocaleTimeString()}`;
+      }
+
+      document.querySelectorAll("[data-toggle]").forEach(bindToggle);
+      document.querySelectorAll("[data-phase]").forEach((button) => {
+        button.addEventListener("click", () => loadPhase(button.dataset.phase));
+      });
+      document.getElementById("loadPhases").addEventListener("click", loadPhases);
+      document.querySelectorAll("[data-scale]").forEach((button) => {
+        button.addEventListener("click", () => setCheckerScale(button.dataset.scale));
+      });
+      document.getElementById("runCheck").addEventListener("click", runCheck);
+      phaseFrame.addEventListener("load", runCheck);
+      loadPhases();
+    </script>
+  </body>
+</html>
+
+
+
+
+
+
+
+
+
+

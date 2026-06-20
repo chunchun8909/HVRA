@@ -1,0 +1,634 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>format check</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=DM+Sans:wght@400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink-primary: #0a0a0a;
+        --ink-tertiary: #8a8a8a;
+        --surface-primary: #ffffff;
+        --surface-secondary: #f5f4f2;
+        --border: rgba(0, 0, 0, 0.1);
+        --fail: #9f1d1d;
+        --pass: #166534;
+        --warn: #8a5a00;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--surface-secondary);
+        color: var(--ink-primary);
+        font: 400 13px "DM Sans", Arial, sans-serif;
+      }
+
+      .level-1 {
+        color: var(--ink-tertiary);
+        font: 400 10.5px "DM Mono", monospace;
+        letter-spacing: 0.1em;
+        text-transform: lowercase;
+      }
+
+      .level-2 {
+        color: var(--ink-primary);
+        font: 400 13px "DM Sans", Arial, sans-serif;
+      }
+
+      .level-3 {
+        color: var(--ink-tertiary);
+        font: 400 10px "DM Mono", monospace;
+      }
+
+      header {
+        align-items: center;
+        background: var(--surface-primary);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        gap: 16px;
+        justify-content: space-between;
+        min-height: 50px;
+        padding: 0 16px;
+      }
+
+      main {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: 320px minmax(0, 1fr);
+        height: calc(100vh - 50px);
+        padding: 12px;
+      }
+
+      button,
+      input,
+      select {
+        border: 1px solid var(--border);
+        background: var(--surface-primary);
+        color: var(--ink-primary);
+        font: 400 13px "DM Sans", Arial, sans-serif;
+      }
+
+      button {
+        cursor: pointer;
+        padding: 8px 10px;
+      }
+
+      input {
+        min-width: 0;
+        padding: 8px 10px;
+        width: 100%;
+      }
+
+      .sidebar,
+      .preview {
+        background: var(--surface-primary);
+        border: 1px solid var(--border);
+        min-height: 0;
+      }
+
+      .sidebar {
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+      }
+
+      .section {
+        border-bottom: 1px solid var(--border);
+        padding: 12px;
+      }
+
+      .section:has(.section-body[hidden]) {
+        border-bottom-color: transparent;
+        padding: 5px 12px;
+        width: 82px;
+      }
+
+      .section.is-collapsed {
+        border-bottom-color: transparent;
+        padding: 5px 12px;
+        width: 82px;
+      }
+
+      .section:has(.section-body[hidden]) .section-header,
+      .section.is-collapsed .section-header,
+      .result-group:has(.result-table[hidden]) .section-header,
+      .result-group.is-collapsed .section-header {
+        border: 1px solid var(--border);
+        border-radius: 100px;
+        gap: 12px;
+        min-height: 24px;
+        padding: 4px 9px 4px;
+        width: 100%;
+      }
+
+      .section:has(.section-body[hidden]) .section-header span:first-child,
+      .section.is-collapsed .section-header span:first-child,
+      .result-group:has(.result-table[hidden]) .section-header span:first-child,
+      .result-group.is-collapsed .section-header span:first-child {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .section:has(.section-body[hidden]) .section-header,
+      .section.is-collapsed .section-header {
+        background: var(--surface-secondary);
+      }
+
+      .section-header {
+        align-items: center;
+        background: transparent;
+        border: 0;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 0 10px;
+        text-align: left;
+        width: 100%;
+      }
+
+      .section-body[hidden] {
+        display: none;
+      }
+
+      .rule {
+        align-items: start;
+        display: grid;
+        gap: 8px;
+        grid-template-columns: 18px minmax(0, 1fr);
+        margin: 8px 0;
+      }
+
+      .legend-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .legend-pill {
+        align-items: center;
+        background: var(--surface-secondary);
+        border: 1px solid var(--border);
+        border-radius: 100px;
+        display: inline-flex;
+        gap: 7px;
+        min-height: 24px;
+        padding: 4px 8px;
+      }
+
+      .result-group {
+        border-top: 1px solid var(--border);
+        padding-top: 10px;
+      }
+
+      .result-group:has(.result-table[hidden]) {
+        padding-top: 5px;
+        width: 82px;
+      }
+
+      .result-group.is-collapsed {
+        padding-top: 5px;
+        width: 82px;
+      }
+
+      .result-group:first-child {
+        border-top: 0;
+        padding-top: 0;
+      }
+
+      .result-table[hidden] {
+        display: none;
+      }
+
+      .dot {
+        border-radius: 50%;
+        height: 8px;
+        margin-top: 5px;
+        width: 8px;
+      }
+
+      .pass {
+        background: var(--pass);
+      }
+
+      .fail {
+        background: var(--fail);
+      }
+
+      .warn {
+        background: var(--warn);
+      }
+
+      .preview {
+        display: grid;
+        grid-template-rows: 40px minmax(0, 1fr);
+        overflow: hidden;
+      }
+
+      .preview-bar {
+        align-items: center;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        gap: 8px;
+        justify-content: space-between;
+        padding: 0 12px;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 6px;
+      }
+
+      .tab {
+        font: 400 10px "DM Mono", monospace;
+        padding: 6px 8px;
+      }
+
+      .tab[aria-selected="true"] {
+        color: var(--ink-primary);
+        outline: 1px solid var(--ink-primary);
+      }
+
+      iframe {
+        border: 0;
+        display: none;
+        height: 100%;
+        width: 100%;
+      }
+
+      iframe.active {
+        display: block;
+      }
+
+      .row {
+        display: grid;
+        gap: 6px;
+        margin-bottom: 10px;
+      }
+
+      code {
+        font: 400 10px "DM Mono", monospace;
+      }
+
+      @media (max-width: 980px) {
+        main {
+          grid-template-columns: 1fr;
+          height: auto;
+        }
+
+        .preview {
+          height: 70vh;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <span class="level-1">format check</span>
+      <span class="level-3" id="lastRun">not checked</span>
+    </header>
+
+    <main>
+      <aside class="sidebar">
+        <section class="section">
+          <button class="section-header level-1" data-toggle="setupBody" type="button" aria-expanded="true">
+            <span>setup</span>
+            <span>&#9662;</span>
+          </button>
+          <div id="setupBody" class="section-body">
+            <div class="row">
+              <label class="level-3" for="backendUrl">backend url</label>
+              <input id="backendUrl" value="http://127.0.0.1:8010" />
+            </div>
+            <button id="runCheck" class="level-2">run check</button>
+          </div>
+        </section>
+
+        <section class="section">
+          <button class="section-header level-1" data-toggle="rulesBody" type="button" aria-expanded="true">
+            <span>legend</span>
+            <span>&#9662;</span>
+          </button>
+          <div id="rulesBody" class="section-body legend-grid">
+            <div class="legend-pill" title="DM Mono, 10.5px, weight 400, 0.10em, tertiary ink">
+              <span class="dot warn"></span>
+              <span class="level-3">level 1</span>
+            </div>
+            <div class="legend-pill" title="DM Sans, 13px, weight 400, primary ink">
+              <span class="dot warn"></span>
+              <span class="level-3">level 2</span>
+            </div>
+            <div class="legend-pill" title="DM Mono, 10px, weight 400, tertiary ink">
+              <span class="dot warn"></span>
+              <span class="level-3">level 3</span>
+            </div>
+            <div class="legend-pill" title="room and links legends must collapse">
+              <span class="dot warn"></span>
+              <span class="level-3">fold</span>
+            </div>
+            <div class="legend-pill" title="no internal pipeline names visible">
+              <span class="dot warn"></span>
+              <span class="level-3">plain</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <button class="section-header level-1" data-toggle="resultBody" type="button" aria-expanded="true">
+            <span>check table</span>
+            <span>&#9662;</span>
+          </button>
+          <div id="resultBody" class="section-body">
+            <div id="results"></div>
+          </div>
+        </section>
+      </aside>
+
+      <section class="preview">
+        <div class="preview-bar">
+          <span class="level-1">preview</span>
+          <div class="tabs">
+            <button class="tab" data-frame="appFrame" aria-selected="true">app</button>
+            <button class="tab" data-frame="roomFrame" aria-selected="false">room</button>
+            <button class="tab" data-frame="kgFrame" aria-selected="false">links</button>
+            <button class="tab" data-frame="validationFrame" aria-selected="false">check</button>
+            <button class="tab" data-frame="reportFrame" aria-selected="false">report</button>
+          </div>
+        </div>
+        <iframe id="appFrame" class="active" src="/" title="main app"></iframe>
+        <iframe id="roomFrame" title="room view"></iframe>
+        <iframe id="kgFrame" title="links view"></iframe>
+        <iframe id="validationFrame" title="validation view"></iframe>
+        <iframe id="reportFrame" title="final report"></iframe>
+      </section>
+    </main>
+
+    <script>
+      const checks = [
+        {
+          name: "old room title removed",
+          target: "room",
+          test: (html) => !/HVRA Room 3D View/i.test(html),
+        },
+        {
+          name: "old graph title removed",
+          target: "kg",
+          test: (html) => !/HVRA Knowledge Graph|Knowledge Graph Test View/i.test(html),
+        },
+        {
+          name: "plain room title",
+          target: "room",
+          test: (html) => /<title>room view<\/title>/i.test(html),
+        },
+        {
+          name: "plain links title",
+          target: "kg",
+          test: (html) => /<title>links view<\/title>/i.test(html),
+        },
+        {
+          name: "no visible internal names",
+          target: "both",
+          test: (html) =>
+            !/spatial_index|risk_map|diagnosis_result|strategy_options|retrofit_validation_options|manual_check_result|Selected Node|Wall Image Textures/i.test(html),
+        },
+        {
+          name: "no bold tags",
+          target: "both",
+          test: (html) => !/<strong\b|font-weight:\s*(500|600|700|bold)/i.test(html),
+        },
+        {
+          name: "approved font sizes only",
+          target: "both",
+          test: (html) =>
+            !/font-size:\s*(11|12|14|15|16|18|20|24)|font:\s*(11|12|14|15|16|18|20|24)/i.test(html),
+        },
+        {
+          name: "collapsible sections",
+          target: "both",
+          test: (html) => /data-toggle=/.test(html) && /sectionBody/.test(html),
+        },
+        {
+          name: "room diagnosis panel",
+          target: "room",
+          test: (html) => /wall diagnosis/i.test(html) && /wallDiagnosisRisk/.test(html),
+        },
+        {
+          name: "orientation save",
+          target: "room",
+          test: (html) => /id="saveOrientation"/.test(html) && /api\/spatial\/overrides/.test(html),
+        },
+        {
+          name: "orientation continue",
+          target: "room",
+          test: (html) => /id="saveReturnOrientation"/.test(html) && /hvra_spatial_vv_continue/.test(html),
+        },
+        {
+          name: "fonts loaded in view",
+          target: "both",
+          test: (html) => /DM\+Mono:wght@400&family=DM\+Sans:wght@400/.test(html),
+        },
+        {
+          name: "validation view title",
+          target: "validation",
+          test: (html) => /<title>validation view<\/title>/i.test(html),
+        },
+        {
+          name: "validation comparison",
+          target: "validation",
+          test: (html) => /before and after/i.test(html) && /original/i.test(html) && /with upgrade/i.test(html),
+        },
+        {
+          name: "option-aware links",
+          target: "kg",
+          test: (html) => /selectedStrategyId/.test(html) && /option focus/.test(html),
+        },
+        {
+          name: "option-aware check",
+          target: "validation",
+          test: (html) => /data-strategy-id/.test(html) && /selectedStrategyId/.test(html),
+        },
+        {
+          name: "option-aware report",
+          target: "report",
+          test: (html) => /data-strategy-id/.test(html) && /optionCards/.test(html),
+        },
+        {
+          name: "final report title",
+          target: "report",
+          test: (html) => /<title>final report<\/title>/i.test(html),
+        },
+      ];
+
+      const resultEl = document.getElementById("results");
+      const backendInput = document.getElementById("backendUrl");
+      const lastRun = document.getElementById("lastRun");
+      const roomFrame = document.getElementById("roomFrame");
+      const kgFrame = document.getElementById("kgFrame");
+      const validationFrame = document.getElementById("validationFrame");
+      const reportFrame = document.getElementById("reportFrame");
+      const resultGroups = new Map();
+
+      function viewUrls() {
+        const backend = backendInput.value.replace(/\/$/, "");
+        return {
+          room: `${backend}/static-views/spatial/room_3d_view.html`,
+          kg: `${backend}/static-views/kg/kg_view.html`,
+          validation: `${backend}/static-views/validation_view.html`,
+          report: `${backend}/static-views/final_report_view.html`,
+        };
+      }
+
+      function bindToggle(button) {
+        button.addEventListener("click", () => {
+          const body = document.getElementById(button.dataset.toggle);
+          const arrow = button.querySelector("span:last-child");
+          const wrapper = button.closest(".section, .result-group");
+          if (!body || !arrow) {
+            return;
+          }
+          body.hidden = !body.hidden;
+          if (wrapper) {
+            wrapper.classList.toggle("is-collapsed", body.hidden);
+          }
+          button.setAttribute("aria-expanded", String(!body.hidden));
+          arrow.textContent = body.hidden ? "\u25b8" : "\u25be";
+        });
+      }
+
+      function ensureResultGroup(groupName) {
+        if (resultGroups.has(groupName)) {
+          return resultGroups.get(groupName);
+        }
+
+        const id = `result_${groupName.replace(/[^a-z0-9]/gi, "_")}`;
+        const group = document.createElement("section");
+        group.className = "result-group";
+        group.innerHTML = `
+          <button class="section-header level-1" data-toggle="${id}" type="button" aria-expanded="true">
+            <span>${groupName}</span>
+            <span>\u25be</span>
+          </button>
+          <div id="${id}" class="result-table"></div>
+        `;
+        resultEl.appendChild(group);
+        bindToggle(group.querySelector("[data-toggle]"));
+
+        const table = group.querySelector(".result-table");
+        resultGroups.set(groupName, table);
+        return table;
+      }
+
+      function renderResult(name, ok, detail, groupName = "general") {
+        const row = document.createElement("div");
+        row.className = "rule";
+        row.innerHTML = `
+          <span class="dot ${ok ? "pass" : "fail"}"></span>
+          <span>
+            <span class="level-2">${name}</span><br />
+            <span class="level-3">${detail}</span>
+          </span>
+        `;
+        ensureResultGroup(groupName).appendChild(row);
+      }
+
+      async function fetchText(url) {
+        const response = await fetch(`${url}?check=${Date.now()}`);
+        if (!response.ok) {
+          throw new Error(`${response.status} ${response.statusText}`);
+        }
+        return response.text();
+      }
+
+      async function runCheck() {
+        const urls = viewUrls();
+        resultEl.innerHTML = "";
+        resultGroups.clear();
+        roomFrame.src = `${urls.room}?preview=${Date.now()}`;
+        kgFrame.src = `${urls.kg}?preview=${Date.now()}`;
+        validationFrame.src = `${urls.validation}?preview=${Date.now()}`;
+        reportFrame.src = `${urls.report}?preview=${Date.now()}`;
+
+        let roomHtml = "";
+        let kgHtml = "";
+        let validationHtml = "";
+        let reportHtml = "";
+
+        try {
+          roomHtml = await fetchText(urls.room);
+          renderResult("room view reachable", true, urls.room, "room");
+        } catch (error) {
+          renderResult("room view reachable", false, error.message, "room");
+        }
+
+        try {
+          kgHtml = await fetchText(urls.kg);
+          renderResult("links view reachable", true, urls.kg, "links");
+        } catch (error) {
+          renderResult("links view reachable", false, error.message, "links");
+        }
+
+        try {
+          validationHtml = await fetchText(urls.validation);
+          renderResult("validation view reachable", true, urls.validation, "validation");
+        } catch (error) {
+          renderResult("validation view reachable", false, error.message, "validation");
+        }
+
+        try {
+          reportHtml = await fetchText(urls.report);
+          renderResult("final report reachable", true, urls.report, "report");
+        } catch (error) {
+          renderResult("final report reachable", false, error.message, "report");
+        }
+
+        checks.forEach((check) => {
+          const html =
+            check.target === "room"
+              ? roomHtml
+              : check.target === "kg"
+                ? kgHtml
+                : check.target === "validation"
+                  ? validationHtml
+                  : check.target === "report"
+                    ? reportHtml
+                  : `${roomHtml}\n${kgHtml}`;
+          if (!html) {
+            renderResult(check.name, false, "view html missing", check.target);
+            return;
+          }
+          renderResult(check.name, check.test(html), check.target, check.target);
+        });
+
+        lastRun.textContent = `checked ${new Date().toLocaleTimeString()}`;
+      }
+
+      document.getElementById("runCheck").addEventListener("click", runCheck);
+
+      document.querySelectorAll("[data-toggle]").forEach(bindToggle);
+
+      document.querySelectorAll("[data-frame]").forEach((button) => {
+        button.addEventListener("click", () => {
+          document.querySelectorAll("[data-frame]").forEach((item) => item.setAttribute("aria-selected", "false"));
+          document.querySelectorAll("iframe").forEach((frame) => frame.classList.remove("active"));
+          button.setAttribute("aria-selected", "true");
+          document.getElementById(button.dataset.frame).classList.add("active");
+        });
+      });
+
+      runCheck();
+    </script>
+  </body>
+</html>
+
+
+

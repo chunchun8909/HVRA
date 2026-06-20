@@ -1,0 +1,5 @@
+infrared-sdk
+python-dotenv
+numpy
+plotly
+

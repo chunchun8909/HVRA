@@ -1,0 +1,394 @@
+﻿from __future__ import annotations
+
+
+DEFAULT_EFFECT = {
+    "solar_gain_multiplier": 0.85,
+    "ventilation_deficit_multiplier": 1.0,
+    "envelope_score_multiplier": 1.0,
+    "nocturnal_recovery_multiplier": 0.95,
+    "operative_temp_reduction_c": 0.8,
+    "wbgt_reduction_c": 0.3,
+    "overheating_hours_multiplier": 0.85,
+    "confidence_score": 0.45,
+    "confidence_reasons": [
+        "Generic retrofit effect because strategy type is not explicitly mapped.",
+        "Rule-based estimate; no dynamic thermal simulation has been run.",
+    ],
+}
+
+
+EFFECT_LIBRARY = {
+    "internal_blinds": {
+        "solar_gain_multiplier": 0.68,
+        "ventilation_deficit_multiplier": 1.0,
+        "envelope_score_multiplier": 1.0,
+        "nocturnal_recovery_multiplier": 0.93,
+        "operative_temp_reduction_c": 1.0,
+        "wbgt_reduction_c": 0.35,
+        "overheating_hours_multiplier": 0.80,
+        "confidence_score": 0.58,
+        "confidence_reasons": [
+            "Internal blinds reduce glare and some solar gains after radiation enters the room.",
+            "External shading is normally more effective because it blocks radiation before glazing entry.",
+            "Effect depends strongly on user operation and reflectance of the blind surface.",
+        ],
+    },
+    "temporary_window_film": {
+        "solar_gain_multiplier": 0.55,
+        "ventilation_deficit_multiplier": 1.0,
+        "envelope_score_multiplier": 1.0,
+        "nocturnal_recovery_multiplier": 0.90,
+        "operative_temp_reduction_c": 1.8,
+        "wbgt_reduction_c": 0.6,
+        "overheating_hours_multiplier": 0.72,
+        "confidence_score": 0.62,
+        "confidence_reasons": [
+            "Strategy directly targets solar heat gain through glazing.",
+            "Magnitude is estimated from rule-based assumptions, not product-specific SHGC test data.",
+            "Effect on night recovery is indirect and therefore lower confidence.",
+        ],
+    },
+    "solar_control_glazing": {
+        "solar_gain_multiplier": 0.45,
+        "ventilation_deficit_multiplier": 1.0,
+        "envelope_score_multiplier": 0.95,
+        "nocturnal_recovery_multiplier": 0.88,
+        "operative_temp_reduction_c": 1.7,
+        "wbgt_reduction_c": 0.55,
+        "overheating_hours_multiplier": 0.70,
+        "confidence_score": 0.64,
+        "confidence_reasons": [
+            "Solar-control glazing reduces solar heat gain through the window.",
+            "Effect depends on selected SHGC and visible-transmittance tradeoffs.",
+        ],
+    },
+    "external_shading": {
+        "solar_gain_multiplier": 0.35,
+        "ventilation_deficit_multiplier": 1.0,
+        "envelope_score_multiplier": 1.0,
+        "nocturnal_recovery_multiplier": 0.82,
+        "operative_temp_reduction_c": 2.6,
+        "wbgt_reduction_c": 0.9,
+        "overheating_hours_multiplier": 0.60,
+        "confidence_score": 0.70,
+        "confidence_reasons": [
+            "External shading blocks radiation before it enters the room.",
+            "Rule-based estimate; geometry and solar exposure are image-derived.",
+        ],
+    },
+    "external_shutters": {
+        "solar_gain_multiplier": 0.30,
+        "ventilation_deficit_multiplier": 1.0,
+        "envelope_score_multiplier": 1.0,
+        "nocturnal_recovery_multiplier": 0.80,
+        "operative_temp_reduction_c": 2.2,
+        "wbgt_reduction_c": 0.75,
+        "overheating_hours_multiplier": 0.62,
+        "confidence_score": 0.66,
+        "confidence_reasons": [
+            "External shutters are effective solar-control elements when closed during peak exposure.",
+            "Effect depends on operation schedule and existing shutter box condition.",
+        ],
+    },
+    "green_pergola": {
+        "solar_gain_multiplier": 0.55,
+        "ventilation_deficit_multiplier": 0.95,
+        "envelope_score_multiplier": 0.98,
+        "nocturnal_recovery_multiplier": 0.88,
+        "operative_temp_reduction_c": 1.4,
+        "wbgt_reduction_c": 0.45,
+        "overheating_hours_multiplier": 0.76,
+        "confidence_score": 0.52,
+        "confidence_reasons": [
+            "Green shading can lower solar exposure and local ambient temperature.",
+            "Effect depends on vegetation maturity, irrigation, and facade access.",
+        ],
+    },
+    "night_purge_ventilation": {
+        "solar_gain_multiplier": 1.0,
+        "ventilation_deficit_multiplier": 0.55,
+        "envelope_score_multiplier": 1.0,
+        "nocturnal_recovery_multiplier": 0.55,
+        "operative_temp_reduction_c": 1.0,
+        "wbgt_reduction_c": 0.4,
+        "overheating_hours_multiplier": 0.68,
+        "confidence_score": 0.58,
+        "confidence_reasons": [
+            "Strategy directly targets night cooling and ACH.",
+            "Actual effect depends on secure openings, wind exposure, and occupant operation.",
+        ],
+    },
+    "cross_ventilation_behaviour": {
+        "solar_gain_multiplier": 1.0,
+        "ventilation_deficit_multiplier": 0.65,
+        "envelope_score_multiplier": 1.0,
+        "nocturnal_recovery_multiplier": 0.70,
+        "operative_temp_reduction_c": 0.9,
+        "wbgt_reduction_c": 0.35,
+        "overheating_hours_multiplier": 0.75,
+        "confidence_score": 0.54,
+        "confidence_reasons": [
+            "Uses an existing cross-ventilation path more effectively.",
+            "Behavioural effect depends on resident timing and security/noise constraints.",
+        ],
+    },
+    "interior_opening_improvement": {
+        "solar_gain_multiplier": 1.0,
+        "ventilation_deficit_multiplier": 0.72,
+        "envelope_score_multiplier": 1.0,
+        "nocturnal_recovery_multiplier": 0.78,
+        "operative_temp_reduction_c": 0.9,
+        "wbgt_reduction_c": 0.3,
+        "overheating_hours_multiplier": 0.78,
+        "confidence_score": 0.52,
+        "confidence_reasons": [
+            "Creates or improves an internal air path.",
+            "Effect depends on pressure path, privacy, and door/transom operation.",
+        ],
+    },
+    "window_enlargement": {
+        "solar_gain_multiplier": 1.05,
+        "ventilation_deficit_multiplier": 0.55,
+        "envelope_score_multiplier": 1.0,
+        "nocturnal_recovery_multiplier": 0.72,
+        "operative_temp_reduction_c": 1.5,
+        "wbgt_reduction_c": 0.45,
+        "overheating_hours_multiplier": 0.72,
+        "confidence_score": 0.48,
+        "confidence_reasons": [
+            "Larger openings can improve ventilation but may also increase solar gain if unshaded.",
+            "Structural feasibility is not verified by this rule-based model.",
+        ],
+    },
+    "stack_effect_roof_vent": {
+        "solar_gain_multiplier": 1.0,
+        "ventilation_deficit_multiplier": 0.62,
+        "envelope_score_multiplier": 0.98,
+        "nocturnal_recovery_multiplier": 0.68,
+        "operative_temp_reduction_c": 1.2,
+        "wbgt_reduction_c": 0.4,
+        "overheating_hours_multiplier": 0.73,
+        "confidence_score": 0.50,
+        "confidence_reasons": [
+            "Stack ventilation can remove warm air from roof-exposed upper rooms.",
+            "Effect depends on vertical air path and pressure conditions.",
+        ],
+    },
+    "roof_insulation": {
+        "solar_gain_multiplier": 0.95,
+        "ventilation_deficit_multiplier": 1.0,
+        "envelope_score_multiplier": 0.65,
+        "nocturnal_recovery_multiplier": 0.75,
+        "operative_temp_reduction_c": 1.6,
+        "wbgt_reduction_c": 0.4,
+        "overheating_hours_multiplier": 0.75,
+        "confidence_score": 0.60,
+        "confidence_reasons": [
+            "Strategy targets top-floor roof heat transfer.",
+            "Envelope effect is estimated because no U-value design proposal is present.",
+        ],
+    },
+    "cool_roof_coating": {
+        "solar_gain_multiplier": 0.75,
+        "ventilation_deficit_multiplier": 1.0,
+        "envelope_score_multiplier": 0.78,
+        "nocturnal_recovery_multiplier": 0.82,
+        "operative_temp_reduction_c": 1.5,
+        "wbgt_reduction_c": 0.4,
+        "overheating_hours_multiplier": 0.76,
+        "confidence_score": 0.58,
+        "confidence_reasons": [
+            "Reflective roof coatings reduce absorbed solar heat at roof level.",
+            "Effect is strongest for roof-exposed top-floor rooms and suitable roof surfaces.",
+        ],
+    },
+    "external_wall_insulation": {
+        "solar_gain_multiplier": 0.95,
+        "ventilation_deficit_multiplier": 1.0,
+        "envelope_score_multiplier": 0.70,
+        "nocturnal_recovery_multiplier": 0.82,
+        "operative_temp_reduction_c": 1.3,
+        "wbgt_reduction_c": 0.35,
+        "overheating_hours_multiplier": 0.80,
+        "confidence_score": 0.58,
+        "confidence_reasons": [
+            "External insulation reduces conductive heat transfer through the facade.",
+            "Effect depends on existing U-value and thermal bridge detailing.",
+        ],
+    },
+    "internal_wall_insulation": {
+        "solar_gain_multiplier": 0.98,
+        "ventilation_deficit_multiplier": 1.0,
+        "envelope_score_multiplier": 0.78,
+        "nocturnal_recovery_multiplier": 0.86,
+        "operative_temp_reduction_c": 1.0,
+        "wbgt_reduction_c": 0.30,
+        "overheating_hours_multiplier": 0.84,
+        "confidence_score": 0.52,
+        "confidence_reasons": [
+            "Internal insulation improves envelope resistance where exterior changes are restricted.",
+            "Cold bridge and room-area impacts are not resolved by this screening model.",
+        ],
+    },
+    "wall_insulation_reinforcement_layer": {
+        "solar_gain_multiplier": 0.96,
+        "ventilation_deficit_multiplier": 1.0,
+        "envelope_score_multiplier": 0.72,
+        "nocturnal_recovery_multiplier": 0.82,
+        "operative_temp_reduction_c": 1.2,
+        "wbgt_reduction_c": 0.35,
+        "overheating_hours_multiplier": 0.80,
+        "confidence_score": 0.50,
+        "confidence_reasons": [
+            "Reinforced thermal lining improves interior-side wall resistance where external ETICS is restricted.",
+            "Moisture, condensation, and thermal-bridge detailing are not resolved by this screening model.",
+        ],
+    },    "cool_facade_paint": {
+        "solar_gain_multiplier": 0.70,
+        "ventilation_deficit_multiplier": 1.0,
+        "envelope_score_multiplier": 0.90,
+        "nocturnal_recovery_multiplier": 0.86,
+        "operative_temp_reduction_c": 1.2,
+        "wbgt_reduction_c": 0.35,
+        "overheating_hours_multiplier": 0.80,
+        "confidence_score": 0.54,
+        "confidence_reasons": [
+            "Reflective facade paint reduces absorbed solar radiation on exposed walls.",
+            "Impact depends on existing facade colour, exposure, and permission constraints.",
+        ],
+    },
+    "phase_change_materials": {
+        "solar_gain_multiplier": 1.0,
+        "ventilation_deficit_multiplier": 1.0,
+        "envelope_score_multiplier": 0.92,
+        "nocturnal_recovery_multiplier": 0.72,
+        "operative_temp_reduction_c": 0.8,
+        "wbgt_reduction_c": 0.25,
+        "overheating_hours_multiplier": 0.82,
+        "confidence_score": 0.46,
+        "confidence_reasons": [
+            "PCM can shift peak timing and improve thermal buffering.",
+            "Screening model cannot verify charge/discharge cycling without dynamic simulation.",
+        ],
+    },
+    "courtyard_greening": {
+        "solar_gain_multiplier": 0.92,
+        "ventilation_deficit_multiplier": 0.98,
+        "envelope_score_multiplier": 1.0,
+        "nocturnal_recovery_multiplier": 0.92,
+        "operative_temp_reduction_c": 0.7,
+        "wbgt_reduction_c": 0.25,
+        "overheating_hours_multiplier": 0.88,
+        "confidence_score": 0.42,
+        "confidence_reasons": [
+            "Courtyard greening is an ambient/context measure rather than direct room retrofit.",
+            "Effect depends on courtyard geometry, vegetation, irrigation, and air movement.",
+        ],
+    },
+    "street_tree_canopy": {
+        "solar_gain_multiplier": 0.90,
+        "ventilation_deficit_multiplier": 1.0,
+        "envelope_score_multiplier": 1.0,
+        "nocturnal_recovery_multiplier": 0.92,
+        "operative_temp_reduction_c": 0.7,
+        "wbgt_reduction_c": 0.25,
+        "overheating_hours_multiplier": 0.88,
+        "confidence_score": 0.40,
+        "confidence_reasons": [
+            "Street tree canopy is an urban-context cooling measure.",
+            "Effect is approximate and requires municipal implementation data.",
+        ],
+    },
+    "shared_cooling_refuge": {
+        "solar_gain_multiplier": 1.0,
+        "ventilation_deficit_multiplier": 1.0,
+        "envelope_score_multiplier": 1.0,
+        "nocturnal_recovery_multiplier": 1.0,
+        "operative_temp_reduction_c": 0.0,
+        "wbgt_reduction_c": 0.0,
+        "overheating_hours_multiplier": 1.0,
+        "confidence_score": 0.35,
+        "confidence_reasons": [
+            "Cooling refuge improves heat-health resilience rather than room thermal performance.",
+            "It should be reported as a support measure, not a room benchmark pass mechanism.",
+        ],
+    },
+}
+
+
+ALIASES = {
+    "internal_shading": "internal_blinds",
+    "external_shading_louvers": "external_shading",
+    "external_shading": "external_shading",
+    "window_film": "temporary_window_film",
+    "temporary_window_film": "temporary_window_film",
+    "solar_control_glazing": "solar_control_glazing",
+    "green_pergola": "green_pergola",
+    "window_enlargement": "window_enlargement",
+    "interior_opening_improvement": "interior_opening_improvement",
+    "stack_effect_roof_vent": "stack_effect_roof_vent",
+    "night_purge_ventilation": "night_purge_ventilation",
+    "cross_ventilation_behaviour": "cross_ventilation_behaviour",
+    "external_wall_insulation_etics": "external_wall_insulation",
+    "external_wall_insulation": "external_wall_insulation",
+    "internal_wall_insulation": "internal_wall_insulation",
+    "wall_insulation_reinforcement_layer": "wall_insulation_reinforcement_layer",
+    "roof_insulation": "roof_insulation",
+    "cool_roof_coating": "cool_roof_coating",
+    "cool_facade_paint": "cool_facade_paint",
+    "phase_change_materials": "phase_change_materials",
+    "thermal_mass_enhancement": "phase_change_materials",
+    "courtyard_greening": "courtyard_greening",
+    "street_tree_canopy": "street_tree_canopy",
+    "shared_cooling_refuge": "shared_cooling_refuge",
+    "window_external_shutters": "external_shutters",
+}
+
+
+def infer_effect_profile(strategy: dict) -> dict:
+    strategy_id = str(strategy.get("strategy_id", "")).lower()
+    strategy_name = str(strategy.get("strategy_name", "")).lower()
+    explicit_profile = str(strategy.get("effect_profile_id", "")).lower()
+
+    for key in (explicit_profile, strategy_id):
+        if key in ALIASES:
+            profile_id = ALIASES[key]
+            return {**EFFECT_LIBRARY[profile_id], "effect_profile_id": profile_id}
+        if key in EFFECT_LIBRARY:
+            return {**EFFECT_LIBRARY[key], "effect_profile_id": key}
+
+    name_rules = [
+        ("shutter", "external_shutters"),
+        ("louver", "external_shading"),
+        ("external", "external_shading"),
+        ("blind", "internal_blinds"),
+        ("film", "temporary_window_film"),
+        ("glazing", "solar_control_glazing"),
+        ("pergola", "green_pergola"),
+        ("night", "night_purge_ventilation"),
+        ("purge", "night_purge_ventilation"),
+        ("cross", "cross_ventilation_behaviour"),
+        ("transom", "interior_opening_improvement"),
+        ("opening", "interior_opening_improvement"),
+        ("roof vent", "stack_effect_roof_vent"),
+        ("cool roof", "cool_roof_coating"),
+        ("roof insulation", "roof_insulation"),
+        ("etics", "external_wall_insulation"),
+        ("reinforcement", "wall_insulation_reinforcement_layer"),
+        ("thermal lining", "wall_insulation_reinforcement_layer"),
+        ("internal wall", "internal_wall_insulation"),
+        ("cool facade", "cool_facade_paint"),
+        ("reflective facade", "cool_facade_paint"),
+        ("phase", "phase_change_materials"),
+        ("pcm", "phase_change_materials"),
+        ("courtyard", "courtyard_greening"),
+        ("tree", "street_tree_canopy"),
+        ("refuge", "shared_cooling_refuge"),
+    ]
+    for token, profile_id in name_rules:
+        if token in strategy_name:
+            return {**EFFECT_LIBRARY[profile_id], "effect_profile_id": profile_id}
+
+    return {**DEFAULT_EFFECT, "effect_profile_id": "generic"}
+
+
