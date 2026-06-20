@@ -59,6 +59,7 @@ Force specific phases:
 
 ```text
 http://127.0.0.1:5173/?phase=input
+http://127.0.0.1:5173/?phase=site
 http://127.0.0.1:5173/?phase=spatial
 http://127.0.0.1:5173/?phase=review
 ```
@@ -92,7 +93,7 @@ Continue after checkpoint with LLM enabled:
 .\.venv\Scripts\python.exe continue_from_checkpoint.py --llm --apply
 ```
 
-Continue with mocks for Gemini and Neo4j:
+Continue with Gemini mocked and local/mock KG mode:
 
 ```powershell
 .\.venv\Scripts\python.exe continue_from_checkpoint.py --llm --apply --mock-gemini --mock-neo4j
@@ -113,6 +114,8 @@ http://127.0.0.1:8010/static-views/spatial/room_3d_view.html
 ```
 
 ## Knowledge Graph View
+
+Current default uses local generated KG JSON/HTML. Neo4j is not required unless you explicitly set `USE_MOCK_NEO4J=false`.
 
 Regenerate the KG HTML view:
 
@@ -211,5 +214,7 @@ Start the backend first, then start the frontend.
 Backend:  http://127.0.0.1:8010
 Frontend: http://127.0.0.1:5173
 ```
+
+
 
 

@@ -37,7 +37,7 @@ HVRA is a backend-first Heat Vulnerability Retrofit Assistant. It helps inspect 
 | RAG Engine | `rag_engine/` | PDF loading, chunking, vector/keyword/hybrid retrieval, manual evidence checking. | `manual_check_result.json`, vector DB |
 | Validation Engine | `validation_engine/` | Baseline/proposed indicator comparison, benchmark pass/fail, confidence gate, combo screening method. | `retrofit_validation_options.json`, `retrofit_validation.json` |
 | Checkpoint Engine | `checkpoint_engine/` | Creates stage checkpoint packages and routes decisions. | `data/checkpoints/*` |
-| Knowledge Graph | `knowledge_graph/` | Neo4j graph writing and generated interactive KG HTML. | Neo4j graph, `kg_view.html` |
+| Knowledge Graph | `knowledge_graph/` | local KG JSON/HTML generation; optional Neo4j graph writing. | `kg_view_data.json`, `kg_view.html` |
 | Gemini Engine | `gemini_engine/` | Visual prompt/result layer for future generated design images. | `gemini_prompt.json`, `gemini_result.json` |
 | Report Engine | `report_engine/` | Final JSON, Markdown, and HTML report compilation. | `final_report.json`, `final_report.md`, `final_report_view.html` |
 
@@ -50,7 +50,7 @@ HVRA is a backend-first Heat Vulnerability Retrofit Assistant. It helps inspect 
 | Ollama | Local LLM JSON reasoning for interpretation, ranking, review. | Real or mock |
 | Gemini | Visual generation/prompt layer. | Real or mock |
 | Chroma/vector retrieval | Local RAG vector store. | Local |
-| Neo4j | Relationship/traceability graph. | Real or mock |
+| Neo4j | Optional external graph database for future/live traceability. Current default uses mock/local KG export. | Disabled/mock |
 | Infrared City | Optional microclimate API/context assist. | Real/cache/mock |
 
 ### Interface Phases
@@ -62,7 +62,7 @@ Phase 2: spatial V&V, wall orientation, window inclusion check
 Phase 3: top three retrofit options, room/KG/check/report review
 ```
 
-The system is designed so each checkpoint can update three synchronized views: canonical JSON, Neo4j graph, and HTML/3D review views. The interface now uses a compact 60 percent production scale, while `phase_check.html` keeps 50/60/75/100 scale buttons only for QA.
+The system is designed so each checkpoint can update three synchronized views: canonical JSON, generated KG view, and HTML/3D review views. The interface now uses a compact 60 percent production scale, while `phase_check.html` keeps 50/60/75/100 scale buttons only for QA.
 
 ---
 
@@ -74,13 +74,13 @@ This document describes the current backend architecture. It replaces the older 
 ### Core Principle
 
 ```text
-canonical JSON -> generated Neo4j view
+canonical JSON -> generated KG JSON/HTML view
 canonical JSON -> generated HTML views
 canonical JSON -> LLM checkpoint prompt
 canonical JSON -> report output
 ```
 
-JSON files remain the source of truth. Neo4j and HTML are generated views used for traceability, debugging, and the current stage-aware interface.
+JSON files remain the source of truth. KG HTML and other HTML outputs are generated views used for traceability, debugging, and the current stage-aware interface.
 
 ### Active Pipeline
 
@@ -127,8 +127,8 @@ Risk Map
 - builds site context for diagnosis, not the final room risk score
         |
         v
-Neo4j Spatial Graph
-- Building -> Room -> Wall -> Component
+Knowledge Graph Export
+- generated JSON/HTML trace: Building -> Room -> Wall -> Component
         |
         v
 Diagnosis Engine
@@ -142,9 +142,9 @@ Problem Map
 - outputs problem_map.json
         |
         v
-Neo4j Diagnosis Graph
-- Room -> Problem
-- Wall/Component -> Problem
+Diagnosis KG Export
+- generated JSON/HTML trace: Room -> Problem
+- generated JSON/HTML trace: Wall/Component -> Problem
         |
         v
 RAG Manual Check
@@ -178,10 +178,10 @@ Selected Retrofit Validation
 - outputs retrofit_validation.json
         |
         v
-Neo4j Decision and Checkpoint Graph
-- Strategy -> ValidationResult
-- Checkpoint -> ValidationResult
-- UserSelection -> Strategy
+Decision and Checkpoint KG Export
+- generated JSON/HTML trace: Strategy -> ValidationResult
+- generated JSON/HTML trace: Checkpoint -> ValidationResult
+- generated JSON/HTML trace: UserSelection -> Strategy
         |
         v
 Gemini Engine
@@ -344,7 +344,7 @@ stop
 
 #### `knowledge_graph/`
 
-Owns Neo4j writes and KG test visualization.
+Owns local KG JSON/HTML visualization; optional Neo4j writes remain available but are disabled by default.
 
 Generated local KG view:
 
@@ -1155,7 +1155,7 @@ canonical JSON -> LLM checkpoint prompt
 canonical JSON -> final report
 ```
 
-Generated HTML and Neo4j are views. JSON remains canonical.
+Generated HTML/KG views are views. JSON remains canonical. Neo4j is optional and not required for the current test setup.
 
 ### Active UI Phases
 
@@ -1209,7 +1209,7 @@ FastAPI backend  -> http://127.0.0.1:8010
 Generated views  -> served by FastAPI from data/output/
 ```
 
-The React frontend is the user-facing control and review shell. It does not calculate heat risk, run LGTNet, write Neo4j, or validate retrofit performance directly. It collects user input, sends requests to FastAPI, displays status, and embeds generated room/KG/report views.
+The React frontend is the user-facing control and review shell. It does not calculate heat risk, run LGTNet, write a live Neo4j graph, or validate retrofit performance directly. It collects user input, sends requests to FastAPI, displays status, and embeds generated room/KG/report views.
 
 The FastAPI backend is the bridge between the interface and the backend engines. It receives form data and image uploads, writes canonical JSON input files, triggers `main.py` or checkpoint continuation, exposes generated files through static routes, and returns structured API responses to React.
 
@@ -1219,7 +1219,7 @@ The FastAPI backend is the bridge between the interface and the backend engines.
 | --- | --- | --- |
 | React / Vite | `interface/` | Browser UI, phase layout, chat shell, option buttons, embedded generated views. |
 | FastAPI | `app.py` | API layer, pipeline trigger, file writer, checkpoint continuation, static generated-view server. |
-| Backend engines | Python packages in root folders | Spatial, risk map, diagnosis, RAG, validation, KG, Gemini, report generation. |
+| Backend engines | Python packages in root folders | Spatial, risk map, diagnosis, RAG, validation, local KG export, Gemini, report generation. |
 | Generated HTML views | `data/output/` | Room viewer, KG viewer, validation view, final report view. |
 
 #### Request Flow
@@ -1253,7 +1253,7 @@ room_3d_view.html saves orientation overrides
   -> POST /api/spatial/overrides
   -> FastAPI writes data/intermediate/spatial_user_overrides.json
   -> React/FastAPI continue the pipeline
-  -> risk map, diagnosis, problem map, RAG, validation, KG, report run
+  -> risk map, diagnosis, problem map, RAG, validation, local KG export, report run
   -> React moves to phase 3
 ```
 
@@ -1279,7 +1279,7 @@ thermal calculations
 risk scoring
 RAG retrieval
 strategy validation
-Neo4j graph logic
+live Neo4j graph logic
 LGTNet/SAM3 execution
 canonical data mutation outside backend APIs
 ```
@@ -1565,6 +1565,7 @@ npm run build
 ```
 
 Do not run Vite through the `Desktop\Test` junction. Rollup may emit invalid relative chunk paths from that location.
+
 
 
 

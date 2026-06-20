@@ -22,12 +22,13 @@ This folder contains the human-facing documentation for the HVRA backend and int
 ## Canonical Principle
 
 ```text
-canonical JSON -> generated Neo4j view
+canonical JSON -> generated KG JSON/HTML view
 canonical JSON -> generated HTML views
 canonical JSON -> LLM checkpoint prompt
 canonical JSON -> report output
 ```
 
-JSON files under `data/input/`, `data/intermediate/`, `data/checkpoints/`, and `data/output/` are the source of truth for current test runs. Neo4j and HTML are generated views for review and traceability.
+JSON files under `data/input/`, `data/intermediate/`, `data/checkpoints/`, and `data/output/` are the source of truth for current test runs. KG HTML and other HTML outputs are generated views for review and traceability.
+
 
 

@@ -16,7 +16,7 @@ canonical JSON -> LLM checkpoint prompt
 canonical JSON -> final report
 ```
 
-Generated HTML and Neo4j are views. JSON remains canonical.
+Generated HTML/KG views are views. JSON remains canonical. Neo4j is optional and not required for the current test setup.
 
 ## Active UI Phases
 
@@ -70,7 +70,7 @@ FastAPI backend  -> http://127.0.0.1:8010
 Generated views  -> served by FastAPI from data/output/
 ```
 
-The React frontend is the user-facing control and review shell. It does not calculate heat risk, run LGTNet, write Neo4j, or validate retrofit performance directly. It collects user input, sends requests to FastAPI, displays status, and embeds generated room/KG/report views.
+The React frontend is the user-facing control and review shell. It does not calculate heat risk, run LGTNet, write a live Neo4j graph, or validate retrofit performance directly. It collects user input, sends requests to FastAPI, displays status, and embeds generated room/KG/report views.
 
 The FastAPI backend is the bridge between the interface and the backend engines. It receives form data and image uploads, writes canonical JSON input files, triggers `main.py` or checkpoint continuation, exposes generated files through static routes, and returns structured API responses to React.
 
@@ -80,7 +80,7 @@ The FastAPI backend is the bridge between the interface and the backend engines.
 | --- | --- | --- |
 | React / Vite | `interface/` | Browser UI, phase layout, chat shell, option buttons, embedded generated views. |
 | FastAPI | `app.py` | API layer, pipeline trigger, file writer, checkpoint continuation, static generated-view server. |
-| Backend engines | Python packages in root folders | Spatial, risk map, diagnosis, RAG, validation, KG, Gemini, report generation. |
+| Backend engines | Python packages in root folders | Spatial, risk map, diagnosis, RAG, validation, local KG export, Gemini, report generation. |
 | Generated HTML views | `data/output/` | Room viewer, KG viewer, validation view, final report view. |
 
 ### Request Flow
@@ -115,7 +115,7 @@ room_3d_view.html saves orientation overrides
   -> POST /api/spatial/overrides
   -> FastAPI writes data/intermediate/spatial_user_overrides.json
   -> React/FastAPI continue the pipeline
-  -> risk map, diagnosis, problem map, RAG, validation, KG, report run
+  -> risk map, diagnosis, problem map, RAG, validation, local KG export, report run
   -> React moves to phase 3
 ```
 
@@ -141,7 +141,7 @@ thermal calculations
 risk scoring
 RAG retrieval
 strategy validation
-Neo4j graph logic
+live Neo4j graph logic
 LGTNet/SAM3 execution
 canonical data mutation outside backend APIs
 ```
@@ -434,6 +434,7 @@ npm run build
 ```
 
 Do not run Vite through the `Desktop\Test` junction. Rollup may emit invalid relative chunk paths from that location.
+
 
 
 

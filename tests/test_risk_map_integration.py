@@ -14,6 +14,7 @@ sys.path.insert(0, str(project_root))
 
 from risk_map.risk_map_builder import build_risk_map
 from diagnosis_engine.environmental_diagnosis import compute_diagnosis
+from utils.config import load_settings
 
 
 def get_mock_interpreted_case(building_info: dict, user_case: dict) -> dict:
@@ -96,11 +97,29 @@ def test_risk_map():
     # Build risk map
     print("\n[2] Building risk map (location + urban context)...")
     try:
-        risk_map = build_risk_map(building_info, region_context)
+        settings = load_settings()
+        risk_map = build_risk_map(
+            building_info,
+            region_context,
+            bbox_radius_m=settings.risk_map_bbox_radius_m,
+            data_root=settings.risk_map_data_root,
+            use_infrared_city=settings.use_infrared_city,
+            infrared_cache_json=settings.infrared_cache_json,
+            infrared_api_key=settings.infrared_api_key,
+            infrared_base_url=settings.infrared_base_url,
+            infrared_force_refresh=settings.infrared_force_refresh,
+        )
         print(f"  âœ“ Risk map generated: {risk_map['risk_map_id']}")
         print(f"  âœ“ Urban modifier: {risk_map['composite_urban_modifier']}")
         print(f"  âœ“ UHI effect: {risk_map['urban_heat_island_modifier']}")
         print(f"  âœ“ Data available: {risk_map['data_completeness']}")
+        infrared_context = risk_map.get("infrared_city_context", {})
+        print(f"  OK Infrared City available: {infrared_context.get('available')}")
+        print(f"  OK Infrared City source: {infrared_context.get('source')}")
+        print(f"  OK Infrared heat exposure: {risk_map.get('infrared_city_heat_exposure')}")
+        if settings.use_infrared_city and not infrared_context.get("available"):
+            print(f"  ERROR Infrared City expected but unavailable: {infrared_context.get('reason')}")
+            return False
     except Exception as e:
         print(f"  âœ— Error building risk map: {e}")
         return False
@@ -186,4 +205,7 @@ def test_risk_map():
 if __name__ == "__main__":
     success = test_risk_map()
     sys.exit(0 if success else 1)
+
+
+
 

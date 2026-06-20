@@ -1,6 +1,6 @@
 ﻿# HVRA Test Run
 
-HVRA is a modular backend prototype for a Heat Vulnerability Retrofit Assistant. It combines image-based room understanding, deterministic heat-risk diagnosis, local RAG/manual checking, Neo4j graph traceability, LLM checkpoint decisions, retrofit validation, and generated inspection views.
+HVRA is a modular backend prototype for a Heat Vulnerability Retrofit Assistant. It combines image-based room understanding, deterministic heat-risk diagnosis, local RAG/manual checking, generated knowledge-graph traceability, LLM checkpoint decisions, retrofit validation, and generated inspection views.
 
 The repository is backend-first with a working stage-aware interface shell. The backend produces canonical JSON outputs and generated HTML views for visual verification; the interface drives input gathering and checkpoint review.
 
@@ -28,7 +28,7 @@ Key docs:
 ## Current Capability
 
 - Real or mock Ollama LLM coordination.
-- Real or mock Neo4j graph writing.
+- Local generated KG view by default; Neo4j is optional and disabled in the current test setup.
 - Real LGTNet room layout extraction with scaling.
 - Real SAM3 window/component detection when the external SAM3 environment is available.
 - EPW-based risk map and climate context.
@@ -58,7 +58,7 @@ hvra_test_run/
   checkpoint_engine/              checkpoint packages, LLM decision routing
   diagnosis_engine/               deterministic heat-risk calculations
   gemini_engine/                  visual prompt and mock/real Gemini layer
-  knowledge_graph/                Neo4j writers and HTML KG visualizer
+  knowledge_graph/                local KG JSON/HTML exporter; optional Neo4j writers
   llm_agent/                      Ollama prompts, clients, schema checks
   rag_engine/                     document loading, retrieval, manual checking
   report_engine/                  final report compilation/export
@@ -168,5 +168,6 @@ Before pushing:
 - Keep `.venv/` out of git.
 - Keep generated `data/intermediate/`, `data/checkpoints/`, `data/output/`, `data/vector_db/`, and `data/raw_pdfs/` out of git.
 - Commit source code, docs, config examples, and `.gitkeep` placeholders only.
+
 
 

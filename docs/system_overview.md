@@ -15,7 +15,7 @@ HVRA is a backend-first Heat Vulnerability Retrofit Assistant. It helps inspect 
 | RAG Engine | `rag_engine/` | PDF loading, chunking, vector/keyword/hybrid retrieval, manual evidence checking. | `manual_check_result.json`, vector DB |
 | Validation Engine | `validation_engine/` | Baseline/proposed indicator comparison, benchmark pass/fail, confidence gate, combo screening method. | `retrofit_validation_options.json`, `retrofit_validation.json` |
 | Checkpoint Engine | `checkpoint_engine/` | Creates stage checkpoint packages and routes decisions. | `data/checkpoints/*` |
-| Knowledge Graph | `knowledge_graph/` | Neo4j graph writing and generated interactive KG HTML. | Neo4j graph, `kg_view.html` |
+| Knowledge Graph | `knowledge_graph/` | local KG JSON/HTML generation; optional Neo4j graph writing. | `kg_view_data.json`, `kg_view.html` |
 | Gemini Engine | `gemini_engine/` | Visual prompt/result layer for future generated design images. | `gemini_prompt.json`, `gemini_result.json` |
 | Report Engine | `report_engine/` | Final JSON, Markdown, and HTML report compilation. | `final_report.json`, `final_report.md`, `final_report_view.html` |
 
@@ -28,7 +28,7 @@ HVRA is a backend-first Heat Vulnerability Retrofit Assistant. It helps inspect 
 | Ollama | Local LLM JSON reasoning for interpretation, ranking, review. | Real or mock |
 | Gemini | Visual generation/prompt layer. | Real or mock |
 | Chroma/vector retrieval | Local RAG vector store. | Local |
-| Neo4j | Relationship/traceability graph. | Real or mock |
+| Neo4j | Optional external graph database for future/live traceability. Current default uses mock/local KG export. | Disabled/mock |
 | Infrared City | Optional microclimate API/context assist. | Real/cache/mock |
 
 ## Interface Phases
@@ -40,5 +40,6 @@ Phase 2: spatial V&V, wall orientation, window inclusion check
 Phase 3: top three retrofit options, room/KG/check/report review
 ```
 
-The system is designed so each checkpoint can update three synchronized views: canonical JSON, Neo4j graph, and HTML/3D review views. The interface now uses a compact 60 percent production scale, while `phase_check.html` keeps 50/60/75/100 scale buttons only for QA.
+The system is designed so each checkpoint can update three synchronized views: canonical JSON, generated KG view, and HTML/3D review views. The interface now uses a compact 60 percent production scale, while `phase_check.html` keeps 50/60/75/100 scale buttons only for QA.
+
 

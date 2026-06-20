@@ -5,13 +5,13 @@ This document describes the current backend architecture. It replaces the older 
 ## Core Principle
 
 ```text
-canonical JSON -> generated Neo4j view
+canonical JSON -> generated KG JSON/HTML view
 canonical JSON -> generated HTML views
 canonical JSON -> LLM checkpoint prompt
 canonical JSON -> report output
 ```
 
-JSON files remain the source of truth. Neo4j and HTML are generated views used for traceability, debugging, and the current stage-aware interface.
+JSON files remain the source of truth. KG HTML and other HTML outputs are generated views used for traceability, debugging, and the current stage-aware interface.
 
 ## Active Pipeline
 
@@ -58,8 +58,8 @@ Risk Map
 - builds site context for diagnosis, not the final room risk score
         |
         v
-Neo4j Spatial Graph
-- Building -> Room -> Wall -> Component
+Knowledge Graph Export
+- generated JSON/HTML trace: Building -> Room -> Wall -> Component
         |
         v
 Diagnosis Engine
@@ -73,9 +73,9 @@ Problem Map
 - outputs problem_map.json
         |
         v
-Neo4j Diagnosis Graph
-- Room -> Problem
-- Wall/Component -> Problem
+Diagnosis KG Export
+- generated JSON/HTML trace: Room -> Problem
+- generated JSON/HTML trace: Wall/Component -> Problem
         |
         v
 RAG Manual Check
@@ -109,10 +109,10 @@ Selected Retrofit Validation
 - outputs retrofit_validation.json
         |
         v
-Neo4j Decision and Checkpoint Graph
-- Strategy -> ValidationResult
-- Checkpoint -> ValidationResult
-- UserSelection -> Strategy
+Decision and Checkpoint KG Export
+- generated JSON/HTML trace: Strategy -> ValidationResult
+- generated JSON/HTML trace: Checkpoint -> ValidationResult
+- generated JSON/HTML trace: UserSelection -> Strategy
         |
         v
 Gemini Engine
@@ -302,7 +302,7 @@ stop
 
 ### `knowledge_graph/`
 
-Owns Neo4j writes and KG test visualization.
+Owns local KG JSON/HTML visualization; optional Neo4j writes remain available but are disabled by default.
 
 Generated local KG view:
 
@@ -499,6 +499,7 @@ risk map backend/cache -> risk_map_context.json -> risk map checkpoint viewer
 ```
 
 The checkpoint uses local OSM footprints for visual alignment and Infrared City for analysis values. True pixel-accurate Infrared raster layers still require storing raw merged-grid cells from the Infrared SDK output; the current cache provides summary statistics, bounds, and grid shape.
+
 
 
 
