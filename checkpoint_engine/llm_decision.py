@@ -21,6 +21,7 @@ def _checkpoint_decision_prompt(llm_review_prompt: dict) -> str:
   "stage": "strategy_validation",
   "status": "llm_recommended",
   "action": "choose_option | combine_options | revise_intent | rerun_strategy_ranking | accept_partial_pass | stop",
+  "selected_package_ids": ["string"],
   "selected_strategy_ids": ["string"],
   "combine_strategy_ids": ["string"],
   "intent_revision": "string",
@@ -36,13 +37,14 @@ def _checkpoint_decision_prompt(llm_review_prompt: dict) -> str:
 def _mock_decision(llm_review_prompt: dict) -> dict:
     options = llm_review_prompt.get("options_for_user", [])
     best = options[0] if options else {}
-    selected_id = best.get("strategy_id")
+    selected_id = best.get("package_id") or best.get("strategy_id")
     status = best.get("benchmark_status")
     action = "choose_option" if status == "pass" else "accept_partial_pass"
     return {
         "stage": "strategy_validation",
         "status": "llm_recommended_mock",
         "action": action,
+        "selected_package_ids": [selected_id] if selected_id else [],
         "selected_strategy_ids": [selected_id] if selected_id else [],
         "combine_strategy_ids": [],
         "intent_revision": "",
@@ -60,14 +62,14 @@ def _normalize_decision(decision: dict, llm_review_prompt: dict) -> dict:
     allowed = llm_review_prompt.get("allowed_user_actions", [])
     action = decision.get("action")
     if action not in allowed:
-        selected_ids = decision.get("selected_strategy_ids", [])
-        combine_ids = decision.get("combine_strategy_ids", [])
+        selected_ids = decision.get("selected_package_ids") or decision.get("selected_strategy_ids", [])
+        combine_ids = decision.get("combine_package_ids") or decision.get("combine_strategy_ids", [])
         if len(combine_ids) > 1:
             decision["action"] = "combine_options"
             decision["status"] = "llm_action_repaired"
             decision["reason"] = (
                 f"LLM returned an invalid action field ({action}); inferred combine_options "
-                "from combine_strategy_ids."
+                "from combined option ids."
             )
         elif selected_ids:
             selected_id = selected_ids[0]
@@ -75,7 +77,7 @@ def _normalize_decision(decision: dict, llm_review_prompt: dict) -> dict:
                 (
                     option
                     for option in llm_review_prompt.get("options_for_user", [])
-                    if option.get("strategy_id") == selected_id
+                    if option.get("package_id") == selected_id or option.get("strategy_id") == selected_id
                 ),
                 {},
             )
@@ -84,7 +86,7 @@ def _normalize_decision(decision: dict, llm_review_prompt: dict) -> dict:
             decision["status"] = "llm_action_repaired"
             decision["reason"] = (
                 f"LLM returned an invalid action field ({action}); inferred {decision['action']} "
-                f"from selected strategy {selected_id} with benchmark status {benchmark_status}."
+                f"from selected option {selected_id} with benchmark status {benchmark_status}."
             )
         else:
             decision["action"] = None
@@ -92,7 +94,9 @@ def _normalize_decision(decision: dict, llm_review_prompt: dict) -> dict:
             decision["reason"] = f"LLM returned an action outside the allowed set: {action}"
     decision.setdefault("stage", "strategy_validation")
     decision.setdefault("status", "llm_recommended")
-    decision.setdefault("selected_strategy_ids", [])
+    selected_ids = decision.get("selected_package_ids") or decision.get("selected_strategy_ids", [])
+    decision["selected_package_ids"] = selected_ids
+    decision["selected_strategy_ids"] = selected_ids
     decision.setdefault("combine_strategy_ids", [])
     decision.setdefault("intent_revision", "")
     decision.setdefault("spatial_overrides_path", "data/intermediate/spatial_user_overrides.json")

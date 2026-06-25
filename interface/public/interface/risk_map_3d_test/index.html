@@ -13,8 +13,8 @@
 <div class="shell">
   <aside class="side">
     <div class="label">risk map checkpoint</div>
-    <div class="title">Precomputed heat context</div>
-    <p class="note">This checkpoint displays backend-precomputed context. The interface does not run live analysis here; it only reviews the simplified result before the room stage.</p>
+    <div class="title">Urban context review</div>
+    <p class="note">This checkpoint reviews backend-precomputed urban context. Map geometry and numerical analysis are real; raster heat-map layers appear only when raw spatial cells are cached.</p>
     <div class="search"><input id="address" value="Barcelona, Carrer de Mallorca 401"><button id="choose">USE</button></div>
     <div class="badge" id="status">loading checkpoint</div>
 
@@ -25,14 +25,14 @@
     </section>
 
     <section class="panel">
-      <div class="label">analysis layers</div>
+      <div class="label">raster layers</div>
       <label class="control"><input data-layer="utci" type="checkbox" checked><span>outdoor heat stress</span><input data-opacity="utci" type="range" min="0" max="1" step="0.05" value="0.78"></label>
       <label class="control"><input data-layer="temperature" type="checkbox"><span>air temperature</span><input data-opacity="temperature" type="range" min="0" max="1" step="0.05" value="0.66"></label>
       <label class="control"><input data-layer="solar" type="checkbox"><span>solar radiation</span><input data-opacity="solar" type="range" min="0" max="1" step="0.05" value="0.66"></label>
       <label class="control"><input data-layer="directSun" type="checkbox"><span>direct sun hours</span><input data-opacity="directSun" type="range" min="0" max="1" step="0.05" value="0.66"></label>
       <label class="control"><input data-layer="wind" type="checkbox"><span>low wind relief</span><input data-opacity="wind" type="range" min="0" max="1" step="0.05" value="0.66"></label>
       <label class="control"><input data-layer="skyView" type="checkbox"><span>sky-view obstruction</span><input data-opacity="skyView" type="range" min="0" max="1" step="0.05" value="0.62"></label>
-      <label class="control"><input data-layer="canopy" type="checkbox"><span>tree-canopy relief</span><input data-opacity="canopy" type="range" min="0" max="1" step="0.05" value="0.62"></label>
+      <label class="control"><input data-layer="canopy" type="checkbox"><span>tree-canopy relief</span><input data-opacity="canopy" type="range" min="0" max="1" step="0.05" value="0.62"></label><p class="note" id="rasterNote">Checking whether raw urban-analysis raster cells are cached.</p>
     </section>
 
     <section class="panel">
@@ -75,17 +75,40 @@ function addMapLine(points,color,alpha,y){const pts=(points||[]).map(([x,z])=>ne
 function addMapFill(points,color,alpha,y){const shape=makeRawShape(points||[]);if(!shape)return;const mesh=new THREE.Mesh(new THREE.ShapeGeometry(shape),new THREE.MeshBasicMaterial({color,transparent:true,opacity:alpha,side:THREE.DoubleSide,depthWrite:false,depthTest:true,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1}));mesh.rotation.x=-Math.PI/2;mesh.position.y=y;mesh.renderOrder=4;groups.map.add(mesh)}
 async function buildMap(data){clear(groups.map);const geom=data.visual_context?.geometry||{},context=geom.context_contours||{},local=geom.local_contours||{};const ground=new THREE.Mesh(new THREE.PlaneGeometry(MAP_CONTEXT,MAP_CONTEXT),new THREE.MeshBasicMaterial({color:0xf4f0e7,transparent:true,opacity:opacity('map'),side:THREE.DoubleSide,depthWrite:false}));ground.rotation.x=-Math.PI/2;ground.position.y=-.12;groups.map.add(ground);for(const b of (context.building_outlines||[])){addMapFill(b.points_m,0xd8d0c0,Math.min(.34,opacity('map')*.48),MAP_FILL_Y)}for(const r of (context.roads||[])){addMapLine(r.points_m,0xffffff,Math.min(.86,opacity('map')*.95),MAP_LINE_Y)}for(const r of (context.roads||[])){addMapLine(r.points_m,0xcfc6b8,Math.min(.38,opacity('map')*.5),MAP_LINE_Y+.012)}for(const b of (local.building_outlines||[])){addMapLine(b.points_m,0x8f8678,Math.min(.58,opacity('map')*.7),MAP_LINE_Y+.024)}const edge=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(MAP_CONTEXT,1,MAP_CONTEXT)),new THREE.LineBasicMaterial({color:0x8d857b,transparent:true,opacity:.45}));edge.position.y=.15;groups.map.add(edge)}
 function buildBoundary(){clear(groups.boundary);const edges=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(STUDY,1,STUDY)),new THREE.LineBasicMaterial({color:0x155f4d,transparent:true,opacity:1}));edges.position.y=.78;groups.boundary.add(edges)}
-function buildGrid(id,grid){clear(groups[id]);const cells=grid?.cells||[],n=grid?.grid_size||50,cell=STUDY/n,c0=new THREE.Color(palettes[id][0]),c1=new THREE.Color(palettes[id][1]);for(const item of cells){const v=Math.max(0,Math.min(1,Number(item.value)||0));const mat=new THREE.MeshBasicMaterial({color:c0.clone().lerp(c1,v),transparent:true,opacity:opacity(id),side:THREE.DoubleSide,depthWrite:false,depthTest:true,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});const mesh=new THREE.Mesh(new THREE.PlaneGeometry(cell,cell),mat);mesh.rotation.x=-Math.PI/2;mesh.position.set(-HALF+(item.x+.5)*cell,ANALYSIS_Y,-HALF+(item.y+.5)*cell);mesh.renderOrder=8;groups[id].add(mesh)}}
+function buildGrid(id,grid){clear(groups[id]);const cells=grid?.cells||[],n=grid?.grid_size||0;if(!cells.length||!n)return;const cell=STUDY/n,c0=new THREE.Color(palettes[id][0]),c1=new THREE.Color(palettes[id][1]);for(const item of cells){const v=Math.max(0,Math.min(1,Number(item.value)||0));const mat=new THREE.MeshBasicMaterial({color:c0.clone().lerp(c1,v),transparent:true,opacity:opacity(id),side:THREE.DoubleSide,depthWrite:false,depthTest:true,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});const mesh=new THREE.Mesh(new THREE.PlaneGeometry(cell,cell),mat);mesh.rotation.x=-Math.PI/2;mesh.position.set(-HALF+(item.x+.5)*cell,ANALYSIS_Y,-HALF+(item.y+.5)*cell);mesh.renderOrder=8;groups[id].add(mesh)}}
 function buildAnalysis(data){const grids=data.visual_context?.contextual_grids||{};buildGrid('utci',grids.utci);buildGrid('temperature',grids.temperature);buildGrid('solar',grids.solar);buildGrid('directSun',grids.direct_sun);buildGrid('wind',grids.wind_stagnation);buildGrid('skyView',grids.sky_view);buildGrid('canopy',grids.canopy)}
 function buildFootprints(data){clear(groups.footprints);if(!siteChosen)return;const source=data.visual_context?.geometry?.osm_aligned_buildings||{};for(const b of (source.buildings||[])){const shape=makeShape(b.footprint_m||[]);if(!shape)continue;const mesh=new THREE.Mesh(new THREE.ShapeGeometry(shape),new THREE.MeshBasicMaterial({color:0x0f6b55,transparent:true,opacity:opacity('footprints'),side:THREE.DoubleSide,depthWrite:false}));mesh.rotation.x=-Math.PI/2;mesh.position.y=.9;groups.footprints.add(mesh)}}function buildBuildings(data){clear(groups.buildings);if(!siteChosen)return;const source=data.visual_context?.geometry?.osm_aligned_buildings||{};for(const b of (source.buildings||[])){const shape=makeShape(b.footprint_m||[]);if(!shape)continue;const h=Math.max(2,Math.min(55,Number(b.height_m)||9));const geo=new THREE.ExtrudeGeometry(shape,{depth:h,bevelEnabled:false});geo.rotateX(-Math.PI/2);const mat=new THREE.MeshStandardMaterial({color:0xaaa193,roughness:.86,transparent:true,opacity:opacity('buildings')});const mesh=new THREE.Mesh(geo,mat);mesh.renderOrder=30;groups.buildings.add(mesh);const edge=new THREE.LineSegments(new THREE.EdgesGeometry(geo),new THREE.LineBasicMaterial({color:0x3b352e,transparent:true,opacity:.22}));edge.renderOrder=31;groups.buildings.add(edge)}groups.buildings.userData.drawn=(source.buildings||[]).length}
 function sync(){for(const id of Object.keys(groups)){const box=document.querySelector(`[data-layer="${id}"]`);if(box)groups[id].visible=box.checked;if(id==='buildings')groups[id].visible=siteChosen&&(box?.checked??true);groups[id].children.forEach(o=>{if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.opacity=opacity(id));else o.material.opacity=opacity(id)}})}requestRender()}
-function renderText(data){const m=data.metrics||{},ia=data.visual_context?.infrared_analysis||{},geom=data.visual_context?.geometry||{},raw=ia.raw_grid_status||{};document.getElementById('resultRows').innerHTML=[['Infrared analysis',ia.available?'available':'missing'],['raw raster cells',Object.values(raw).some(v=>v.has_raw_cells)?'available':'summary only'],['Infrared heat',fmt(ia.heat_exposure_score)],['UTCI mean',fmt(m.utci_mean_c,' C')],['UTCI max',fmt(raw.utci?.max,' C')],['solar mean',fmt(raw.solar_radiation?.mean,' W/m2')],['direct sun',fmt(raw.direct_sun_hours?.mean,' h')],['wind mean',fmt(raw.wind_speed?.mean,' m/s')],['sky view',fmt(raw.sky_view_factor?.mean)],['map layer','OSM vector site map'],['3D buildings',siteChosen?(geom.osm_aligned_buildings?.buildings||[]).length:'hidden'],['alignment','shared OSM vector frame']].map(([a,b])=>`<div class="row"><span>${a}</span><strong>${b}</strong></div>`).join('');document.getElementById('viewNote').textContent=siteChosen?'Site chosen. Roads, map outlines, and 3D buildings now use one OSM vector frame.':'Map and analysis are precomputed. Choose the site to reveal vector-aligned 3D buildings.';document.getElementById('buildingNote').textContent=siteChosen?'3D buildings are shown on a fixed north-up site map.':'Hidden until the site is chosen.';document.getElementById('status').textContent=data.backend?.source||'precomputed visual checkpoint'}
+function renderText(data){const m=data.metrics||{},ia=data.visual_context?.infrared_analysis||{},geom=data.visual_context?.geometry||{},raw=ia.raw_grid_status||{},grids=data.visual_context?.contextual_grids||{};const hasRaw=Object.values(raw).some(v=>v.has_raw_cells);const rasterCells=Object.values(grids).reduce((sum,g)=>sum+(g?.cells?.length||0),0);document.getElementById('resultRows').innerHTML=[['Infrared analysis',ia.available?'available':'missing'],['urban raster',hasRaw?`${rasterCells} cells`:'not cached'],['visual mode',data.visual_context?.visual_method||'summary only'],['Infrared heat',fmt(ia.heat_exposure_score)],['UTCI mean',fmt(m.utci_mean_c,' C')],['UTCI max',fmt(raw.utci?.max,' C')],['solar mean',fmt(raw.solar_radiation?.mean,' W/m2')],['direct sun',fmt(raw.direct_sun_hours?.mean,' h')],['wind mean',fmt(raw.wind_speed?.mean,' m/s')],['sky view',fmt(raw.sky_view_factor?.mean)],['map layer','OSM vector site map'],['3D buildings',siteChosen?(geom.osm_aligned_buildings?.buildings||[]).length:'hidden'],['alignment','shared OSM vector frame']].map(([a,b])=>`<div class="row"><span>${a}</span><strong>${b}</strong></div>`).join('');document.getElementById('rasterNote').textContent=hasRaw?'Raw urban-analysis raster cells are available and can be toggled above.':'No raw urban-analysis raster cells are cached. These toggles stay empty; use the numerical summaries below.';document.getElementById('viewNote').textContent=siteChosen?'Site chosen. Roads, map outlines, and 3D buildings now use one OSM vector frame.':'Urban context is precomputed. Choose the site to reveal vector-aligned 3D buildings.';document.getElementById('buildingNote').textContent=siteChosen?'3D buildings are shown on a fixed north-up site map.':'Hidden until the site is chosen.';document.getElementById('status').textContent=data.backend?.source||'precomputed visual checkpoint'}
 async function render(data){payload=data;await buildMap(data);buildBoundary();buildAnalysis(data);buildFootprints(data);buildBuildings(data);sync();renderText(data);requestRender()}
-async function loadCheckpoint(){const res=await fetch('/interface/risk_map_3d_test/risk_map_context.json?v=checkpoint');return await res.json()}
+async function loadCheckpoint(){
+  const stamp=Date.now();
+  const urls=[
+    `/api/risk-map/context?v=${stamp}`,
+    `risk_map_context.json?v=${stamp}`,
+    `/interface/risk_map_3d_test/risk_map_context.json?v=${stamp}`
+  ];
+  let lastError=null;
+  for(const url of urls){
+    try{
+      const res=await fetch(url,{cache:'no-store'});
+      if(!res.ok)throw new Error(`${url} returned ${res.status}`);
+      const data=await res.json();
+      data.backend=data.backend||{};
+      data.backend.visual_fetch_url=url;
+      return data;
+    }catch(error){
+      lastError=error;
+    }
+  }
+  throw lastError||new Error('Unable to load risk map context.');
+}
 document.getElementById('choose').onclick=async()=>{siteChosen=true;if(payload){payload.site={...(payload.site||{}),address:document.getElementById('address').value};await render(payload)}};document.querySelectorAll('input').forEach(i=>i.addEventListener('input',()=>sync()));document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));init();loadCheckpoint().then(data=>render(data));
 </script>
 </body>
 </html>
+
+
 
 
 

@@ -3,10 +3,9 @@ import { useEffect, useRef, useState } from 'react'
 const TEXTAREA_MIN_HEIGHT = 40
 const TEXTAREA_MAX_HEIGHT = 106
 
-export default function ActionInputBar({ onSend, disabled }) {
+export default function ActionInputBar({ onSend, disabled, showSetupInputs = true }) {
   const [text, setText] = useState('')
   const [panoFile, setPanoFile] = useState(null)
-  const [perspectiveFile, setPerspectiveFile] = useState(null)
   const [buildingInfo, setBuildingInfo] = useState({
     room_type: '',
     room_area_m2: '',
@@ -51,10 +50,9 @@ export default function ActionInputBar({ onSend, disabled }) {
     if (disabled) {
       return
     }
-    await onSend({ text: text.trim(), panoFile, perspectiveFile, buildingInfo })
+    await onSend({ text: text.trim(), panoFile, buildingInfo })
     setText('')
     setPanoFile(null)
-    setPerspectiveFile(null)
     setBuildingInfo({
       room_type: '',
       room_area_m2: '',
@@ -68,72 +66,55 @@ export default function ActionInputBar({ onSend, disabled }) {
 
   return (
     <div className="border-t border-DEFAULT bg-surface-primary px-5 py-3">
-      <div className="mb-2 grid grid-cols-3 gap-2">
-        <input
-          className="type-level-3 min-w-0 rounded-sm border border-DEFAULT bg-surface-secondary px-2 py-2 outline-none focus:border-strong"
-          placeholder="room"
-          value={buildingInfo.room_type}
-          onChange={(event) => updateBuildingInfo('room_type', event.target.value)}
-        />
-        <input
-          className="type-level-3 min-w-0 rounded-sm border border-DEFAULT bg-surface-secondary px-2 py-2 outline-none focus:border-strong"
-          inputMode="decimal"
-          placeholder="m2"
-          value={buildingInfo.room_area_m2}
-          onChange={(event) => updateBuildingInfo('room_area_m2', event.target.value)}
-        />
-        <input
-          className="type-level-3 min-w-0 rounded-sm border border-DEFAULT bg-surface-secondary px-2 py-2 outline-none focus:border-strong"
-          inputMode="decimal"
-          placeholder="height"
-          value={buildingInfo.room_height_m}
-          onChange={(event) => updateBuildingInfo('room_height_m', event.target.value)}
-        />
-      </div>
+      {showSetupInputs ? (
+        <>
+          <div className="mb-2 grid grid-cols-3 gap-2">
+            <input
+              className="type-level-3 min-w-0 rounded-sm border border-DEFAULT bg-surface-secondary px-2 py-2 outline-none focus:border-strong"
+              placeholder="room"
+              value={buildingInfo.room_type}
+              onChange={(event) => updateBuildingInfo('room_type', event.target.value)}
+            />
+            <input
+              className="type-level-3 min-w-0 rounded-sm border border-DEFAULT bg-surface-secondary px-2 py-2 outline-none focus:border-strong"
+              inputMode="decimal"
+              placeholder="m2"
+              value={buildingInfo.room_area_m2}
+              onChange={(event) => updateBuildingInfo('room_area_m2', event.target.value)}
+            />
+            <input
+              className="type-level-3 min-w-0 rounded-sm border border-DEFAULT bg-surface-secondary px-2 py-2 outline-none focus:border-strong"
+              inputMode="decimal"
+              placeholder="height"
+              value={buildingInfo.room_height_m}
+              onChange={(event) => updateBuildingInfo('room_height_m', event.target.value)}
+            />
+          </div>
 
-      <div className="flex flex-wrap gap-2">
-        <label
-          className={`type-level-3 inline-flex h-10 max-w-[168px] flex-1 basis-[148px] cursor-pointer items-center justify-between gap-2 rounded-sm border border-dashed border-strong bg-surface-secondary px-3 transition-colors duration-150 ${
-            activeZone === 'pano' ? 'border-accent/40 text-accent' : ''
-          }`}
-          onDragOver={(event) => {
-            event.preventDefault()
-            setActiveZone('pano')
-          }}
-          onDragLeave={() => setActiveZone('')}
-          onDrop={(event) => handleDrop(event, setPanoFile)}
-        >
-          <span>pano image</span>
-          <span className="truncate">{panoFile ? panoFile.name : 'choose'}</span>
-          <input
-            type="file"
-            className="hidden"
-            accept="image/*"
-            onChange={(event) => handleFileChange(event, setPanoFile)}
-          />
-        </label>
-
-        <label
-          className={`type-level-3 inline-flex h-10 max-w-[168px] flex-1 basis-[148px] cursor-pointer items-center justify-between gap-2 rounded-sm border border-dashed border-strong bg-surface-secondary px-3 transition-colors duration-150 ${
-            activeZone === 'perspective' ? 'border-accent/40 text-accent' : ''
-          }`}
-          onDragOver={(event) => {
-            event.preventDefault()
-            setActiveZone('perspective')
-          }}
-          onDragLeave={() => setActiveZone('')}
-          onDrop={(event) => handleDrop(event, setPerspectiveFile)}
-        >
-          <span>window view</span>
-          <span className="truncate">{perspectiveFile ? perspectiveFile.name : 'choose'}</span>
-          <input
-            type="file"
-            className="hidden"
-            accept="image/*"
-            onChange={(event) => handleFileChange(event, setPerspectiveFile)}
-          />
-        </label>
-      </div>
+          <div className="flex flex-wrap gap-2">
+            <label
+              className={`type-level-3 inline-flex h-10 max-w-[168px] flex-1 basis-[148px] cursor-pointer items-center justify-between gap-2 rounded-sm border border-dashed border-strong bg-surface-secondary px-3 transition-colors duration-150 ${
+                activeZone === 'pano' ? 'border-accent/40 text-accent' : ''
+              }`}
+              onDragOver={(event) => {
+                event.preventDefault()
+                setActiveZone('pano')
+              }}
+              onDragLeave={() => setActiveZone('')}
+              onDrop={(event) => handleDrop(event, setPanoFile)}
+            >
+              <span>room image</span>
+              <span className="truncate">{panoFile ? panoFile.name : 'choose'}</span>
+              <input
+                type="file"
+                className="hidden"
+                accept="image/*"
+                onChange={(event) => handleFileChange(event, setPanoFile)}
+              />
+            </label>
+          </div>
+        </>
+      ) : null}
 
       <div className="mt-3 flex items-end gap-2">
         <textarea

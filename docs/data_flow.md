@@ -10,9 +10,11 @@ HVRA uses file-based JSON as the canonical backend state during the prototype ph
 | `data/input/building_info.json` | Room dimensions, building context, glazing, floor/height, baseline info. |
 | `data/input/region_context.json` | Address/coordinates, city, neighbourhood, climate context. |
 | `data/input/retrofit_constraints.json` | Budget, disruption, permission, ownership, preferred/excluded strategy types. |
-| `data/input/strategy_catalogue.json` | Static retrofit strategy source of truth. |
+| data/input/strategy_catalogue.json | Static retrofit strategy source of truth. |
+| data/input/strategy_evidence_map.json | Evidence role, confidence, and source IDs for each strategy. |
+| data/input/visual_retrofit_catalogue.json | 3D placement, asset type, material, and render-layer rules for each strategy. |
 | `data/input/images/pano_image/` | Pano images for LGTNet layout extraction. |
-| `data/input/images/perspective_image/` | Perspective/reference images for final visual/report workflows. |
+| `data/input/images/perspective_image/` | Legacy/deactivated; current final visual output uses the 3D room preview with retrofit components. |
 
 ## RAG Data
 

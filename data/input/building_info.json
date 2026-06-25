@@ -1,11 +1,11 @@
 {
   "building_id": "BLD_001",
   "room_id": "ROOM_001",
-  "room_type": "s",
+  "room_type": "bedroom",
   "floor": 4,
   "is_top_floor": true,
-  "room_area_m2": 34.0,
-  "room_height_m": 5.0,
+  "room_area_m2": 25.0,
+  "room_height_m": 2.8,
   "facing_direction": "N",
   "external_facades": 1,
   "window_area_m2": null,
@@ -18,5 +18,6 @@
   "known_limitations": [
     "no_ifc_model",
     "image_based_estimation"
-  ]
+  ],
+  "has_ac": false
 }

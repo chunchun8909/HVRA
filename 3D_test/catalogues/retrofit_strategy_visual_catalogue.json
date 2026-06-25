@@ -1,0 +1,340 @@
+{
+  "catalogue_id": "HVRA_3D_VISUAL_RETROFIT_STRATEGY_CATALOGUE_V2",
+  "scope": "3D_test only. Visual strategy taxonomy and screening-effect metadata for testing before main pipeline integration.",
+  "effect_metadata_note": "Temperature effects are screening ranges for early option comparison, not dynamic simulation outputs. Perceived cooling is separated from actual operative-temperature reduction where relevant.",
+  "placement_principles": [
+    "Every generated object must be hosted to a detected wall, opening, floor, ceiling, or validated support plane.",
+    "Window-covering rails mount close to the interior wall face and above the detected opening head.",
+    "Sliding or balcony doors must preserve a clear active passage; side-mounted greenery is preferred over front-mounted obstruction.",
+    "Old-building apartment retrofits avoid roof-dependent interventions, structural exterior changes without permission, and heavy wet assemblies.",
+    "Biophilic elements are comfort/restorative visual layers unless separately validated as shading or ventilation interventions.",
+    "Numerical effects should be displayed as confidence-bounded screening values, never as guaranteed performance."
+  ],
+  "strategies": [
+    {
+      "id": "interior_window_covering_layer",
+      "label": "Interior window covering layer",
+      "visual_assets": [
+        "full_height_drape",
+        "short_sill_curtain",
+        "roman_shade",
+        "venetian_blind",
+        "vertical_blind"
+      ],
+      "suitable_for": [
+        "window",
+        "sliding_glass_door",
+        "balcony_door"
+      ],
+      "avoid_when": [
+        "blocks_door_operation",
+        "rail_cannot_be_fixed",
+        "low_head_clearance"
+      ],
+      "mounting": "interior wall/opening head, 0.08-0.16 m from wall face",
+      "screening_effects": {
+        "primary_metric": "peak_indoor_operative_temperature_delta_c",
+        "asset_effects": {
+          "full_height_drape": {
+            "delta_t_min_c": 0.3,
+            "delta_t_max_c": 0.8,
+            "confidence": "low_medium",
+            "effect_type": "internal_shading_fallback"
+          },
+          "short_sill_curtain": {
+            "delta_t_min_c": 0.1,
+            "delta_t_max_c": 0.4,
+            "confidence": "low",
+            "effect_type": "partial_light_privacy_control"
+          },
+          "roman_shade": {
+            "delta_t_min_c": 0.5,
+            "delta_t_max_c": 1.0,
+            "confidence": "medium",
+            "effect_type": "internal_shading"
+          },
+          "venetian_blind": {
+            "delta_t_min_c": 0.5,
+            "delta_t_max_c": 1.0,
+            "confidence": "medium",
+            "effect_type": "adjustable_internal_shading"
+          },
+          "vertical_blind": {
+            "delta_t_min_c": 0.5,
+            "delta_t_max_c": 1.0,
+            "confidence": "medium",
+            "effect_type": "sliding_door_internal_shading"
+          }
+        },
+        "academic_basis": [
+          "ASHRAE Fundamentals Handbook internal shading / SHGC reduction logic",
+          "IDAE passive solar-control guidance"
+        ],
+        "project_warning": "Internal fabric shading is usually weaker than exterior shading because solar radiation has already entered the room."
+      }
+    },
+    {
+      "id": "solar_control_glazing_layer",
+      "label": "Solar-control glazing tint",
+      "visual_assets": [
+        "solar_control_glazing_tint"
+      ],
+      "suitable_for": [
+        "window",
+        "sliding_glass_door",
+        "solar_exposed_glazing"
+      ],
+      "avoid_when": [
+        "window_replacement_not_allowed",
+        "heritage_glazing_to_preserve",
+        "daylight_loss_unacceptable"
+      ],
+      "mounting": "changes existing glazing material/colour; no added second pane in the visual test",
+      "screening_effects": {
+        "primary_metric": "peak_indoor_operative_temperature_delta_c",
+        "delta_t_min_c": 1.0,
+        "delta_t_max_c": 2.0,
+        "confidence": "medium",
+        "effect_type": "solar_heat_gain_reduction",
+        "academic_basis": [
+          "CTE DB-HE 2022 envelope and solar-control logic",
+          "Perez-Lombard et al. (2008), Energy and Buildings"
+        ]
+      }
+    },
+    {
+      "id": "external_shading_layer",
+      "label": "External shading layer",
+      "visual_assets": [
+        "external_louver",
+        "fabric_awning",
+        "external_shutter",
+        "balcony_planter_shade"
+      ],
+      "suitable_for": [
+        "external_facade_with_permission",
+        "balcony_or_maintenance_access",
+        "solar_exposed_window"
+      ],
+      "avoid_when": [
+        "renter_no_approval",
+        "heritage_facade",
+        "unsafe_wind_or_load_condition",
+        "no_external_access"
+      ],
+      "mounting": "exterior facade/balcony only after permission and safety checks",
+      "screening_effects": {
+        "primary_metric": "peak_indoor_operative_temperature_delta_c",
+        "asset_effects": {
+          "fabric_awning": {
+            "delta_t_min_c": 2.0,
+            "delta_t_max_c": 4.0,
+            "confidence": "medium",
+            "effect_type": "exterior_solar_interception"
+          },
+          "external_louver": {
+            "delta_t_min_c": 2.0,
+            "delta_t_max_c": 4.0,
+            "confidence": "medium",
+            "effect_type": "exterior_solar_interception"
+          },
+          "external_shutter": {
+            "delta_t_min_c": 1.5,
+            "delta_t_max_c": 3.0,
+            "confidence": "medium",
+            "effect_type": "exterior_solar_interception"
+          },
+          "balcony_planter_shade": {
+            "delta_t_min_c": 0.3,
+            "delta_t_max_c": 1.0,
+            "confidence": "low_medium",
+            "effect_type": "vegetation_micro_shading"
+          }
+        },
+        "academic_basis": [
+          "IDAE (2011) solar protection guidance",
+          "Henze et al. (2004), Energy and Buildings",
+          "Perez et al. green facade review for planter shading"
+        ],
+        "project_warning": "Exterior shading should be prioritized over internal coverings where permission and safety allow."
+      }
+    },
+    {
+      "id": "ceiling_air_movement_layer",
+      "label": "Ceiling fan air movement",
+      "visual_assets": [
+        "ceiling_fan"
+      ],
+      "suitable_for": [
+        "occupied_zone",
+        "ceiling",
+        "heat_stress_comfort_support"
+      ],
+      "avoid_when": [
+        "insufficient_ceiling_height",
+        "unsafe_electrical_fixing",
+        "conflict_with_tall_furniture_or_curtains"
+      ],
+      "mounting": "ceiling-hosted fan centered in occupied zone, clear of curtains and tall furniture",
+      "screening_effects": {
+        "primary_metric": "perceived_cooling_delta_c",
+        "actual_temperature_delta_min_c": 0.0,
+        "actual_temperature_delta_max_c": 0.8,
+        "perceived_cooling_min_c": 1.0,
+        "perceived_cooling_max_c": 3.0,
+        "confidence": "medium",
+        "effect_type": "elevated_air_speed_thermal_comfort",
+        "academic_basis": [
+          "ASHRAE 55-2023 elevated air speed logic",
+          "LBNL thermal comfort guidance"
+        ],
+        "project_warning": "A fan improves felt comfort and heat-stress tolerance but does not fix solar gain or envelope heat transfer."
+      }
+    },
+    {
+      "id": "wall_inner_lining_layer",
+      "label": "Wall insulation reinforcement layer",
+      "visual_assets": [
+        "thin_internal_lining_panel"
+      ],
+      "suitable_for": [
+        "opaque_wall",
+        "target_heat_gain_wall",
+        "poor_envelope_wall"
+      ],
+      "avoid_when": [
+        "damp_wall",
+        "historic_finish_to_preserve",
+        "insufficient_room_clearance"
+      ],
+      "mounting": "thin inward layer over existing wall; does not extend facade outward",
+      "screening_effects": {
+        "primary_metric": "peak_indoor_operative_temperature_delta_c",
+        "delta_t_min_c": 0.7,
+        "delta_t_max_c": 1.8,
+        "confidence": "medium",
+        "effect_type": "conductive_heat_gain_reduction",
+        "academic_basis": [
+          "IDAE (2016) retrofit envelope guidance",
+          "CTE DB-HE 2022 envelope logic",
+          "EN ISO 13788 condensation/moisture risk logic"
+        ],
+        "project_warning": "Interior insulation must be checked for moisture, condensation, and thermal bridge risk before specification."
+      }
+    },
+    {
+      "id": "biophilic_floor_cluster",
+      "label": "Floor plant cluster",
+      "visual_assets": [
+        "mixed_indoor_plant_cluster",
+        "rectangular_long_planter"
+      ],
+      "suitable_for": [
+        "daylight_corner",
+        "occupied_zone_edge",
+        "clear_floor_zone"
+      ],
+      "avoid_when": [
+        "circulation_conflict",
+        "low_daylight_without_shade_tolerant_species",
+        "resident_maintenance_not_feasible"
+      ],
+      "mounting": "floor-based, beside opening or corner, never in door sweep/path",
+      "screening_effects": {
+        "primary_metric": "supportive_comfort_delta_c",
+        "delta_t_min_c": 0.0,
+        "delta_t_max_c": 0.3,
+        "confidence": "low",
+        "effect_type": "biophilic_support_minor_local_cooling",
+        "academic_basis": [
+          "Urban green infrastructure and heat-health adaptation literature",
+          "Biophilic design literature; not a direct room thermal compliance source"
+        ],
+        "project_warning": "Indoor planting should not drive benchmark pass/fail unless it is part of a validated shading strategy."
+      }
+    },
+    {
+      "id": "biophilic_wall_adjacent_layer",
+      "label": "Wall-adjacent planting layer",
+      "visual_assets": [
+        "plant_ladder",
+        "trellis_climber_screen",
+        "daylight_planter_shelf"
+      ],
+      "suitable_for": [
+        "window_adjacent_wall",
+        "side_of_sliding_door",
+        "clear_side_host_zone"
+      ],
+      "avoid_when": [
+        "blocks_opening",
+        "low_maintenance_requirement",
+        "unsafe_fixing"
+      ],
+      "mounting": "use sideHost wall strip beside detected opening; close to wall face, side-shifted away from active glazing and door path",
+      "screening_effects": {
+        "primary_metric": "supportive_comfort_delta_c",
+        "delta_t_min_c": 0.0,
+        "delta_t_max_c": 0.3,
+        "confidence": "low",
+        "effect_type": "biophilic_support_minor_local_cooling",
+        "conditional_upgrade": {
+          "condition": "if exterior-facing vegetation directly shades the opening or facade",
+          "delta_t_min_c": 0.3,
+          "delta_t_max_c": 1.0,
+          "confidence": "low_medium"
+        },
+        "academic_basis": [
+          "Perez et al. (2011), Energy and Buildings for green facade shading",
+          "Biophilic design literature for restorative/wellbeing support"
+        ],
+        "project_warning": "Interior trellis/plant shelves are mainly visual-comfort measures unless their geometry shades solar-exposed glazing."
+      }
+    },
+    {
+      "id": "hanging_lightweight_greenery",
+      "label": "Hanging lightweight greenery",
+      "visual_assets": [
+        "hanging_planter_rail"
+      ],
+      "suitable_for": [
+        "high_head_clearance",
+        "renter_safe_clamp_or_existing_rail",
+        "clear_side_host_zone"
+      ],
+      "avoid_when": [
+        "ceiling_fixing_not_allowed",
+        "low_head_clearance",
+        "drip_risk_unmanaged"
+      ],
+      "mounting": "wall/opening-head rail on sideHost wall strip, with visible bracket placeholders and drip-safe hanging pot logic",
+      "screening_effects": {
+        "primary_metric": "supportive_comfort_delta_c",
+        "delta_t_min_c": 0.0,
+        "delta_t_max_c": 0.3,
+        "confidence": "low",
+        "effect_type": "biophilic_support_minor_local_cooling",
+        "academic_basis": [
+          "Biophilic design literature; not a direct room thermal compliance source"
+        ],
+        "project_warning": "Use as a support layer, not the primary thermal retrofit."
+      }
+    }
+  ],
+  "support_placeholder_system": {
+    "purpose": "Temporary procedural supports explain how future GLB components attach to the room before realistic assets are injected.",
+    "rules": [
+      "Rails and brackets are shown when an item needs a wall/opening-head support.",
+      "Shelves are represented as wall-hosted console shelves with visible brackets.",
+      "Plant ladders are wall-adjacent freestanding supports, not objects floating over glazing.",
+      "Trellis screens are wall-mounted panels beside the opening, with foliage biased outward into the room.",
+      "Objects with uncertain fixing remain conditional until user or technical confirmation.",
+      "Numerical-effect ranges are shown beside assets as screening metadata and must be validated before final reporting."
+    ],
+    "local_axes": {
+      "x": "along detected wall segment",
+      "y": "height above finished floor",
+      "z": "offset inward from the wall face toward the room"
+    }
+  }
+}

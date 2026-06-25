@@ -1,0 +1,353 @@
+{
+  "plan_id": "HVRA_ADVANCED_3D_ASSET_PLAN_V1",
+  "mode": "advanced_glb_ready_asset_plan",
+  "source": {
+    "spatial": "C:\\Users\\Morris\\OneDrive\\Desktop\\hvra_test_run\\data\\intermediate\\spatial_index_with_overrides.json",
+    "constraints": "C:\\Users\\Morris\\OneDrive\\Desktop\\hvra_test_run\\data\\input\\retrofit_constraints.json",
+    "building_info": "C:\\Users\\Morris\\OneDrive\\Desktop\\hvra_test_run\\data\\input\\building_info.json",
+    "catalogue": "C:\\Users\\Morris\\OneDrive\\Desktop\\hvra_test_run\\3D_test\\advanced\\advanced_asset_catalogue.json"
+  },
+  "building_context": {
+    "room_id": "ROOM_001",
+    "building_type": null,
+    "ownership_status": "renter",
+    "facade_modification_allowed": false,
+    "has_balcony": false,
+    "facing_direction": "N",
+    "room_height_m": 5.0
+  },
+  "opening_context": {
+    "opening_type": "sliding_glass_door",
+    "inferred_opening_type": "sliding_glass_door",
+    "override_used": true,
+    "component": {
+      "id": "ROOM_001_WALL_07_WINDOW_01",
+      "component_type": "window",
+      "wall_id": "ROOM_001_WALL_07",
+      "estimated_area_m2": 6.659,
+      "width_m": 1.554,
+      "height_m": 4.284,
+      "bbox_px": [
+        296.059326171875,
+        94.82284545898438,
+        584.7239379882812,
+        656.0264892578125
+      ],
+      "bbox_width_px": 288.665,
+      "bbox_height_px": 561.204,
+      "confidence": 0.70703125,
+      "source": "C:\\Users\\Morris\\OneDrive\\Desktop\\hvra_test_run\\data\\output\\spatial\\sam3\\wall_07\\window_meta.json",
+      "wall_fragment_image": "C:\\Users\\Morris\\OneDrive\\Desktop\\hvra_test_run\\data\\output\\spatial\\wall_sides\\wall_07.png",
+      "dimension_source": "sam3_bbox_scaled_to_lgtnet_wall_fragment"
+    },
+    "target_wall_id": "ROOM_001_WALL_07",
+    "width_m": 1.554,
+    "height_m": 4.284,
+    "area_m2": 6.659,
+    "wall_position_ratio": 0.49705601814907235,
+    "vertical_position_ratio": 0.5731674310815243,
+    "bbox_width_ratio": 0.3258065596121967,
+    "bbox_height_ratio": 0.856799456181417,
+    "wall_fragment_image_size_px": {
+      "width": 886,
+      "height": 655
+    },
+    "bbox_source": "sam3_bbox_on_wall_fragment"
+  },
+  "asset_quality_requirements": {
+    "preferred_format": "glb",
+    "web_runtime": "threejs_gltfloader",
+    "max_single_asset_mb": 8,
+    "preferred_single_asset_mb": 3,
+    "texture_policy": "compressed_or_baked_pbr_textures",
+    "origin_policy": "bottom_center_or_mounting_face_origin",
+    "scale_policy": "real_world_meters",
+    "lod_policy": "low_poly_for_interactive_viewer_high_detail_for_report_render"
+  },
+  "summary": {
+    "allowed": 2,
+    "conditional": 6,
+    "blocked": 4,
+    "preferred_next_step": "Replace procedural fallbacks with curated GLB assets for allowed and conditional candidates only."
+  },
+  "allowed_assets": [
+    {
+      "asset_id": "glb_soft_drapes_full_height",
+      "label": "Soft full-height drapes",
+      "family": "interior_window_covering",
+      "status": "allowed",
+      "target_wall_id": "ROOM_001_WALL_07",
+      "opening_type": "sliding_glass_door",
+      "strategy_binding": [
+        "internal_blinds",
+        "night_privacy",
+        "low_disruption_comfort"
+      ],
+      "future_glb_slot": "3D_test/advanced/assets/window_coverings/soft_drapes_full_height.glb",
+      "procedural_fallback": "curtain_drapes",
+      "placement_rule": "inside face of target glazed wall, rail above opening, fabric clears walking path",
+      "plant_palette": [],
+      "care_profile": null,
+      "reasons": [
+        "Asset is compatible with current opening and constraint assumptions."
+      ]
+    },
+    {
+      "asset_id": "glb_vertical_blind_track",
+      "label": "Vertical blinds",
+      "family": "interior_window_covering",
+      "status": "allowed",
+      "target_wall_id": "ROOM_001_WALL_07",
+      "opening_type": "sliding_glass_door",
+      "strategy_binding": [
+        "internal_blinds",
+        "solar_control"
+      ],
+      "future_glb_slot": "3D_test/advanced/assets/window_coverings/vertical_blind_track.glb",
+      "procedural_fallback": "vertical_blind",
+      "placement_rule": "interior track above full-height opening; slats stack to non-passage side",
+      "plant_palette": [],
+      "care_profile": null,
+      "reasons": [
+        "Asset is compatible with current opening and constraint assumptions."
+      ]
+    }
+  ],
+  "conditional_assets": [
+    {
+      "asset_id": "glb_roller_shade_split",
+      "label": "Split roller shade",
+      "family": "interior_window_covering",
+      "status": "conditional",
+      "target_wall_id": "ROOM_001_WALL_07",
+      "opening_type": "sliding_glass_door",
+      "strategy_binding": [
+        "internal_blinds",
+        "solar_control"
+      ],
+      "future_glb_slot": "3D_test/advanced/assets/window_coverings/split_roller_shade.glb",
+      "procedural_fallback": "roller_shade",
+      "placement_rule": "split panels over wide opening; leave door operation clear",
+      "plant_palette": [],
+      "care_profile": null,
+      "reasons": [
+        "Sliding/balcony door operation must stay clear; place asset beside the active passage, not in front of it."
+      ]
+    },
+    {
+      "asset_id": "glb_interior_plant_cluster",
+      "label": "Mixed indoor plant cluster",
+      "family": "biophilic_shading",
+      "status": "conditional",
+      "target_wall_id": "ROOM_001_WALL_07",
+      "opening_type": "sliding_glass_door",
+      "strategy_binding": [
+        "interior_biophilic_cooling_zone",
+        "biophilic_visual_restoration"
+      ],
+      "future_glb_slot": "3D_test/advanced/assets/plants/interior_plant_cluster.glb",
+      "procedural_fallback": "plant_corner_dense",
+      "placement_rule": "interior daylight corner beside target opening; preserve circulation and door operation; visual/wellbeing support only, not primary air purification",
+      "plant_palette": [
+        "bamboo_palm_tall",
+        "rubber_plant_medium",
+        "boston_fern_medium",
+        "weeping_fig_tall",
+        "aloe_small"
+      ],
+      "care_profile": "mixed low-to-medium maintenance; avoid overwatering and low-daylight corners",
+      "reasons": [
+        "Maintain a clear circulation strip; use compact/side placement only.",
+        "North-facing daylight may be limited; choose shade-tolerant species or preserved greenery.",
+        "Biophilic assets support comfort perception and nature connection; they are not counted as the primary air-quality or thermal-control system."
+      ]
+    },
+    {
+      "asset_id": "glb_daylight_planter_shelf",
+      "label": "Daylight planter shelf",
+      "family": "biophilic_interior_layers",
+      "status": "conditional",
+      "target_wall_id": "ROOM_001_WALL_07",
+      "opening_type": "sliding_glass_door",
+      "strategy_binding": [
+        "interior_biophilic_cooling_zone",
+        "low_disruption_comfort"
+      ],
+      "future_glb_slot": "3D_test/advanced/assets/plants/daylight_planter_shelf.glb",
+      "procedural_fallback": "daylight_planter_shelf",
+      "placement_rule": "low shelf on the interior side of the glazed wall, shifted away from the active door path and kept below the handle zone",
+      "plant_palette": [
+        "aloe_small",
+        "spider_plant_small",
+        "pothos_trailing",
+        "snake_plant_small"
+      ],
+      "care_profile": null,
+      "reasons": [
+        "Sliding/balcony door operation must stay clear; place asset beside the active passage, not in front of it.",
+        "Maintain a clear circulation strip; use compact/side placement only.",
+        "Biophilic assets support comfort perception and nature connection; they are not counted as the primary air-quality or thermal-control system."
+      ]
+    },
+    {
+      "asset_id": "glb_hanging_planter_rail",
+      "label": "Hanging planter rail",
+      "family": "biophilic_interior_layers",
+      "status": "conditional",
+      "target_wall_id": "ROOM_001_WALL_07",
+      "opening_type": "sliding_glass_door",
+      "strategy_binding": [
+        "interior_biophilic_cooling_zone",
+        "vertical_greening"
+      ],
+      "future_glb_slot": "3D_test/advanced/assets/plants/hanging_planter_rail.glb",
+      "procedural_fallback": "hanging_planter_rail",
+      "placement_rule": "interior rail above or beside the opening; suspend small planters outside the walking/door operation path with waterproof drip trays",
+      "plant_palette": [
+        "pothos_trailing",
+        "spider_plant_small",
+        "boston_fern_medium"
+      ],
+      "care_profile": null,
+      "reasons": [
+        "Ceiling or rail fixing should be renter-safe or user-confirmed before use.",
+        "Sliding/balcony door operation must stay clear; place asset beside the active passage, not in front of it.",
+        "Biophilic assets support comfort perception and nature connection; they are not counted as the primary air-quality or thermal-control system."
+      ]
+    },
+    {
+      "asset_id": "glb_vertical_plant_ladder",
+      "label": "Vertical plant ladder",
+      "family": "biophilic_interior_layers",
+      "status": "conditional",
+      "target_wall_id": "ROOM_001_WALL_07",
+      "opening_type": "sliding_glass_door",
+      "strategy_binding": [
+        "interior_biophilic_cooling_zone",
+        "vertical_greening"
+      ],
+      "future_glb_slot": "3D_test/advanced/assets/plants/vertical_plant_ladder.glb",
+      "procedural_fallback": "vertical_plant_ladder",
+      "placement_rule": "freestanding ladder shelf in daylight corner; must not overlap window/door opening, egress, or circulation strip",
+      "plant_palette": [
+        "boston_fern_medium",
+        "chinese_evergreen_medium",
+        "spider_plant_small",
+        "pothos_trailing"
+      ],
+      "care_profile": null,
+      "reasons": [
+        "Maintain a clear circulation strip; use compact/side placement only.",
+        "North-facing daylight may be limited; choose shade-tolerant species or preserved greenery.",
+        "Biophilic assets support comfort perception and nature connection; they are not counted as the primary air-quality or thermal-control system."
+      ]
+    },
+    {
+      "asset_id": "glb_trellis_climber_screen",
+      "label": "Interior trellis climber screen",
+      "family": "biophilic_interior_layers",
+      "status": "conditional",
+      "target_wall_id": "ROOM_001_WALL_07",
+      "opening_type": "sliding_glass_door",
+      "strategy_binding": [
+        "vertical_greening",
+        "biophilic_visual_restoration"
+      ],
+      "future_glb_slot": "3D_test/advanced/assets/plants/trellis_climber_screen.glb",
+      "procedural_fallback": "trellis_climber_screen",
+      "placement_rule": "slim trellis panel beside, not in front of, the active glazed opening; requires pruning and daylight",
+      "plant_palette": [
+        "pothos_trailing",
+        "lilyturf_grass",
+        "small_climber"
+      ],
+      "care_profile": null,
+      "reasons": [
+        "Sliding/balcony door operation must stay clear; place asset beside the active passage, not in front of it.",
+        "North-facing daylight may be limited; choose shade-tolerant species or preserved greenery.",
+        "Biophilic assets support comfort perception and nature connection; they are not counted as the primary air-quality or thermal-control system."
+      ]
+    }
+  ],
+  "blocked_assets": [
+    {
+      "asset_id": "glb_venetian_blind_window_only",
+      "label": "Venetian blind",
+      "family": "interior_window_covering",
+      "status": "blocked",
+      "target_wall_id": "ROOM_001_WALL_07",
+      "opening_type": "sliding_glass_door",
+      "strategy_binding": [
+        "internal_blinds"
+      ],
+      "future_glb_slot": "3D_test/advanced/assets/window_coverings/venetian_blind.glb",
+      "procedural_fallback": "venetian_blind",
+      "placement_rule": "interior only; punched windows only",
+      "plant_palette": [],
+      "care_profile": null,
+      "reasons": [
+        "Asset is explicitly avoided for sliding_glass_door."
+      ]
+    },
+    {
+      "asset_id": "glb_adjustable_external_louver",
+      "label": "Adjustable external louver",
+      "family": "external_shading",
+      "status": "blocked",
+      "target_wall_id": "ROOM_001_WALL_07",
+      "opening_type": "sliding_glass_door",
+      "strategy_binding": [
+        "external_shading_louvers"
+      ],
+      "future_glb_slot": "3D_test/advanced/assets/shading/adjustable_external_louver.glb",
+      "procedural_fallback": "horizontal_fixed_shade",
+      "placement_rule": "outside target external wall, offset from glazing, do not intersect door swing or balcony path",
+      "plant_palette": [],
+      "care_profile": null,
+      "reasons": [
+        "Facade-mounted asset requires owner/building approval."
+      ]
+    },
+    {
+      "asset_id": "glb_fabric_awning",
+      "label": "Fabric awning",
+      "family": "external_shading",
+      "status": "blocked",
+      "target_wall_id": "ROOM_001_WALL_07",
+      "opening_type": "sliding_glass_door",
+      "strategy_binding": [
+        "external_shading_louvers",
+        "window_external_shutters"
+      ],
+      "future_glb_slot": "3D_test/advanced/assets/shading/fabric_awning.glb",
+      "procedural_fallback": "awning_shade",
+      "placement_rule": "outside and above opening, sized by glazing width plus side allowance",
+      "plant_palette": [],
+      "care_profile": null,
+      "reasons": [
+        "Facade-mounted asset requires owner/building approval."
+      ]
+    },
+    {
+      "asset_id": "glb_balcony_planter_shade",
+      "label": "Balcony planter shade",
+      "family": "biophilic_shading",
+      "status": "blocked",
+      "target_wall_id": "ROOM_001_WALL_07",
+      "opening_type": "sliding_glass_door",
+      "strategy_binding": [
+        "balcony_planter_shading",
+        "green_pergola"
+      ],
+      "future_glb_slot": "3D_test/advanced/assets/plants/balcony_planter_shade.glb",
+      "procedural_fallback": "vegetation_window",
+      "placement_rule": "outside balcony zone only, not on shared facade without approval",
+      "plant_palette": [],
+      "care_profile": null,
+      "reasons": [
+        "Biophilic exterior asset requires balcony or outdoor maintenance access.",
+        "Biophilic assets support comfort perception and nature connection; they are not counted as the primary air-quality or thermal-control system."
+      ]
+    }
+  ]
+}

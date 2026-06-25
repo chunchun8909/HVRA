@@ -1,0 +1,230 @@
+{
+  "catalogue_id": "HVRA_3D_PLANT_VISUAL_CATALOGUE_V2",
+  "scope": "3D_test only. Plant visual families for procedural placeholders and future GLB asset search.",
+  "air_quality_caveat": "Plants are not treated as the primary air-quality system in calculations. They are used as visual, restorative, and possible shading/comfort-support elements.",
+  "placement_rules": {
+    "small": "shelf, sill, hanging pot, or small side table; avoid active door path",
+    "medium": "floor pot or plant ladder shelf; keep 0.75-0.90 m clear walking strip",
+    "large": "floor corner or side of glazed wall only; avoid blocking window/door operation",
+    "trailing": "hanging rail or upper shelf with drip tray; keep away from handles and openings"
+  },
+  "plants": [
+    {
+      "id": "snake_plant_small",
+      "label": "Snake plant",
+      "size_class": "small",
+      "visual_style": "upright_sword",
+      "scale_range_m": [
+        0.6,
+        0.95
+      ],
+      "light": "low_to_medium",
+      "maintenance": "low",
+      "visual_use": [
+        "shelf",
+        "side_cluster",
+        "plant_ladder"
+      ]
+    },
+    {
+      "id": "aloe_small",
+      "label": "Aloe",
+      "size_class": "mini",
+      "visual_style": "rosette_succulent",
+      "scale_range_m": [
+        0.35,
+        0.55
+      ],
+      "light": "bright",
+      "maintenance": "low",
+      "visual_use": [
+        "shelf"
+      ]
+    },
+    {
+      "id": "spider_plant_small",
+      "label": "Spider plant",
+      "size_class": "small",
+      "visual_style": "arching_spider",
+      "scale_range_m": [
+        0.55,
+        0.9
+      ],
+      "light": "medium",
+      "maintenance": "low",
+      "visual_use": [
+        "hanging",
+        "shelf",
+        "plant_ladder"
+      ]
+    },
+    {
+      "id": "pothos_trailing",
+      "label": "Pothos / devil ivy",
+      "size_class": "trailing",
+      "visual_style": "trailing_vine",
+      "scale_range_m": [
+        0.55,
+        1.1
+      ],
+      "light": "low_to_medium",
+      "maintenance": "low",
+      "visual_use": [
+        "hanging",
+        "trellis",
+        "shelf"
+      ]
+    },
+    {
+      "id": "boston_fern_medium",
+      "label": "Boston fern",
+      "size_class": "medium",
+      "visual_style": "soft_fern",
+      "scale_range_m": [
+        0.9,
+        1.35
+      ],
+      "light": "medium_indirect",
+      "maintenance": "medium",
+      "visual_use": [
+        "floor_cluster",
+        "plant_ladder"
+      ]
+    },
+    {
+      "id": "chinese_evergreen_medium",
+      "label": "Chinese evergreen",
+      "size_class": "medium",
+      "visual_style": "broadleaf_cluster",
+      "scale_range_m": [
+        0.85,
+        1.3
+      ],
+      "light": "low_to_medium",
+      "maintenance": "low",
+      "visual_use": [
+        "floor_cluster",
+        "plant_ladder"
+      ]
+    },
+    {
+      "id": "peace_lily_medium",
+      "label": "Peace lily",
+      "size_class": "medium",
+      "visual_style": "broadleaf_cluster",
+      "scale_range_m": [
+        0.85,
+        1.35
+      ],
+      "light": "medium_indirect",
+      "maintenance": "medium",
+      "visual_use": [
+        "floor_cluster",
+        "plant_ladder"
+      ]
+    },
+    {
+      "id": "bamboo_palm_tall",
+      "label": "Bamboo palm",
+      "size_class": "large",
+      "visual_style": "tall_palm",
+      "scale_range_m": [
+        1.5,
+        2.3
+      ],
+      "light": "medium_indirect",
+      "maintenance": "medium",
+      "visual_use": [
+        "floor_corner",
+        "side_cluster"
+      ]
+    },
+    {
+      "id": "dwarf_date_palm_tall",
+      "label": "Dwarf date palm",
+      "size_class": "large",
+      "visual_style": "tall_palm",
+      "scale_range_m": [
+        1.45,
+        2.2
+      ],
+      "light": "bright_indirect",
+      "maintenance": "medium",
+      "visual_use": [
+        "floor_corner",
+        "side_cluster"
+      ]
+    },
+    {
+      "id": "weeping_fig_tall",
+      "label": "Weeping fig",
+      "size_class": "large",
+      "visual_style": "small_tree",
+      "scale_range_m": [
+        1.45,
+        2.25
+      ],
+      "light": "bright_indirect",
+      "maintenance": "medium",
+      "visual_use": [
+        "floor_corner"
+      ]
+    },
+    {
+      "id": "rubber_plant_medium",
+      "label": "Rubber plant",
+      "size_class": "medium",
+      "visual_style": "broadleaf_cluster",
+      "scale_range_m": [
+        1.0,
+        1.6
+      ],
+      "light": "medium_to_bright",
+      "maintenance": "low",
+      "visual_use": [
+        "floor_cluster",
+        "side_cluster"
+      ]
+    },
+    {
+      "id": "lilyturf_grass",
+      "label": "Lilyturf grass",
+      "size_class": "small",
+      "visual_style": "arching_spider",
+      "scale_range_m": [
+        0.5,
+        0.8
+      ],
+      "light": "medium",
+      "maintenance": "low",
+      "visual_use": [
+        "shelf",
+        "plant_ladder"
+      ]
+    }
+  ],
+  "orientation_rules": {
+    "wall_adjacent_plants": "foliage should face into the room, not into the wall; procedural leaves use a positive room-side bias",
+    "shelf_plants": "pots sit on shelf surface, not floor; shelf is wall-hosted with brackets",
+    "hanging_plants": "pots hang from a rail with visible suspension lines and should stay beside the opening path",
+    "floor_plants": "large plants sit on the floor near corners or beside openings only when circulation is clear"
+  },
+  "scale_system": {
+    "mini": "0.35-0.55 m visual height; secondary shelf/sill plants only, not a main retrofit proposal",
+    "small": "0.55-0.90 m visual height; readable shelf, hanging, or low stand plants",
+    "medium": "0.90-1.50 m visual height; plant ladder or floor cluster plants",
+    "large": "1.50-2.30 m visual height; floor corner or side cluster, design-significant vegetation",
+    "trailing": "vines drop 0.45-1.10 m from shelf or hanging rail"
+  },
+  "visual_styles": {
+    "upright_sword": "vertical blade-like leaves, compact footprint",
+    "rosette_succulent": "short radial leaves, small pot, shelf-safe",
+    "arching_spider": "thin arching leaves, good for hanging/shelf",
+    "soft_fern": "dense low fronds, medium spread",
+    "trailing_vine": "drooping vines and small leaves",
+    "broadleaf_cluster": "medium oval leaves in grouped stems",
+    "tall_palm": "tall stem with radial fronds, floor-only",
+    "small_tree": "woody stem with upper canopy, floor-only"
+  },
+  "project_relevance_note": "For HVRA, vegetation should be shown at a scale that can affect perception, shading adjacency, or biophilic comfort. Very small plants are secondary details and should not be presented as main retrofit options."
+}

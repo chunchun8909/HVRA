@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HVRA One Wall Component Logic</title>
+<style>
+:root{--paper:#f7f5ef;--panel:#fffdfa;--line:#d8d3c7;--ink:#171714;--muted:#766f64;--accent:#2f8298}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--paper);font-family:Arial,sans-serif;color:var(--ink)}
+#app{display:grid;grid-template-columns:280px 1fr 300px;height:100vh}.panel{background:rgba(255,255,252,.95);border-right:1px solid var(--line);padding:16px;overflow:auto}.right{border-left:1px solid var(--line);border-right:0}
+h1,h2{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}p,button{font-size:13px;line-height:1.45}.small{font-size:11px;color:var(--muted)}button{width:100%;padding:8px 10px;margin:4px 0;border:1px solid var(--line);background:#fff;text-align:left;cursor:pointer}button.active{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+#stage{position:relative;min-width:0}#canvas{width:100%;height:100%;display:block}.hud,.legend{position:absolute;background:rgba(255,255,252,.94);border:1px solid var(--line);padding:12px}.hud{left:18px;top:18px;width:300px}.legend{right:18px;bottom:18px;width:255px}.swatch{display:inline-block;width:10px;height:10px;margin-right:6px;border:1px solid var(--line)}#error{position:absolute;left:18px;bottom:18px;background:#fff3f2;border:1px solid #c47670;color:#5b1f1c;display:none;white-space:pre-wrap;padding:12px;max-width:560px;font-size:12px}
+</style>
+<script type="importmap">{"imports":{"three":"../../interface/public/vendor/three/build/three.module.js"}}</script>
+</head>
+<body>
+<div id="app">
+  <aside class="panel"><h1>One Wall Logic</h1><p>Clean component test. Wall plane is <b>z=0</b>. Interior is <b>+z</b>. Every support must visibly connect to wall, floor, rail, or shelf.</p><h2>Show</h2><div id="buttons"></div></aside>
+  <main id="stage"><canvas id="canvas"></canvas><div class="hud"><h2>Spatial Rule</h2><div id="ruleText"></div></div><div class="legend"><h2>Direction</h2><p><span class="swatch" style="background:#d9edf0"></span>wall plane</p><p><span class="swatch" style="background:#dff0d8"></span>interior side</p><p><span class="swatch" style="background:#f1d5d2"></span>exterior/no-go</p></div><div id="error"></div></main>
+  <aside class="panel right"><h1>Rules</h1><div id="rules"></div></aside>
+</div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from '../../interface/public/vendor/three/examples/jsm/controls/OrbitControls.js';
+const errorBox=document.getElementById('error');
+function fail(e){console.error(e);errorBox.style.display='block';errorBox.textContent=String(e&&e.stack?e.stack:e)}
+try{
+const canvas=document.getElementById('canvas');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+const scene=new THREE.Scene();scene.background=new THREE.Color(0xf7f5ef);
+const camera=new THREE.PerspectiveCamera(45,1,.1,80);camera.position.set(4.4,3.1,6.3);
+const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(0,1.45,.34);controls.enableDamping=true;
+scene.add(new THREE.HemisphereLight(0xffffff,0xb8ad9b,2.4));const sun=new THREE.DirectionalLight(0xffffff,1.5);sun.position.set(3,5,4);scene.add(sun);
+const WALL={width:4.8,height:3.0};const OPENING={x:0,y:1.42,width:1.45,height:2.35,sill:.12,head:2.72};
+const objects=new Map();
+const rules={all:'Show all. Red opening zone stays clear. All supports visibly connect to wall, floor, shelf, track, rail, ceiling, or exterior bracket.',zones:'Placement contract: red is no-go opening path, green side zones host wall systems, blue zone hosts floor planting.',fullHeightDrape:'Full-height drape: one rail above the opening with many thin continuous fabric strips, subtle ripple, and interior-side placement.',shortSillCurtain:'Short sill curtain: shorter fabric panels mounted near the opening head, ending above the sill/floor path.',romanShade:'Roman shade: a compact fabric panel mounted at the opening head, folding upward rather than reaching the floor.',venetianBlind:'Venetian blind: many thin horizontal slats held inside the opening frame.',verticalBlind:'Vertical blind: many thin slats hang evenly from the underside of the track.',solarControlGlazing:'Solar-control glazing tint: changes the existing glass colour/material; no second glazing pane is added.',externalAwning:'External awning: exterior-side fabric shade with two bracket arms above the opening.',ceilingFan:'Ceiling fan: centered ceiling support, hub, and blades rotate around one shared axis.',rectangularPlanter:'Rectangular long planter: continuous pot for longer vegetation, placed beside the opening and clear of the sliding path.',planterShelf:'Back plate is on wall. Brackets connect wall plate to shelf. Pots sit on shelf top.',hangingRail:'Wall brackets hold a rail. Cords connect rail to pots. Plants hang inside the room.',plantLadder:'Floor-standing ladder rests on floor and leans near the wall. Pots sit on shelves.',trellis:'Trellis frame is wall-mounted. Green sphere clusters are denser and more irregularly scattered across timber intersections, each tied back to the frame.',floorPlants:'Large plants stand on the floor planting zone, beside the opening, clear of the door path.',outsideMarker:'Exterior marker only. Components must not be placed on this side.'}
+function mat(c,o=1,side=THREE.DoubleSide){return new THREE.MeshStandardMaterial({color:c,transparent:o<1,opacity:o,side,roughness:.72,metalness:.02})}
+function box(g,size,pos,c,o=1){const m=new THREE.Mesh(new THREE.BoxGeometry(size[0],size[1],size[2]),mat(c,o));m.position.set(pos[0],pos[1],pos[2]);g.add(m);return m}
+function cyl(g,r,h,pos,c,o=1,radial=18){const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,radial),mat(c,o));m.position.set(pos[0],pos[1],pos[2]);g.add(m);return m}
+function sphere(g,r,pos,c,o=1){const m=new THREE.Mesh(new THREE.SphereGeometry(r,14,10),mat(c,o));m.position.set(pos[0],pos[1],pos[2]);g.add(m);return m}
+function add(name,g){objects.set(name,g);scene.add(g);return g}
+function sideX(width,side='right',margin=.18){return (side==='left'?-1:1)*(OPENING.width/2+margin+width/2)}
+function clearState(active='all'){objects.forEach((o,k)=>o.visible=active==='all'||k===active);document.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.key===active));document.getElementById('ruleText').innerHTML=`<p>${rules[active]}</p>`}
+function cylinderBetween(g,a,b,r,c,o=1){const start=new THREE.Vector3(a[0],a[1],a[2]);const end=new THREE.Vector3(b[0],b[1],b[2]);const mid=start.clone().add(end).multiplyScalar(.5);const len=start.distanceTo(end);const mesh=new THREE.Mesh(new THREE.CylinderGeometry(r,r,len,12),mat(c,o));mesh.position.copy(mid);mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),end.clone().sub(start).normalize());g.add(mesh);return mesh}
+function leafAt(g,base,end,size=.08,color=0x4f8b57){cylinderBetween(g,base,end,.006,0x355e3f,1);const dir=new THREE.Vector3(end[0]-base[0],end[1]-base[1],end[2]-base[2]).normalize();const l=sphere(g,size,end,color,.96);l.scale.set(1.55,.34,.62);l.quaternion.setFromUnitVectors(new THREE.Vector3(1,0,0),dir);return l}
+function wallPlate(g,x,y,w,h,color=0xf0e7d6){return box(g,[w,h,.035],[x,y,.018],color,.95)}
+function wallBracket(g,x,y,depth=.28){box(g,[.035,.22,.035],[x,y-.05,.018],0x7f7466,1);box(g,[.22,.03,.05],[x,y+.04,.12],0x7f7466,1);cylinderBetween(g,[x,y-.14,.028],[x,y+.04,depth],.012,0x7f7466,1)}
+function buildBase(){
+  const g=new THREE.Group();
+  box(g,[WALL.width,WALL.height,.035],[0,WALL.height/2,0],0xd9edf0,.52);
+  box(g,[WALL.width,.025,2.2],[0,.012,1.1],0xded6c6,.65);
+  box(g,[WALL.width,.012,1.0],[0,.018,-.5],0xe8c7c4,.45);
+
+  const fw=OPENING.width, fh=OPENING.height, fx=OPENING.x, fy=OPENING.y;
+  const head=OPENING.head, sill=OPENING.sill;
+  const t=.070;
+  const frameZ=.074;
+  const panelZ=.112;
+  const paneZ=.045;
+  const dark=0x1e2426;
+
+  // Existing tinted glass material; solar-control mode changes colour, not a second glass sheet.
+  box(g,[fw-t*2,fh-t*2,.018],[fx,fy,paneZ],0x6f9eaa,.40);
+
+  // Outer frame. Pieces deliberately overlap at corners so the frame reads as connected.
+  box(g,[fw+t*1.25,t,.095],[fx,head,frameZ],dark,1);
+  box(g,[fw+t*1.25,t,.095],[fx,sill,frameZ],dark,1);
+  box(g,[t,fh+t*1.25,.095],[fx-fw/2,fy,frameZ],dark,1);
+  box(g,[t,fh+t*1.25,.095],[fx+fw/2,fy,frameZ],dark,1);
+
+  // Sliding-panel geometry. Two complete panel rectangles sit inside the outer frame.
+  const innerTop=head-t*.85;
+  const innerBottom=sill+t*.85;
+  const innerH=innerTop-innerBottom;
+  const leftOuter=fx-fw/2+t*.78;
+  const rightOuter=fx+fw/2-t*.78;
+  const leftMeet=fx-t*.18;
+  const rightMeet=fx+t*.18;
+  const leftCenter=(leftOuter+leftMeet)/2;
+  const rightCenter=(rightMeet+rightOuter)/2;
+  const leftW=leftMeet-leftOuter;
+  const rightW=rightOuter-rightMeet;
+
+  // Glass panes inside each sliding leaf.
+  box(g,[leftW-t*.85,innerH-t*.85,.014],[leftCenter,fy,paneZ+.010],0x8eb9c4,.26);
+  box(g,[rightW-t*.85,innerH-t*.85,.014],[rightCenter,fy,paneZ+.014],0x8eb9c4,.22);
+
+  // Left sliding leaf frame: all four sides meet.
+  box(g,[leftW+t*.35,t*.55,.080],[leftCenter,innerTop,panelZ],dark,1);
+  box(g,[leftW+t*.35,t*.55,.080],[leftCenter,innerBottom,panelZ],dark,1);
+  box(g,[t*.58,innerH+t*.45,.080],[leftOuter,fy,panelZ],dark,1);
+  box(g,[t*.58,innerH+t*.45,.080],[leftMeet,fy,panelZ],dark,1);
+
+  // Right sliding leaf frame: all four sides meet.
+  box(g,[rightW+t*.35,t*.55,.080],[rightCenter,innerTop,panelZ+.006],dark,1);
+  box(g,[rightW+t*.35,t*.55,.080],[rightCenter,innerBottom,panelZ+.006],dark,1);
+  box(g,[t*.58,innerH+t*.45,.080],[rightMeet,fy,panelZ+.006],dark,1);
+  box(g,[t*.58,innerH+t*.45,.080],[rightOuter,fy,panelZ+.006],dark,1);
+
+  // Continuous center meeting strip: two adjacent stiles connect from bottom rail to top rail.
+  box(g,[t*.42,innerH+t*.55,.090],[fx-t*.23,fy,panelZ+.020],dark,1);
+  box(g,[t*.42,innerH+t*.55,.090],[fx+t*.23,fy,panelZ+.026],dark,1);
+
+  scene.add(g)
+}function buildZones(){const g=new THREE.Group();box(g,[OPENING.width+.46,2.65,.42],[0,1.34,.30],0xb45b55,.14);box(g,[1.25,2.35,.26],[-1.65,1.28,.20],0x70a36c,.12);box(g,[1.25,2.35,.26],[1.65,1.28,.20],0x70a36c,.12);box(g,[1.75,.035,.86],[1.62,.02,.63],0x2f8298,.14);add('zones',g)}
+function pot(g,x,baseY,z,r=.12,h=.18,color=0x8a5a3f){
+  // Correct plant pot profile: wider rim at top, narrower foot at bottom.
+  const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r*.68,h,20),mat(color,1));
+  m.position.set(x,baseY+h/2,z);g.add(m);
+  return baseY+h;
+}
+function plantLeaf(g,base,end,size=.055,color=0x4f8b57){
+  cylinderBetween(g,base,end,.006,0x355e3f,1);
+  const dir=new THREE.Vector3(end[0]-base[0],end[1]-base[1],end[2]-base[2]).normalize();
+  const l=sphere(g,size,end,color,.96);
+  l.scale.set(1.25,.32,.56);
+  l.quaternion.setFromUnitVectors(new THREE.Vector3(1,0,0),dir);
+  return l;
+}
+function makePlant(g,{x,z,baseY=0,kind='broadleaf',height=1,color=0x4f8b57}){
+  const potR=.095+Math.min(height,1.8)*.024;
+  const potH=.16+Math.min(height,1.8)*.025;
+  const top=pot(g,x,baseY,z,potR,potH,kind==='succulent'?0xa77a58:0x7b5842);
+  const crown=[x,top+.035,z+.04];
+  const alt=0x2f7441;
+
+  if(kind==='topiary'||kind==='ball'){
+    const stemTop=[x,top+Math.max(.26,height*.30),z+.07];
+    cylinderBetween(g,[x,top,z+.035],stemTop,.014,0x355e3f,1);
+    const crownMesh=sphere(g,.13+height*.045,stemTop,color,.96);
+    crownMesh.scale.set(1.05,.88,1.05);
+    return;
+  }
+
+  if(kind==='succulent'){
+    for(let i=0;i<12;i++){
+      const a=i*Math.PI*2/12;
+      plantLeaf(g,crown,[x+Math.cos(a)*.12,top+.105,z+.10+Math.sin(a)*.07],.045,i%2?0x7aa86b:0x5f925c);
+    }
+    return;
+  }
+
+  if(kind==='trailing'){
+    for(let i=0;i<5;i++){
+      const root=[x-.16+i*.08,top+.035,z+.06];
+      let prev=root;
+      for(let j=0;j<4;j++){
+        const next=[root[0]+(j%2?.025:-.025),top-.08-j*.105,z+.13];
+        cylinderBetween(g,prev,next,.005,0x355e3f,1);
+        plantLeaf(g,next,[next[0]+(j%2?.04:-.04),next[1]-.02,next[2]+.03],.032,j%2?color:alt);
+        prev=next;
+      }
+    }
+    return;
+  }
+
+  if(kind==='palm'){
+    const trunkTop=[x,top+Math.max(.58,height*.52),z+.08];
+    cylinderBetween(g,[x,top,z+.035],trunkTop,.018,0x3f6042,1);
+    for(let i=0;i<12;i++){
+      const a=i*Math.PI*2/12;
+      plantLeaf(g,trunkTop,[x+Math.cos(a)*.34,trunkTop[1]+.05,z+.17+Math.sin(a)*.22],.058,i%2?color:alt);
+    }
+    return;
+  }
+
+  if(kind==='tree'){
+    const trunkTop=[x,top+Math.max(.42,height*.38),z+.07];
+    cylinderBetween(g,[x,top,z+.035],trunkTop,.024,0x5a4a38,1);
+    for(let i=0;i<9;i++){
+      const a=i*Math.PI*2/9;
+      plantLeaf(g,trunkTop,[x+Math.cos(a)*.23,trunkTop[1]+.08+Math.sin(i)*.02,z+.17+Math.sin(a)*.16],.065,i%2?color:alt);
+    }
+    return;
+  }
+
+  if(kind==='grass'||kind==='spider'||kind==='fern'){
+    const count=kind==='fern'?14:12;
+    const spread=kind==='fern'?.24:.19;
+    for(let i=0;i<count;i++){
+      const a=i*Math.PI*2/count;
+      plantLeaf(g,crown,[x+Math.cos(a)*spread,top+.18+Math.sin(i)*.018,z+.13+Math.sin(a)*.12],kind==='fern'?.042:.046,i%2?color:0x72a76c);
+    }
+    return;
+  }
+
+  // Broadleaf: few clear stems from crown, no loose leaf cloud.
+  for(let i=0;i<7;i++){
+    const a=i*Math.PI*2/7;
+    plantLeaf(g,crown,[x+Math.cos(a)*.20,top+.31+Math.sin(i)*.018,z+.15+Math.sin(a)*.12],.062,i%2?color:alt);
+  }
+}function fullHeightDrape(){
+  const g=new THREE.Group();
+  const width=Math.max(1.45,Math.min(OPENING.width+.48,2.35));
+  const railY=OPENING.head+.13;
+  const fabricBottom=Math.max(.07,OPENING.sill+.02);
+  const h=Math.max(.6,railY-fabricBottom);
+  box(g,[width+.30,.034,.052],[0,railY,.165],0x6b5147,1);
+  for(let i=0;i<22;i++){
+    const t=i/21;
+    const x=-width/2+t*width;
+    const wave=Math.sin(t*Math.PI*5.5);
+    const tone=i%2?0xd7b5a4:0xcda08e;
+    const stripW=.050+Math.abs(wave)*.010;
+    const panel=box(g,[stripW,h,.024],[x,fabricBottom+h/2,.205+wave*.018],tone,.64);
+    panel.rotation.z=wave*.018;
+  }
+  for(let i=0;i<11;i++){
+    const x=-width/2+i*(width/10);
+    cyl(g,.018,.012,[x,railY-.032,.19],0x6b5147,1,12).rotation.x=Math.PI/2;
+  }
+  add('fullHeightDrape',g)
+}function verticalBlind(){
+  const g=new THREE.Group();
+  const w=OPENING.width+.28;
+  const y=OPENING.head+.10;
+  wallPlate(g,0,y,w+.16,.095,0xf1efe5);
+  wallBracket(g,-w*.45,y,.11);
+  wallBracket(g,w*.45,y,.11);
+  box(g,[w+.16,.040,.070],[0,y,.158],0xf1efe5,1);
+  const bottom=OPENING.sill+.055;
+  const top=y-.055;
+  const slatH=top-bottom;
+  for(let i=0;i<24;i++){
+    const x=-w/2+i*w/23;
+    box(g,[.007,.062,.009],[x,top+.024,.178],0x8d8a80,1);
+    const s=box(g,[.026,slatH,.016],[x,bottom+slatH/2,.205],0xf7f5ef,.78);
+    s.rotation.y=.36+Math.sin(i*.45)*.035;
+  }
+  add('verticalBlind',g)
+}
+function shortSillCurtain(){
+  const g=new THREE.Group();
+  const width=OPENING.width+.26;
+  const railY=OPENING.head+.06;
+  const bottom=OPENING.head-.78;
+  const h=railY-bottom;
+  box(g,[width+.16,.028,.046],[0,railY,.17],0x6b5147,1);
+  for(let side=-1;side<=1;side+=2){
+    for(let i=0;i<10;i++){
+      const t=i/9;
+      const x=side*(.06+t*(width*.39));
+      const wave=Math.sin((i+1)*.85)*.014;
+      const p=box(g,[.035,h,.017],[x,bottom+h/2,.205+wave],side<0?0xd8c2b5:0xcfae9e,.64);
+      p.rotation.z=side*.024*Math.sin(i*.7);
+    }
+  }
+  add('shortSillCurtain',g)
+}function romanShade(){
+  const g=new THREE.Group();
+  const w=OPENING.width+.22;
+  const top=OPENING.head+.075;
+  const h=.82;
+  wallPlate(g,0,top,w+.18,.10,0xf1e7dc);
+  box(g,[w,h,.020],[0,top-h/2,.19],0xd8c2ad,.74);
+  for(let i=0;i<5;i++){
+    box(g,[w+.02,.020,.026],[0,top-.16-i*.13,.215],0xb89474,.85);
+  }
+  add('romanShade',g)
+}
+function venetianBlind(){
+  const g=new THREE.Group();
+  const w=OPENING.width+.26;
+  const top=OPENING.head+.075;
+  const bottom=OPENING.sill+.10;
+  wallPlate(g,0,top,w+.16,.09,0xf3f1e9);
+  box(g,[w+.12,.036,.065],[0,top,.17],0xf3f1e9,1);
+  for(let i=0;i<22;i++){
+    const y=top-.14-i*((top-bottom-.16)/21);
+    const s=box(g,[w,.012,.045],[0,y,.205],0xf8f6ee,.88);
+    s.rotation.x=.34;
+  }
+  cylinderBetween(g,[-w*.44,top-.05,.23],[-w*.44,bottom,.23],.0035,0x9b968a,.9);
+  cylinderBetween(g,[w*.44,top-.05,.23],[w*.44,bottom,.23],.0035,0x9b968a,.9);
+  add('venetianBlind',g)
+}
+function solarControlGlazing(){
+  const g=new THREE.Group();
+  // No extra glass plane: this strategy uses the tinted base glazing already drawn in buildBase.
+  box(g,[OPENING.width-.34,.030,.030],[OPENING.x,OPENING.head-.22,.116],0x6f9eaa,.82);
+  add('solarControlGlazing',g)
+}function externalAwning(){
+  const g=new THREE.Group();
+  const w=OPENING.width+.52;
+  const y=OPENING.head+.18;
+  box(g,[w+.18,.052,.070],[0,y,-.055],0x6b5147,1);
+  const fabric=new THREE.Mesh(new THREE.BoxGeometry(w,.045,.92),mat(0x9abf9f,.78));
+  fabric.position.set(0,y-.18,-.48);
+  fabric.rotation.x=-.22;
+  g.add(fabric);
+  cylinderBetween(g,[-w*.46,y-.02,-.04],[-w*.46,y-.36,-.88],.014,0x6f6a5f,1);
+  cylinderBetween(g,[w*.46,y-.02,-.04],[w*.46,y-.36,-.88],.014,0x6f6a5f,1);
+  box(g,[w,.035,.035],[0,y-.38,-.90],0x6b5147,1);
+  add('externalAwning',g)
+}
+function ceilingFan(){
+  const g=new THREE.Group();
+  const cx=0, cy=2.50, cz=.86;
+  cylinderBetween(g,[cx,2.93,cz],[cx,cy+.08,cz],.018,0x6f6a5f,1);
+  cyl(g,.082,.070,[cx,cy,cz],0xede9df,1,28);
+  for(let i=0;i<4;i++){
+    const arm=new THREE.Group();
+    arm.position.set(cx,cy,cz);
+    const blade=box(arm,[.58,.020,.085],[.34,0,0],0xb9956a,1);
+    blade.rotation.z=.015;
+    arm.rotation.y=i*Math.PI/2;
+    g.add(arm);
+  }
+  add('ceilingFan',g)
+}function rectangularPot(g,x,baseY,z,w=.90,d=.22,h=.18,color=0x9a7356){
+  box(g,[w,h,d],[x,baseY+h/2,z],color,1);
+  box(g,[w+.04,.035,d+.04],[x,baseY+h+.018,z],0xb18b6b,1);
+  return baseY+h+.04;
+}
+function rectangularPlanter(){
+  const g=new THREE.Group();
+  const w=1.18;
+  const x=sideX(w,'right',.36);
+  const top=rectangularPot(g,x,0,.48,w,.30,.20,0x8a684e);
+  for(let i=0;i<14;i++){
+    const px=x-w*.43+i*(w*.86/13);
+    const kind=i%5===0?'grass':(i%5===1?'succulent':(i%5===2?'topiary':(i%5===3?'broadleaf':'fern')));
+    makePlant(g,{x:px,z:.48+((i%3)-1)*.045,baseY:top-.02,kind,height:.52+(i%4)*.10,color:i%2?0x4f8b57:0x6ca56a});
+  }
+  add('rectangularPlanter',g)
+}
+function planterShelf(){const g=new THREE.Group();const w=1.35;const x=sideX(w,'right');const y=.96;wallPlate(g,x,y-.08,w+.14,.28);wallBracket(g,x-w*.35,y,.31);wallBracket(g,x+w*.35,y,.31);box(g,[w,.08,.42],[x,y,.26],0xb79266,1);const top=y+.04;[{dx:-.43,h:.62,k:'succulent',c:0x7aa86b},{dx:-.17,h:.72,k:'topiary',c:0x5f925c},{dx:.10,h:.82,k:'spider',c:0x72a76c},{dx:.39,h:.92,k:'trailing',c:0x4f8b57}].forEach(p=>makePlant(g,{x:x+p.dx,z:.34,baseY:top,kind:p.k,height:p.h,color:p.c}));add('planterShelf',g)}
+function hangingRail(){const g=new THREE.Group();const w=1.38;const x=sideX(w,'left');const y=2.40;wallPlate(g,x,y,w+.16,.16);wallBracket(g,x-w*.39,y,.20);wallBracket(g,x+w*.39,y,.20);cylinderBetween(g,[x-w/2,y,.24],[x+w/2,y,.24],.026,0x5f4a35);[{dx:-.40,h:.95,k:'trailing',c:0x3f7e4a,drop:.62},{dx:0,h:.82,k:'spider',c:0x72a76c,drop:.54},{dx:.40,h:.90,k:'fern',c:0x6ca56a,drop:.58}].forEach(p=>{const px=x+p.dx;cylinderBetween(g,[px,y,.24],[px,y-p.drop,.36],.006,0x6f6a5f);makePlant(g,{x:px,z:.35,baseY:y-p.drop-.20,kind:p.k,height:p.h,color:p.c})});add('hangingRail',g)}
+function plantLadder(){const g=new THREE.Group();const w=.95;const x=sideX(w,'left',.42);cylinderBetween(g,[x-w*.38,.02,.58],[x-w*.32,2.3,.10],.025,0x8b6b48);cylinderBetween(g,[x+w*.38,.02,.58],[x+w*.32,2.3,.10],.025,0x8b6b48);[{y:.42,dx:-.23,h:.78,k:'fern',c:0x6ca56a},{y:.88,dx:.20,h:.86,k:'topiary',c:0x5f925c},{y:1.34,dx:-.18,h:.78,k:'spider',c:0x72a76c},{y:1.80,dx:.18,h:.88,k:'trailing',c:0x3f7e4a}].forEach(p=>{box(g,[w,.055,.34],[x,p.y,.36],0xc7aa82,1);makePlant(g,{x:x+p.dx,z:.43,baseY:p.y+.03,kind:p.k,height:p.h,color:p.c})});add('plantLadder',g)}
+function trellis(){
+  const g=new THREE.Group();
+  const w=.98;
+  const x=sideX(w,'right',.42);
+  const h=2.18;
+  wallPlate(g,x,1.38,w+.10,h+.10,0xe7dcc8);
+  const verticals=[];
+  const horizontals=[];
+  for(let i=0;i<5;i++){
+    const vx=x-w*.40+i*w*.20;
+    verticals.push(vx);
+    box(g,[.026,h,.035],[vx,1.38,.05],0xb79569,1)
+  }
+  for(let j=0;j<7;j++){
+    const hy=.42+j*.30;
+    horizontals.push(hy);
+    box(g,[w,.022,.035],[x,hy,.05],0xb79569,1)
+  }
+  const anchors=[];
+  for(let vi=0;vi<verticals.length;vi++){
+    for(let hi=1;hi<horizontals.length-1;hi++){
+      const edge=(vi===0||vi===verticals.length-1)?0.65:1;
+      const middle=(hi===2||hi===3||hi===4)?1.35:1;
+      const n=Math.round((7+((vi*5+hi*3)%8))*edge*middle);
+      anchors.push({cx:verticals[vi],cy:horizontals[hi],n})
+    }
+  }
+  anchors.forEach((c,ci)=>{
+    for(let i=0;i<c.n;i++){
+      const a=(i*2.399)+(ci*.43);
+      const shell=.045+((i+ci)%5)*.018;
+      const driftX=((i*17+ci*11)%100/100-.5)*.13;
+      const driftY=((i*23+ci*7)%100/100-.5)*.105;
+      const px=c.cx+Math.cos(a)*shell+driftX;
+      const py=c.cy+Math.sin(a)*shell+driftY;
+      if(py<horizontals[0]+.06||py>horizontals[horizontals.length-1]-.06) continue;
+      const nearestV=verticals.reduce((best,v)=>Math.abs(v-px)<Math.abs(best-px)?v:best,verticals[0]);
+      const nearestH=horizontals.reduce((best,hv)=>Math.abs(hv-py)<Math.abs(best-py)?hv:best,horizontals[0]);
+      const base=Math.abs(nearestV-px)<Math.abs(nearestH-py)?[nearestV,py,.07]:[px,nearestH,.07];
+      const pz=.13+((i+ci)%4)*.026;
+      cylinderBetween(g,base,[px,py,pz],.0032,0x7f6a49,.82);
+      const ball=sphere(g,.035+((i+ci)%4)*.008,[px,py,pz],(i+ci)%3===0?0x2f7441:((i+ci)%3===1?0x4f8b57:0x6aa960),.96);
+      ball.scale.set(1.18,.90,1.05)
+    }
+  });
+  add('trellis',g)
+}function floorPlants(){const g=new THREE.Group();const x=sideX(1.45,'right',.52);box(g,[1.58,.025,.74],[x,.012,.56],0xd8c7a8,.45);[{dx:-.52,z:.42,h:1.95,k:'palm',c:0x4f8b57},{dx:-.10,z:.65,h:1.35,k:'broadleaf',c:0x477d45},{dx:.35,z:.42,h:.92,k:'fern',c:0x6ca56a},{dx:.08,z:.90,h:1.45,k:'tree',c:0x3f7e4a},{dx:.62,z:.72,h:.82,k:'topiary',c:0x5f925c}].forEach(p=>makePlant(g,{x:x+p.dx,z:p.z,baseY:0,kind:p.k,height:p.h,color:p.c}));add('floorPlants',g)}
+function outsideMarker(){const g=new THREE.Group();box(g,[1.15,1.9,.08],[0,1.25,-.22],0xb45b55,.45);add('outsideMarker',g)}
+buildBase();buildZones();fullHeightDrape();shortSillCurtain();romanShade();venetianBlind();verticalBlind();solarControlGlazing();externalAwning();ceilingFan();rectangularPlanter();planterShelf();hangingRail();plantLadder();trellis();floorPlants();outsideMarker();
+const order=['all','zones','fullHeightDrape','shortSillCurtain','romanShade','venetianBlind','verticalBlind','solarControlGlazing','externalAwning','ceilingFan','rectangularPlanter','planterShelf','hangingRail','plantLadder','trellis','floorPlants','outsideMarker'];document.getElementById('buttons').innerHTML=order.map(k=>`<button data-key="${k}">${k}</button>`).join('');document.querySelectorAll('button').forEach(b=>b.onclick=()=>clearState(b.dataset.key));document.getElementById('rules').innerHTML=order.map(k=>`<h2>${k}</h2><p>${rules[k]}</p>`).join('');clearState('all');
+function resize(){const r=canvas.parentElement.getBoundingClientRect();renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix()}function animate(){requestAnimationFrame(animate);controls.update();renderer.render(scene,camera)}resize();animate();addEventListener('resize',resize);
+}catch(e){fail(e)}
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

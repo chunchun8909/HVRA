@@ -271,6 +271,63 @@ EFFECT_LIBRARY = {
             "Screening model cannot verify charge/discharge cycling without dynamic simulation.",
         ],
     },
+
+    "ceiling_fan_air_movement": {
+        "solar_gain_multiplier": 1.0,
+        "ventilation_deficit_multiplier": 0.92,
+        "envelope_score_multiplier": 1.0,
+        "nocturnal_recovery_multiplier": 0.95,
+        "operative_temp_reduction_c": 0.2,
+        "wbgt_reduction_c": 0.25,
+        "overheating_hours_multiplier": 0.88,
+        "confidence_score": 0.56,
+        "confidence_reasons": [
+            "Elevated air speed can improve perceived thermal comfort under ASHRAE 55 logic.",
+            "A fan does not remove heat by itself, so temperature reduction is kept minimal.",
+        ],
+    },
+    "secure_night_vent_limiter": {
+        "solar_gain_multiplier": 1.0,
+        "ventilation_deficit_multiplier": 0.62,
+        "envelope_score_multiplier": 1.0,
+        "nocturnal_recovery_multiplier": 0.62,
+        "operative_temp_reduction_c": 0.9,
+        "wbgt_reduction_c": 0.35,
+        "overheating_hours_multiplier": 0.70,
+        "confidence_score": 0.55,
+        "confidence_reasons": [
+            "Secure night opening supports night-purge operation where security or safety limits normal window opening.",
+            "Effect depends on outdoor night temperature, noise, wind exposure, and user operation.",
+        ],
+    },
+    "balcony_planter_shading": {
+        "solar_gain_multiplier": 0.78,
+        "ventilation_deficit_multiplier": 0.98,
+        "envelope_score_multiplier": 0.98,
+        "nocturnal_recovery_multiplier": 0.90,
+        "operative_temp_reduction_c": 0.6,
+        "wbgt_reduction_c": 0.20,
+        "overheating_hours_multiplier": 0.86,
+        "confidence_score": 0.42,
+        "confidence_reasons": [
+            "Balcony planting can provide local shading and biophilic comfort support.",
+            "Thermal effect is low-confidence without local solar geometry, vegetation maturity, and irrigation assumptions.",
+        ],
+    },
+    "interior_biophilic_cooling_zone": {
+        "solar_gain_multiplier": 1.0,
+        "ventilation_deficit_multiplier": 1.0,
+        "envelope_score_multiplier": 1.0,
+        "nocturnal_recovery_multiplier": 0.98,
+        "operative_temp_reduction_c": 0.1,
+        "wbgt_reduction_c": 0.05,
+        "overheating_hours_multiplier": 0.98,
+        "confidence_score": 0.30,
+        "confidence_reasons": [
+            "Interior planting is treated as a supportive comfort and acceptability measure, not a benchmark-passing retrofit.",
+            "Do not use this strategy alone to claim room thermal-comfort compliance.",
+        ],
+    },
     "courtyard_greening": {
         "solar_gain_multiplier": 0.92,
         "ventilation_deficit_multiplier": 0.98,
@@ -341,6 +398,10 @@ ALIASES = {
     "courtyard_greening": "courtyard_greening",
     "street_tree_canopy": "street_tree_canopy",
     "shared_cooling_refuge": "shared_cooling_refuge",
+    "interior_biophilic_cooling_zone": "interior_biophilic_cooling_zone",
+    "balcony_planter_shading": "balcony_planter_shading",
+    "secure_night_vent_limiter": "secure_night_vent_limiter",
+    "ceiling_fan_air_movement": "ceiling_fan_air_movement",
     "window_external_shutters": "external_shutters",
 }
 
@@ -358,6 +419,10 @@ def infer_effect_profile(strategy: dict) -> dict:
             return {**EFFECT_LIBRARY[key], "effect_profile_id": key}
 
     name_rules = [
+        ("fan", "ceiling_fan_air_movement"),
+        ("secure", "secure_night_vent_limiter"),
+        ("planter", "balcony_planter_shading"),
+        ("biophilic", "interior_biophilic_cooling_zone"),
         ("shutter", "external_shutters"),
         ("louver", "external_shading"),
         ("external", "external_shading"),

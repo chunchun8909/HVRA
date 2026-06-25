@@ -33,3 +33,4 @@ Then rebuild:
 ```powershell
 .\.venv\Scripts\python.exe -m rag_engine.build_index
 ```
+

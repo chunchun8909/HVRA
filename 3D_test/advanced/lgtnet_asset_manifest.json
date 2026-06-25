@@ -5,7 +5,7 @@
   "registry_url": null,
   "api_key_env": "ASSET_REGISTRY_API_KEY",
   "api_key_loaded": false,
-  "dry_run": false,
+  "dry_run": true,
   "room_geometry": {
     "wall_count": 8,
     "layout_height_m_raw": 2.9792428016662598,
@@ -170,7 +170,7 @@
         },
         "reason": "placeholder target until SAM/window metadata is linked"
       },
-      "registry_status": "skipped_missing_registry_config",
+      "registry_status": "dry_run",
       "asset_id": null,
       "asset_name": null,
       "asset_url": null,
@@ -190,7 +190,7 @@
         },
         "reason": "placeholder target until SAM/window metadata is linked"
       },
-      "registry_status": "skipped_missing_registry_config",
+      "registry_status": "dry_run",
       "asset_id": null,
       "asset_name": null,
       "asset_url": null,
@@ -209,7 +209,7 @@
         },
         "reason": "simple non-interactive placement for smoke test"
       },
-      "registry_status": "skipped_missing_registry_config",
+      "registry_status": "dry_run",
       "asset_id": null,
       "asset_name": null,
       "asset_url": null,
@@ -228,7 +228,7 @@
         },
         "reason": "simple non-interactive placement for smoke test"
       },
-      "registry_status": "skipped_missing_registry_config",
+      "registry_status": "dry_run",
       "asset_id": null,
       "asset_name": null,
       "asset_url": null,

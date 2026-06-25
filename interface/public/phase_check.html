@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -127,6 +127,36 @@
       }
 
       .sidebar,
+
+      .option-report {
+        max-height: 330px;
+        overflow: auto;
+      }
+
+      .option-report .summary-line {
+        border-bottom: 1px solid var(--border);
+        display: grid;
+        gap: 4px;
+        padding: 7px 0;
+      }
+
+      .option-report table {
+        border-collapse: collapse;
+        margin: 8px 0;
+        width: 100%;
+      }
+
+      .option-report th,
+      .option-report td {
+        border-top: 1px solid var(--border);
+        padding: 6px 4px;
+        text-align: left;
+      }
+
+      .option-report .inline-list {
+        line-height: 1.5;
+        margin: 6px 0 0;
+      }
       .preview {
         background: var(--surface-primary);
         border: 1px solid var(--border);
@@ -221,6 +251,36 @@
         background: var(--warn);
       }
 
+
+      .option-report {
+        max-height: 330px;
+        overflow: auto;
+      }
+
+      .option-report .summary-line {
+        border-bottom: 1px solid var(--border);
+        display: grid;
+        gap: 4px;
+        padding: 7px 0;
+      }
+
+      .option-report table {
+        border-collapse: collapse;
+        margin: 8px 0;
+        width: 100%;
+      }
+
+      .option-report th,
+      .option-report td {
+        border-top: 1px solid var(--border);
+        padding: 6px 4px;
+        text-align: left;
+      }
+
+      .option-report .inline-list {
+        line-height: 1.5;
+        margin: 6px 0 0;
+      }
       .preview {
         display: grid;
         grid-template-rows: 40px minmax(0, 1fr);
@@ -328,14 +388,7 @@
               <span class="dot warn"></span>
               <span>
                 <span class="level-2">phase 1</span><br />
-                <span class="level-3">chat gathers site context</span>
-              </span>
-            </div>
-            <div class="rule">
-              <span class="dot warn"></span>
-              <span>
-                <span class="level-2">phase 1.5</span><br />
-                <span class="level-3">site context checkpoint</span>
+                <span class="level-3">chat gathers case context</span>
               </span>
             </div>
             <div class="rule">
@@ -349,12 +402,50 @@
               <span class="dot warn"></span>
               <span>
                 <span class="level-2">phase 3</span><br />
-                <span class="level-3">options + room + links + check + report</span>
+                <span class="level-3">options + room + report</span>
               </span>
             </div>
           </div>
         </section>
 
+
+        <section class="section" id="phase3ReportSection" hidden>
+          <button class="section-header level-1" data-toggle="phase3ReportBody" type="button" aria-expanded="true">
+            <span>option report</span>
+            <span>&#9662;</span>
+          </button>
+          <div id="phase3ReportBody" class="section-body option-report">
+            <div class="summary-line">
+              <span class="level-1">option 1</span>
+              <span class="level-2">Combined critical heat-risk package</span>
+              <span class="level-3">benchmark: partial_pass | confidence: screening</span>
+              <span class="level-3">ranked option 1 for this room diagnosis</span>
+            </div>
+            <table>
+              <thead>
+                <tr><th class="level-1">indicator</th><th class="level-1">before</th><th class="level-1">after</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="level-2">peak operative temperature</td><td class="level-2">33 C</td><td class="level-2">29.3 C</td></tr>
+                <tr><td class="level-2">WBGT heat stress</td><td class="level-2">26.9 C</td><td class="level-2">25.6 C</td></tr>
+                <tr><td class="level-2">overheating hours</td><td class="level-2">698 h</td><td class="level-2">209 h</td></tr>
+                <tr><td class="level-2">night recovery temperature</td><td class="level-2">26.5 C</td><td class="level-2">24.4 C</td></tr>
+              </tbody>
+            </table>
+            <div class="summary-line">
+              <span class="level-1">strategies</span>
+              <span class="level-2 inline-list">External Shading, Night purge ventilation behavioural protocol, Wall insulation reinforcement layer, Ceiling fan air movement</span>
+            </div>
+            <div class="summary-line">
+              <span class="level-1">room</span>
+              <span class="level-2 inline-list">externalAwning, shortSillCurtain, insulationReinforcementLayer, plantLadder, trellis, ceilingFan</span>
+            </div>
+            <div class="summary-line">
+              <span class="level-1">visual note</span>
+              <span class="level-2">The current report visual uses the selected Phase 3 3D room/component preview. A static screenshot can be captured from this view for export later.</span>
+            </div>
+          </div>
+        </section>
         <section class="section">
           <button class="section-header level-1" data-toggle="resultBody" type="button" aria-expanded="true">
             <span>check table</span>
@@ -371,7 +462,6 @@
           <span class="level-1">preview</span>
           <div class="phase-tabs">
             <button class="phase-tab" data-phase="input" aria-selected="true">phase 1</button>
-            <button class="phase-tab" data-phase="site" aria-selected="false">phase 1.5</button>
             <button class="phase-tab" data-phase="spatial" aria-selected="false">phase 2</button>
             <button class="phase-tab" data-phase="review" aria-selected="false">phase 3</button>
           </div>
@@ -395,11 +485,11 @@
       const activePhaseTitle = document.getElementById("activePhaseTitle");
       const activePhaseDetail = document.getElementById("activePhaseDetail");
       const scaleViewport = document.getElementById("scaleViewport");
+      const phase3ReportSection = document.getElementById("phase3ReportSection");
       const phaseLabels = {
         input: { title: "phase 1", detail: "chat only" },
-        site: { title: "phase 1.5", detail: "chat + site risk map" },
         spatial: { title: "phase 2", detail: "chat + room model" },
-        review: { title: "phase 3", detail: "options + room + links + check + report" },
+        review: { title: "phase 3", detail: "options + room + report" },
       };
       let activePhase = "input";
 
@@ -468,6 +558,7 @@
           button.setAttribute("aria-selected", String(button.dataset.phase === phase));
         });
         phaseFrame.src = phaseUrl(phase);
+        phase3ReportSection.hidden = phase !== "review";
         resultEl.innerHTML = "";
         lastRun.textContent = `loaded ${label.title}`;
       }
@@ -483,10 +574,10 @@
       function countViewFrames(doc) {
         return {
           room: doc.querySelectorAll('iframe[title="room view"]').length,
+          components: doc.querySelectorAll('iframe[title="room view"]').length,
           links: doc.querySelectorAll('iframe[title="links view"]').length,
           validation: doc.querySelectorAll('iframe[title="validation view"]').length,
           report: doc.querySelectorAll('iframe[title="final report"]').length,
-          riskMap: doc.querySelectorAll("canvas").length || doc.querySelectorAll('iframe[title="risk map view"]').length || Number(/risk map checkpoint|site risk map|precomputed heat context|risk map view/i.test(doc.body?.innerText || "")),
         };
       }
 
@@ -512,13 +603,13 @@
         if (activePhase === "input") {
           renderResult(
             "phase 1 layout",
-            views.room === 0 && views.links === 0 && views.validation === 0 && views.report === 0,
+            views.room === 0 && views.components === 0 && views.links === 0 && views.validation === 0 && views.report === 0,
             "chat only, no room/links/report iframes",
           );
           renderResult(
             "phase 1 prompt",
             /address or coordinates/i.test(bodyText) && /site context/i.test(bodyText),
-            "chat instruction asks for location before diagnosis context",
+            "chat instruction asks for location as text before diagnosis context",
           );
           renderResult(
             "phase 1 example",
@@ -531,32 +622,10 @@
             "orientation is reserved for phase 2 model review",
           );
         }
-        if (activePhase === "site") {
-          renderResult(
-            "phase 1.5 layout",
-            views.riskMap > 0 && views.room === 0 && views.links === 0 && views.validation === 0 && views.report === 0,
-            "site context checkpoint shows risk map without room/review iframes",
-          );
-          renderResult(
-            "phase 1.5 content",
-            /site map/i.test(bodyText),
-            "site map view is exposed through the app viewer",
-          );
-          renderResult(
-            "phase 1.5 controls",
-            views.riskMap > 0,
-            "risk map iframe is present in the standard app viewer",
-          );
-          renderResult(
-            "phase 1.5 boundary",
-            views.riskMap > 0,
-            "site checkpoint exposes the 500 m analysis boundary",
-          );
-        }
         if (activePhase === "spatial") {
           renderResult(
             "phase 2 layout",
-            views.room === 1 && views.links === 0 && views.validation === 0 && views.report === 0,
+            views.room === 1 && views.components === 0 && views.links === 0 && views.validation === 0 && views.report === 0,
             "chat plus room model only",
           );
           renderResult(
@@ -588,23 +657,28 @@
         if (activePhase === "review") {
           renderResult(
             "phase 3 layout",
-            views.room === 1 && views.links === 1 && views.validation === 1 && views.report === 1,
-            "chat plus room, links, validation, and report",
+            views.room === 0 && views.components === 1 && views.links === 0 && views.validation === 0 && views.report === 1,
+            "chat plus room and report",
           );
           renderResult(
             "phase 3 tabs",
-            /room/i.test(bodyText) && /links/i.test(bodyText) && /check/i.test(bodyText) && /report/i.test(bodyText),
-            "review navigation exposes room, links, validation, and report",
+            /room/i.test(bodyText) && !/components/i.test(bodyText) && !/links/i.test(bodyText) && /report/i.test(bodyText),
+            "review navigation exposes room and report",
           );
           renderResult(
-            "phase 3 validation",
-            /check/i.test(bodyText),
-            "numerical validation view is available between links and report",
+            "phase 3 check removed",
+            views.validation === 0,
+            "separate check view is deactivated because component view carries effect analysis",
           );
           renderResult(
             "phase 3 options",
             /option 1/i.test(bodyText) && /option 2/i.test(bodyText) && /option 3/i.test(bodyText),
             "top three retrofit option buttons are visible",
+          );
+          renderResult(
+            "phase 3 all option",
+            /\ball\b/i.test(bodyText),
+            "strategy selector exposes option 1, option 2, option 3, and all",
           );
           renderResult(
             "phase 3 spatial edits",
@@ -629,6 +703,10 @@
     </script>
   </body>
 </html>
+
+
+
+
 
 
 

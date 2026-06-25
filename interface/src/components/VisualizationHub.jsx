@@ -1,10 +1,9 @@
-﻿import { useEffect, useState } from 'react'
+﻿import { useEffect, useMemo, useState } from 'react'
 
 const viewTabs = [
-  { key: 'site', label: 'site map', title: 'site map' },
   { key: 'room', label: 'room', title: 'room view' },
+  { key: 'components', label: 'room', title: 'room view' },
   { key: 'links', label: 'links', title: 'links view' },
-  { key: 'validation', label: 'check', title: 'validation view' },
   { key: 'report', label: 'report', title: 'final report' },
 ]
 
@@ -19,26 +18,48 @@ export default function VisualizationHub({
   roomRef,
   kgRef,
   reportRef,
-  enabledViews = ['room', 'links', 'validation', 'report'],
+  enabledViews = ['room', 'components', 'links', 'report'],
   viewerMode = 'review',
   isLoading = false,
   loadingLabel = '',
   loadingProgress = 0,
+  refreshSignal = 0,
 }) {
   const firstView = enabledViews[0] || 'room'
   const [activeView, setActiveView] = useState(firstView)
   const [strategyOptions, setStrategyOptions] = useState([])
-  const [activeStrategyId, setActiveStrategyId] = useState('')
+  const [selectionMode, setSelectionMode] = useState('')
   const visibleTabs = viewTabs.filter((tab) => enabledViews.includes(tab.key))
   const selectedView = enabledViews.includes(activeView) ? activeView : firstView
   const encodedBackendUrl = encodeURIComponent(backendUrl)
-  const siteSrc = `/risk_map_3d_test.html?embedded=1&api_base=${encodedBackendUrl}`
-  const strategyQuery = activeStrategyId ? `&strategy_id=${encodeURIComponent(activeStrategyId)}` : ''
-  const optionQuery = activeStrategyId ? `?strategy_id=${encodeURIComponent(activeStrategyId)}` : ''
-  const roomSrc = `${backendUrl}/static-views/spatial/room_3d_view.html?viewer_mode=${viewerMode}&api_base=${encodedBackendUrl}${strategyQuery}`
-  const kgSrc = `${backendUrl}/static-views/kg/kg_view.html${optionQuery}`
-  const validationSrc = `${backendUrl}/static-views/validation_view.html${optionQuery}`
-  const reportSrc = `${backendUrl}/static-views/final_report_view.html${optionQuery}`
+  const selectedStrategyIds = useMemo(() => {
+    if (viewerMode !== 'review') return []
+    if (selectionMode === 'all') return strategyOptions.map((option) => option.id).filter(Boolean)
+    return selectionMode ? [selectionMode] : []
+  }, [selectionMode, strategyOptions, viewerMode])
+  const selectedStrategyParam = selectedStrategyIds.join(',')
+  const firstStrategyId = selectedStrategyIds[0] || ''
+  const selectedStrategyIndex = strategyOptions.findIndex((option) => option.id === firstStrategyId)
+  const componentOptionKey = selectionMode === 'all'
+    ? 'all'
+    : selectedStrategyIndex >= 0
+      ? `option_${selectedStrategyIndex + 1}`
+      : firstStrategyId
+  const packageParam = firstStrategyId ? encodeURIComponent(firstStrategyId) : ''
+  const componentParam = componentOptionKey ? encodeURIComponent(componentOptionKey) : ''
+  const strategyQuery = selectedStrategyIds.length
+    ? `&strategy_ids=${encodeURIComponent(selectedStrategyParam)}&strategy_id=${packageParam}&package_id=${packageParam}`
+    : ''
+  const optionQuery = selectedStrategyIds.length
+    ? `?strategy_ids=${encodeURIComponent(selectedStrategyParam)}&strategy_id=${packageParam}&package_id=${packageParam}`
+    : ''
+  const componentQuery = selectedStrategyIds.length
+    ? `?strategy_ids=${encodeURIComponent(selectedStrategyParam)}&strategy_id=${componentParam}&package_id=${packageParam}`
+    : ''
+  const roomSrc = `${backendUrl}/static-views/spatial/room_3d_view.html?viewer_mode=${viewerMode}&api_base=${encodedBackendUrl}${strategyQuery}&v=${refreshSignal}`
+  const componentSrc = `${backendUrl}/static-views/spatial/room_3d_full_texture_component_check.html${componentQuery}${componentQuery ? "&" : "?"}v=${refreshSignal}`
+  const kgSrc = `${backendUrl}/static-views/kg/kg_view.html${optionQuery}${optionQuery ? "&" : "?"}v=${refreshSignal}`
+  const reportSrc = `${backendUrl}/static-views/final_report_view.html${optionQuery}${optionQuery ? "&" : "?"}v=${refreshSignal}`
 
   useEffect(() => {
     setActiveView(firstView)
@@ -47,7 +68,7 @@ export default function VisualizationHub({
   useEffect(() => {
     if (viewerMode !== 'review') {
       setStrategyOptions([])
-      setActiveStrategyId('')
+      setSelectionMode('')
       return
     }
 
@@ -56,36 +77,55 @@ export default function VisualizationHub({
       .then((payload) => {
         const options = payload.options?.length ? payload.options : fallbackStrategyOptions
         setStrategyOptions(options)
-        setActiveStrategyId((current) => current || options[0]?.id || '')
+        setSelectionMode((current) => {
+          if (current === 'all') return 'all'
+          return options.some((option) => option.id === current) ? current : options[0]?.id || ''
+        })
       })
       .catch(() => {
         setStrategyOptions(fallbackStrategyOptions)
-        setActiveStrategyId((current) => current || fallbackStrategyOptions[0].id)
+        setSelectionMode((current) => current || fallbackStrategyOptions[0].id)
       })
   }, [backendUrl, viewerMode])
 
-  const frameClass = (key) => `h-full w-full border-0 ${selectedView === key ? 'block' : 'hidden'}`
+  const frameClass = (key) => `absolute inset-0 h-full w-full border-0 ${selectedView === key ? 'z-10 opacity-100' : 'z-0 pointer-events-none opacity-0'}`
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden bg-surface-secondary">
       <div className="type-level-1 flex items-center justify-between gap-3 border-b border-DEFAULT px-5 py-3">
         <div className="flex min-w-0 items-center gap-2">
-          {strategyOptions.length && !isLoading ? (
-            strategyOptions.map((option) => (
+          {strategyOptions.length > 0 && !isLoading ? (
+            <>
+              {strategyOptions.slice(0, 3).map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  aria-pressed={selectionMode === option.id}
+                  title={`${option.name}${option.status ? ` | ${option.status}` : ''}${option.confidence ? ` | ${option.confidence}` : ''}`}
+                  className={`type-level-3 rounded-sm border px-3 py-2 ${
+                    selectionMode === option.id
+                      ? 'border-strong bg-surface-primary text-ink-primary'
+                      : 'border-DEFAULT bg-surface-secondary text-ink-tertiary'
+                  }`}
+                  onClick={() => setSelectionMode(option.id)}
+                >
+                  {option.label}
+                </button>
+              ))}
               <button
-                key={option.id}
                 type="button"
-                title={`${option.name}${option.status ? ` | ${option.status}` : ''}${option.confidence ? ` | ${option.confidence}` : ''}`}
+                aria-pressed={selectionMode === 'all'}
+                title="show all three retrofit options as a combined visual review"
                 className={`type-level-3 rounded-sm border px-3 py-2 ${
-                  activeStrategyId === option.id
+                  selectionMode === 'all'
                     ? 'border-strong bg-surface-primary text-ink-primary'
                     : 'border-DEFAULT bg-surface-secondary text-ink-tertiary'
                 }`}
-                onClick={() => setActiveStrategyId(option.id)}
+                onClick={() => setSelectionMode('all')}
               >
-                {option.label}
+                all
               </button>
-            ))
+            </>
           ) : (
             <span>{isLoading ? loadingLabel || 'working' : viewTabs.find((tab) => tab.key === selectedView)?.title}</span>
           )}
@@ -110,12 +150,11 @@ export default function VisualizationHub({
         ) : null}
       </div>
 
-      <div className="min-h-0 flex-1 overflow-hidden bg-surface-primary">
-        {enabledViews.includes('site') ? <iframe src={siteSrc} title="risk map view" className={frameClass('site')} /> : null}
-        {enabledViews.includes('room') ? <iframe ref={roomRef} src={roomSrc} title="room view" className={frameClass('room')} /> : null}
-        {enabledViews.includes('links') ? <iframe ref={kgRef} src={kgSrc} title="links view" className={frameClass('links')} /> : null}
-        {enabledViews.includes('validation') ? <iframe src={validationSrc} title="validation view" className={frameClass('validation')} /> : null}
-        {enabledViews.includes('report') ? <iframe ref={reportRef} src={reportSrc} title="final report" className={frameClass('report')} /> : null}
+      <div className="relative min-h-0 flex-1 overflow-hidden bg-surface-primary">
+        {enabledViews.includes('room') ? <iframe key={roomSrc} ref={roomRef} src={roomSrc} title="room view" className={frameClass('room')} /> : null}
+        {enabledViews.includes('components') ? <iframe key={componentSrc} src={componentSrc} title="component room view" className={frameClass('components')} /> : null}
+        {enabledViews.includes('links') ? <iframe key={kgSrc} ref={kgRef} src={kgSrc} title="links view" className={frameClass('links')} /> : null}
+        {enabledViews.includes('report') ? <iframe key={reportSrc} ref={reportRef} src={reportSrc} title="final report" className={frameClass('report')} /> : null}
       </div>
 
       {isLoading ? (
@@ -132,4 +171,10 @@ export default function VisualizationHub({
     </div>
   )
 }
+
+
+
+
+
+
 

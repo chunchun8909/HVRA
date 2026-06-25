@@ -9,6 +9,7 @@ PROBLEM_ACTIONS = {
         "suggested_strategy_ids": [
             "window_external_shutters",
             "external_shading_louvers",
+            "balcony_planter_shading",
             "solar_control_glazing",
             "internal_blinds",
         ],
@@ -18,6 +19,7 @@ PROBLEM_ACTIONS = {
         "plain_action": "Lower retained heat overnight by combining safe night ventilation with roof or ceiling heat-transfer reduction where the room is top-floor exposed.",
         "suggested_strategy_ids": [
             "night_purge_ventilation",
+            "secure_night_vent_limiter",
             "stack_effect_roof_vent",
             "roof_insulation",
             "cool_roof_coating",
@@ -29,8 +31,10 @@ PROBLEM_ACTIONS = {
         "plain_action": "Increase useful air change and create a safer purge path; if cross-flow is not available, use a low-disruption opening or stack-assisted exhaust strategy.",
         "suggested_strategy_ids": [
             "interior_opening_improvement",
+            "secure_night_vent_limiter",
             "stack_effect_roof_vent",
             "night_purge_ventilation",
+            "ceiling_fan_air_movement",
             "window_enlargement",
             "cross_ventilation_behaviour",
         ],

@@ -1,0 +1,131 @@
+﻿{
+    "catalogue_id":  "HVRA_3D_TEST_HYBRID_ASSETS_V1",
+    "purpose":  "Test-only procedural visual variants before replacing with curated GLB assets.",
+    "asset_mode":  "procedural_now_glb_ready_later",
+    "variants":  [
+                     {
+                         "id":  "curtain_drapes",
+                         "label":  "Drapes",
+                         "family":  "window_covering",
+                         "generator":  "curtain_drapes",
+                         "strategy_binding":  [
+                                                  "internal_blinds"
+                                              ],
+                         "placement":  "inside detected window wall",
+                         "future_glb_slot":  "assets/window_coverings/drapes_soft_fold.glb"
+                     },
+                     {
+                         "id":  "sheer_curtain",
+                         "label":  "Sheer curtain",
+                         "family":  "window_covering",
+                         "generator":  "sheer_curtain",
+                         "strategy_binding":  [
+                                                  "internal_blinds"
+                                              ],
+                         "placement":  "inside detected window wall",
+                         "future_glb_slot":  "assets/window_coverings/sheer_curtain.glb"
+                     },
+                     {
+                         "id":  "roller_shade",
+                         "label":  "Roller shade",
+                         "family":  "window_covering",
+                         "generator":  "roller_shade",
+                         "strategy_binding":  [
+                                                  "internal_blinds"
+                                              ],
+                         "placement":  "inside detected window wall",
+                         "future_glb_slot":  "assets/window_coverings/roller_shade.glb"
+                     },
+                     {
+                         "id":  "vertical_blind",
+                         "label":  "Vertical blind",
+                         "family":  "window_covering",
+                         "generator":  "vertical_blind",
+                         "strategy_binding":  [
+                                                  "internal_blinds"
+                                              ],
+                         "placement":  "inside full-height glazed opening or sliding door",
+                         "future_glb_slot":  "assets/window_coverings/vertical_blind.glb"
+                     },
+                     {
+                         "id":  "venetian_blind",
+                         "label":  "Venetian blind",
+                         "family":  "window_covering",
+                         "generator":  "venetian_blind",
+                         "strategy_binding":  [
+                                                  "internal_blinds"
+                                              ],
+                         "placement":  "inside detected window wall",
+                         "future_glb_slot":  "assets/window_coverings/venetian_blind.glb"
+                     },
+                     {
+                         "id":  "horizontal_fixed_shade",
+                         "label":  "Horizontal shade",
+                         "family":  "external_shading",
+                         "generator":  "horizontal_fixed_shade",
+                         "strategy_binding":  [
+                                                  "external_shading_louvers"
+                                              ],
+                         "placement":  "outside detected external wall/window",
+                         "future_glb_slot":  "assets/shading/horizontal_fixed_louver.glb"
+                     },
+                     {
+                         "id":  "vertical_movable_shade",
+                         "label":  "Vertical fins",
+                         "family":  "external_shading",
+                         "generator":  "vertical_movable_shade",
+                         "strategy_binding":  [
+                                                  "external_shading_louvers"
+                                              ],
+                         "placement":  "outside detected external wall/window",
+                         "future_glb_slot":  "assets/shading/vertical_fins.glb"
+                     },
+                     {
+                         "id":  "awning_shade",
+                         "label":  "Awning",
+                         "family":  "external_shading",
+                         "generator":  "awning_shade",
+                         "strategy_binding":  [
+                                                  "external_shading_louvers",
+                                                  "window_external_shutters"
+                                              ],
+                         "placement":  "outside above detected window",
+                         "future_glb_slot":  "assets/shading/awning.glb"
+                     },
+                     {
+                         "id":  "trellis_shade",
+                         "label":  "Trellis",
+                         "family":  "biophilic_shading",
+                         "generator":  "trellis_shade",
+                         "strategy_binding":  [
+                                                  "green_pergola",
+                                                  "balcony_planter_shading"
+                                              ],
+                         "placement":  "outside detected external wall/window",
+                         "future_glb_slot":  "assets/shading/trellis.glb"
+                     },
+                     {
+                         "id":  "vegetation_window",
+                         "label":  "Vegetation on window",
+                         "family":  "biophilic_shading",
+                         "generator":  "vegetation_window",
+                         "strategy_binding":  [
+                                                  "green_pergola",
+                                                  "balcony_planter_shading"
+                                              ],
+                         "placement":  "outside detected external wall/window",
+                         "future_glb_slot":  "assets/plants/window_climber.glb"
+                     },
+                     {
+                         "id":  "plant_corner_dense",
+                         "label":  "Plant corner",
+                         "family":  "biophilic_resilience",
+                         "generator":  "plant_corner_dense",
+                         "strategy_binding":  [
+                                                  "interior_biophilic_cooling_zone"
+                                              ],
+                         "placement":  "daylight interior corner",
+                         "future_glb_slot":  "assets/plants/interior_plant_cluster.glb"
+                     }
+                 ]
+}

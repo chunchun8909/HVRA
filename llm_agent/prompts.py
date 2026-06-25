@@ -10,6 +10,86 @@ Use only the provided case, building, constraints, problem map, and manual evide
 Prefer short strings and arrays. Do not include comments."""
 
 
+def _compact_problem_map(problem_map: dict) -> dict:
+    return {
+        "room_id": problem_map.get("room_id"),
+        "suggested_strategy_ids": problem_map.get("suggested_strategy_ids", []),
+        "problems": [
+            {
+                "id": problem.get("id"),
+                "problem_type": problem.get("problem_type"),
+                "primary_cause": problem.get("primary_cause"),
+                "severity": problem.get("severity"),
+                "spatial_targets": problem.get("spatial_targets", [])[:4],
+                "candidate_strategy_ids": [
+                    strategy_id
+                    for action in problem.get("suggested_actions", [])
+                    for strategy_id in action.get("candidate_strategy_ids", [])
+                ],
+            }
+            for problem in problem_map.get("problems", [])
+        ],
+    }
+
+
+def _compact_evidence_item(item: dict) -> dict:
+    return {
+        "source_title": item.get("source_title"),
+        "page": item.get("page"),
+        "score": item.get("score"),
+        "retrieval_mode": item.get("retrieval_mode"),
+        "snippet": str(item.get("snippet", ""))[:80],
+    }
+
+
+def _compact_strategy(strategy: dict) -> dict:
+    catalogue_evidence = strategy.get("catalogue_evidence", {})
+    return {
+        "strategy_id": strategy.get("strategy_id"),
+        "strategy_name": strategy.get("strategy_name"),
+        "user_facing_name": strategy.get("user_facing_name"),
+        "category": strategy.get("category"),
+        "scope": strategy.get("scope"),
+        "target_components": strategy.get("target_components", []),
+        "evidence_confidence": strategy.get("evidence_confidence") or strategy.get("confidence"),
+        "constraint_tags": strategy.get("constraint_tags", []),
+        "notes": str(strategy.get("notes", ""))[:90],
+        "catalogue_evidence": {
+            "evidence_level": catalogue_evidence.get("evidence_level"),
+            "evidence_role": catalogue_evidence.get("evidence_role"),
+            "primary_source_ids": catalogue_evidence.get("primary_source_ids", [])[:4],
+        },
+        "top_evidence": [_compact_evidence_item(item) for item in strategy.get("evidence", [])[:1]],
+    }
+
+
+def _priority_strategy_ids(problem_map: dict) -> list[str]:
+    ids = []
+    for strategy_id in problem_map.get("suggested_strategy_ids", []):
+        if strategy_id not in ids:
+            ids.append(strategy_id)
+    for problem in problem_map.get("problems", []):
+        for action in problem.get("suggested_actions", []):
+            for strategy_id in action.get("candidate_strategy_ids", []):
+                if strategy_id not in ids:
+                    ids.append(strategy_id)
+    return ids
+
+
+def _compact_manual_check(manual_check: dict, problem_map: dict | None = None) -> dict:
+    priority_ids = _priority_strategy_ids(problem_map or {})
+    eligible = manual_check.get("eligible_strategies", [])
+    priority = [strategy for strategy in eligible if strategy.get("strategy_id") in priority_ids]
+    backup = [strategy for strategy in eligible if strategy.get("strategy_id") not in priority_ids]
+    selected = (priority + backup)[:6]
+    return {
+        "query": manual_check.get("query"),
+        "retrieval_mode": manual_check.get("retrieval_mode"),
+        "eligible_strategies": [_compact_strategy(strategy) for strategy in selected],
+        "omitted_eligible_strategy_count": max(0, len(eligible) - len(selected)),
+    }
+
+
 def case_interpretation_prompt(user_case: dict, building_info: dict, constraints: dict) -> str:
     return "\n\n".join(
         [
@@ -32,12 +112,14 @@ def case_interpretation_prompt(user_case: dict, building_info: dict, constraints
 
 
 def strategy_ranking_prompt(problem_map: dict, manual_check: dict, constraints: dict) -> str:
+    compact_problem_map = _compact_problem_map(problem_map)
+    compact_manual_check = _compact_manual_check(manual_check, problem_map)
     return "\n\n".join(
         [
             SYSTEM_RULES,
-            "Task: rank suitable retrofit strategies using manual evidence, constraints, and the suggested actions in the problem map.",
-            f"problem_map={json.dumps(problem_map)}",
-            f"manual_check={json.dumps(manual_check)}",
+            "Task: rank suitable retrofit strategies using compact manual evidence, catalogue_evidence, constraints, and the suggested actions in the problem map.",
+            f"problem_map={json.dumps(compact_problem_map)}",
+            f"manual_check={json.dumps(compact_manual_check)}",
             f"constraints={json.dumps(constraints)}",
             """Return exactly this shape:
 {
@@ -51,7 +133,7 @@ def strategy_ranking_prompt(problem_map: dict, manual_check: dict, constraints: 
     }
   ]
 }
-Rank only strategies listed as eligible in manual_check. Prefer strategies listed in problem_map.suggested_strategy_ids or problem.suggested_actions[].candidate_strategy_ids when they are eligible. Rationale must explain which mapped problem and target surface the strategy responds to.""",
+Rank only strategies listed as eligible in manual_check. Prefer strategies listed in problem_map.suggested_strategy_ids or problem.problems[].candidate_strategy_ids when they are eligible. Use catalogue_evidence to distinguish standards/codes, manuals/research, screening assumptions, and low-confidence support measures. Rationale must explain which mapped problem and target surface the strategy responds to; do not present biophilic/support measures as guaranteed benchmark-passing thermal fixes unless paired with stronger measures. Return no more than 5 ranked strategies.""",
         ]
     )
 
@@ -70,4 +152,3 @@ def review_prompt(payload: dict) -> str:
 }""",
         ]
     )
-

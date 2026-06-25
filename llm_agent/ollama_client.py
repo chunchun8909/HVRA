@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 import time
@@ -24,6 +24,8 @@ def _request_json(url: str, payload: dict | None, timeout: int) -> dict[str, Any
     except HTTPError as error:
         body = error.read().decode("utf-8", errors="replace")
         raise RuntimeError(f"Ollama HTTP error {error.code}: {body}") from error
+    except TimeoutError as error:
+        raise RuntimeError("Ollama timed out. Use a smaller prompt/model, increase OLLAMA_TIMEOUT_SECONDS, or set USE_MOCK_LLM=true.") from error
     except URLError as error:
         raise RuntimeError("Could not reach Ollama. Start Ollama or set USE_MOCK_LLM=true.") from error
 
@@ -98,6 +100,7 @@ def generate_text(settings: Settings, prompt: str) -> str:
         "options": {
             "temperature": 0.1,
             "top_p": 0.9,
+            "num_predict": 700,
         },
     }
 
@@ -124,3 +127,4 @@ def generate_text(settings: Settings, prompt: str) -> str:
 def generate_json(settings: Settings, prompt: str) -> dict[str, Any]:
     text = generate_text(settings, prompt)
     return _extract_json_object(text)
+

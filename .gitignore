@@ -37,3 +37,8 @@ risk_map/dataset/cataluna-260530-free.gpkg.zip
 risk_map/dataset/MTM_GPKG_alçades.zip
 risk_map/dataset/cataluna-260528.osm.pbf
 risk_map/dataset/MTM_GPKG_al*.zip
+
+perspective_test/.env
+
+perspective_test/output/
+!perspective_test/output/.gitkeep

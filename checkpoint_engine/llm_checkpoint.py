@@ -29,21 +29,41 @@ def build_llm_review_prompt(stage: str, stage_result: dict, context: dict | None
         }
 
     if stage == "strategy_validation":
-        options = stage_result.get("validated_options", [])
+        packages = stage_result.get("packages") or stage_result.get("phase3_strategy_packages", {}).get("packages", [])
         compact_options = []
-        for option in options:
-            strategy = option.get("strategy", {})
-            compact_options.append(
-                {
-                    "validation_rank": option.get("validation_rank"),
-                    "strategy_id": strategy.get("strategy_id"),
-                    "strategy_name": strategy.get("strategy_name"),
-                    "benchmark_status": option.get("benchmark_result", {}).get("overall"),
-                    "confidence": option.get("confidence", {}).get("level"),
-                    "recommendation": option.get("recommendation"),
-                    "numerical_comparison": option.get("numerical_comparison", []),
-                }
-            )
+        if packages:
+            for index, package in enumerate(packages, start=1):
+                visual = package.get("visual_generation", {})
+                compact_options.append(
+                    {
+                        "validation_rank": index,
+                        "package_id": package.get("package_id"),
+                        "strategy_id": package.get("package_id"),
+                        "strategy_name": package.get("package_name"),
+                        "benchmark_status": package.get("benchmark_status"),
+                        "confidence": package.get("confidence_level"),
+                        "recommendation": package.get("user_label"),
+                        "selected_strategy_ids": package.get("selected_strategy_ids", []),
+                        "component_ids": visual.get("component_ids", []),
+                        "before_after": package.get("before_after", {}),
+                        "optimizer_score": package.get("optimizer_score"),
+                    }
+                )
+        else:
+            options = stage_result.get("validated_options", [])
+            for option in options:
+                strategy = option.get("strategy", {})
+                compact_options.append(
+                    {
+                        "validation_rank": option.get("validation_rank"),
+                        "strategy_id": strategy.get("strategy_id"),
+                        "strategy_name": strategy.get("strategy_name"),
+                        "benchmark_status": option.get("benchmark_result", {}).get("overall"),
+                        "confidence": option.get("confidence", {}).get("level"),
+                        "recommendation": option.get("recommendation"),
+                        "numerical_comparison": option.get("numerical_comparison", []),
+                    }
+                )
 
         return {
             "stage": stage,
@@ -62,6 +82,7 @@ def build_llm_review_prompt(stage: str, stage_result: dict, context: dict | None
             "options_for_user": compact_options,
             "required_response_schema": {
                 "action": "choose_option | combine_options | revise_intent | rerun_strategy_ranking | accept_partial_pass | stop",
+                "selected_package_ids": [],
                 "selected_strategy_ids": [],
                 "intent_revision": "",
                 "reason": "",

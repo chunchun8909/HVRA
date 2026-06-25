@@ -1,0 +1,407 @@
+{
+  "catalogue_id": "HVRA_VISUAL_RETROFIT_CATALOGUE_V1",
+  "purpose": "Maps retrofit strategies to simple 3D or image-generation placement rules.",
+  "coordinate_assumption": "Use spatial_index wall/window/ceiling IDs; never place objects where no target surface/component exists.",
+  "strategies": {
+    "external_shading_louvers": {
+      "visual_asset_type": "parametric_louver_or_brise_soleil",
+      "target_surface_type": [
+        "window",
+        "external_wall"
+      ],
+      "placement_rule": "Attach outside selected window wall above/over detected window bbox.",
+      "geometry_rule": "Width = window width plus side margin; depth projects outward; repeat slats horizontally.",
+      "material_rule": "matte light metal or timber, high solar reflectance optional.",
+      "render_layer": "surface_object",
+      "cautions": []
+    },
+    "internal_blinds": {
+      "visual_asset_type": "interior_blind_plane",
+      "target_surface_type": [
+        "window"
+      ],
+      "placement_rule": "Place just inside the selected window plane.",
+      "geometry_rule": "Thin semi-opaque sheet covering glazing.",
+      "material_rule": "light reflective fabric; opacity adjustable.",
+      "render_layer": "interior_overlay",
+      "cautions": []
+    },
+    "solar_control_glazing": {
+      "visual_asset_type": "glazing_material_change",
+      "target_surface_type": [
+        "window"
+      ],
+      "placement_rule": "Apply to selected window pane.",
+      "geometry_rule": "No added bulk; replace window material properties.",
+      "material_rule": "slightly tinted low-g glazing.",
+      "render_layer": "material_override",
+      "cautions": []
+    },
+    "green_pergola": {
+      "visual_asset_type": "vegetation_shading_object",
+      "target_surface_type": [
+        "balcony",
+        "window",
+        "external_wall"
+      ],
+      "placement_rule": "Place outside or on balcony edge of selected solar-exposed window wall.",
+      "geometry_rule": "Planter boxes with vertical/overhead foliage; keep clear of door/window swing.",
+      "material_rule": "green foliage with light planter base.",
+      "render_layer": "biophilic_object",
+      "cautions": [
+        "Do not block emergency egress or required ventilation opening."
+      ]
+    },
+    "window_enlargement": {
+      "visual_asset_type": "opening_geometry_change",
+      "target_surface_type": [
+        "window",
+        "external_wall"
+      ],
+      "placement_rule": "Apply to selected external wall around existing window.",
+      "geometry_rule": "Enlarge window rectangle only after structural feasibility flag.",
+      "material_rule": "new framed opening with matching wall finish.",
+      "render_layer": "geometry_edit",
+      "cautions": [
+        "Major structural option; keep as concept unless feasibility confirmed."
+      ]
+    },
+    "interior_opening_improvement": {
+      "visual_asset_type": "interior_transom_or_door_grille",
+      "target_surface_type": [
+        "door",
+        "interior_partition"
+      ],
+      "placement_rule": "Attach above/within interior door or partition path.",
+      "geometry_rule": "Small transom slot or grille object aligned with internal airflow path.",
+      "material_rule": "painted grille/transom frame.",
+      "render_layer": "interior_object",
+      "cautions": []
+    },
+    "stack_effect_roof_vent": {
+      "visual_asset_type": "ceiling_roof_vent_object",
+      "target_surface_type": [
+        "ceiling",
+        "roof"
+      ],
+      "placement_rule": "Place on ceiling/roof surface if top-floor or roof-exposed.",
+      "geometry_rule": "Small vent/diffuser aligned vertically above warm-air zone.",
+      "material_rule": "white ceiling grille or roof cowl.",
+      "render_layer": "ceiling_object",
+      "cautions": [
+        "Only show when the unit is top-floor/roof-exposed and roof access or owner approval is feasible."
+      ]
+    },
+    "night_purge_ventilation": {
+      "visual_asset_type": "operation_overlay",
+      "target_surface_type": [
+        "window",
+        "door"
+      ],
+      "placement_rule": "Highlight operable window/door path used for night or cross ventilation.",
+      "geometry_rule": "Use arrows and small opening-angle marker; no permanent object unless secure limiter is selected.",
+      "material_rule": "blue airflow arrows; small metal limiter for secure night vent.",
+      "render_layer": "flow_overlay",
+      "cautions": []
+    },
+    "external_wall_insulation_etics": {
+      "visual_asset_type": "wall_layer_material",
+      "target_surface_type": [
+        "external_wall"
+      ],
+      "placement_rule": "Apply layer to selected external wall surfaces.",
+      "geometry_rule": "Thin offset surface layer; thickness shown symbolically, not construction detail.",
+      "material_rule": "light insulated plaster/lining material.",
+      "render_layer": "surface_layer",
+      "cautions": []
+    },
+    "roof_insulation": {
+      "visual_asset_type": "ceiling_roof_layer",
+      "target_surface_type": [
+        "ceiling",
+        "roof"
+      ],
+      "placement_rule": "Apply layer to ceiling/roof plane when top-floor exposed.",
+      "geometry_rule": "Thin surface layer on ceiling or roof-adjacent plane.",
+      "material_rule": "insulated board/membrane finish.",
+      "render_layer": "surface_layer",
+      "cautions": [
+        "Only show when the unit is top-floor/roof-exposed and roof access or owner approval is feasible."
+      ]
+    },
+    "cool_roof_coating": {
+      "visual_asset_type": "cool_roof_material",
+      "target_surface_type": [
+        "roof",
+        "ceiling"
+      ],
+      "placement_rule": "Apply to roof/ceiling proxy surface for top-floor rooms.",
+      "geometry_rule": "Material override only; no object geometry.",
+      "material_rule": "high-albedo white/light roof coating.",
+      "render_layer": "material_override",
+      "cautions": [
+        "Only show when the unit is top-floor/roof-exposed and roof access or owner approval is feasible."
+      ]
+    },
+    "phase_change_materials": {
+      "visual_asset_type": "pcm_panel_layer",
+      "target_surface_type": [
+        "wall",
+        "ceiling"
+      ],
+      "placement_rule": "Apply as interior wall/ceiling panel layer where thermal buffering is proposed.",
+      "geometry_rule": "Thin modular panels on selected wall or ceiling.",
+      "material_rule": "subtle panelized interior finish.",
+      "render_layer": "surface_layer",
+      "cautions": []
+    },
+    "courtyard_greening": {
+      "visual_asset_type": "context_vegetation_marker",
+      "target_surface_type": [
+        "site_context"
+      ],
+      "placement_rule": "Place outside room model in site/context view only.",
+      "geometry_rule": "Tree/canopy or courtyard vegetation proxy, not inside room.",
+      "material_rule": "green canopy mass.",
+      "render_layer": "context_object",
+      "cautions": []
+    },
+    "shared_cooling_refuge": {
+      "visual_asset_type": "report_only_resilience_measure",
+      "target_surface_type": [
+        "report"
+      ],
+      "placement_rule": "Do not place in room model; show as report/checkpoint badge.",
+      "geometry_rule": "No room geometry.",
+      "material_rule": "n/a",
+      "render_layer": "report_only",
+      "cautions": []
+    },
+    "street_tree_canopy": {
+      "visual_asset_type": "context_vegetation_marker",
+      "target_surface_type": [
+        "site_context"
+      ],
+      "placement_rule": "Place outside room model in site/context view only.",
+      "geometry_rule": "Tree/canopy or courtyard vegetation proxy, not inside room.",
+      "material_rule": "green canopy mass.",
+      "render_layer": "context_object",
+      "cautions": []
+    },
+    "internal_wall_insulation": {
+      "visual_asset_type": "wall_layer_material",
+      "target_surface_type": [
+        "external_wall"
+      ],
+      "placement_rule": "Place as an interior lining on the room-facing side of selected external wall surfaces.",
+      "geometry_rule": "Thin inward offset surface layer over the existing wall; do not extend beyond the exterior facade plane.",
+      "material_rule": "light internal insulated lining / reinforced plasterboard finish.",
+      "render_layer": "surface_layer",
+      "cautions": [
+        "Do not show as an external projection for older/facade-restricted buildings.",
+        "Review moisture/condensation and thermal-bridge details before specification."
+      ]
+    },
+    "wall_insulation_reinforcement_layer": {
+      "visual_asset_type": "wall_layer_material",
+      "target_surface_type": [
+        "external_wall"
+      ],
+      "placement_rule": "Place as an interior lining on the room-facing side of selected external wall surfaces.",
+      "geometry_rule": "Thin inward offset surface layer over the existing wall; do not extend beyond the exterior facade plane.",
+      "material_rule": "light internal insulated lining / reinforced plasterboard finish.",
+      "render_layer": "surface_layer",
+      "cautions": [
+        "Do not show as an external projection for older/facade-restricted buildings.",
+        "Review moisture/condensation and thermal-bridge details before specification."
+      ]
+    },
+    "cool_facade_paint": {
+      "visual_asset_type": "cool_facade_material",
+      "target_surface_type": [
+        "external_wall"
+      ],
+      "placement_rule": "Apply to selected solar-exposed external wall.",
+      "geometry_rule": "Material override only; preserve openings.",
+      "material_rule": "light reflective facade finish.",
+      "render_layer": "material_override",
+      "cautions": []
+    },
+    "window_external_shutters": {
+      "visual_asset_type": "shutter_panels",
+      "target_surface_type": [
+        "window"
+      ],
+      "placement_rule": "Attach to detected window sides or shutter box on external wall.",
+      "geometry_rule": "Two side panels or roller shutter box sized to window.",
+      "material_rule": "light-colour external shutter material.",
+      "render_layer": "surface_object",
+      "cautions": []
+    },
+    "cross_ventilation_behaviour": {
+      "visual_asset_type": "operation_overlay",
+      "target_surface_type": [
+        "window",
+        "door"
+      ],
+      "placement_rule": "Highlight operable window/door path used for night or cross ventilation.",
+      "geometry_rule": "Use arrows and small opening-angle marker; no permanent object unless secure limiter is selected.",
+      "material_rule": "blue airflow arrows; small metal limiter for secure night vent.",
+      "render_layer": "flow_overlay",
+      "cautions": []
+    },
+    "ceiling_fan_air_movement": {
+      "visual_asset_type": "ceiling_fan_object",
+      "target_surface_type": [
+        "ceiling",
+        "occupied_zone"
+      ],
+      "placement_rule": "Center in occupied zone below ceiling, away from tall furniture and window curtains.",
+      "geometry_rule": "Simple 3-5 blade fan; radius proportional to room area.",
+      "material_rule": "white or timber fan blades.",
+      "render_layer": "ceiling_object",
+      "cautions": [
+        "Check ceiling height and electrical feasibility."
+      ]
+    },
+    "secure_night_vent_limiter": {
+      "visual_asset_type": "operation_overlay",
+      "target_surface_type": [
+        "window",
+        "door"
+      ],
+      "placement_rule": "Highlight operable window/door path used for night or cross ventilation.",
+      "geometry_rule": "Use arrows and small opening-angle marker; no permanent object unless secure limiter is selected.",
+      "material_rule": "blue airflow arrows; small metal limiter for secure night vent.",
+      "render_layer": "flow_overlay",
+      "cautions": []
+    },
+    "balcony_planter_shading": {
+      "visual_asset_type": "vegetation_shading_object",
+      "target_surface_type": [
+        "balcony",
+        "window",
+        "external_wall"
+      ],
+      "placement_rule": "Place outside or on balcony edge of selected solar-exposed window wall.",
+      "geometry_rule": "Planter boxes with vertical/overhead foliage; keep clear of door/window swing.",
+      "material_rule": "green foliage with light planter base.",
+      "render_layer": "biophilic_object",
+      "cautions": [
+        "Do not block emergency egress or required ventilation opening."
+      ]
+    },
+    "interior_biophilic_cooling_zone": {
+      "visual_asset_type": "interior_plant_cluster",
+      "target_surface_type": [
+        "occupied_zone",
+        "interior_corner"
+      ],
+      "placement_rule": "Place in a daylight corner near but not blocking the window.",
+      "geometry_rule": "Cluster of potted plants and optional low shelf within occupied zone.",
+      "material_rule": "varied green foliage, ceramic or timber pots.",
+      "render_layer": "interior_object",
+      "cautions": [
+        "Supportive visual/comfort measure only."
+      ]
+    }
+  },
+  "tested_component_variants": {
+    "source": "3D_test/one_wall_spatial_logic/index.html",
+    "host_contract": "data/output/spatial/host_geometry.json",
+    "status": "prototype_ready_for_phase_3_component_view",
+    "placement_principle": "Use invisible host wall/opening/ceiling zones; do not infer placement from image texture alone.",
+    "components": {
+      "fullHeightDrape": {
+        "strategy_family": "internal_shading",
+        "effect_profile_id": "internal_blinds",
+        "host": "full_drape_zone",
+        "thermal_effect": "low_to_medium_solar_gain_reduction"
+      },
+      "shortSillCurtain": {
+        "strategy_family": "internal_shading",
+        "effect_profile_id": "internal_blinds",
+        "host": "short_curtain_zone",
+        "thermal_effect": "low_solar_gain_reduction"
+      },
+      "romanShade": {
+        "strategy_family": "internal_shading",
+        "effect_profile_id": "internal_blinds",
+        "host": "interior_head_zone",
+        "thermal_effect": "low_to_medium_solar_gain_reduction"
+      },
+      "venetianBlind": {
+        "strategy_family": "internal_shading",
+        "effect_profile_id": "internal_blinds",
+        "host": "interior_blind_zone",
+        "thermal_effect": "medium_solar_gain_reduction"
+      },
+      "verticalBlind": {
+        "strategy_family": "internal_shading",
+        "effect_profile_id": "internal_blinds",
+        "host": "interior_blind_zone",
+        "thermal_effect": "medium_solar_gain_reduction"
+      },
+      "solarControlGlazing": {
+        "strategy_family": "solar_control_glazing",
+        "effect_profile_id": "solar_control_glazing",
+        "host": "opening_glass_zone",
+        "thermal_effect": "medium_solar_gain_reduction"
+      },
+      "externalAwning": {
+        "strategy_family": "external_shading",
+        "effect_profile_id": "external_shading",
+        "host": "exterior_awning_zone",
+        "thermal_effect": "high_solar_gain_reduction"
+      },
+      "ceilingFan": {
+        "strategy_family": "air_movement",
+        "effect_profile_id": "ceiling_fan_air_movement",
+        "host": "ceiling_center",
+        "thermal_effect": "comfort_improvement_not_air_temperature_reduction"
+      },
+      "rectangularPlanter": {
+        "strategy_family": "biophilic_support",
+        "effect_profile_id": "interior_biophilic_cooling_zone",
+        "host": "floor_planting_zone",
+        "thermal_effect": "visual_comfort_microclimate_support"
+      },
+      "planterShelf": {
+        "strategy_family": "biophilic_support",
+        "effect_profile_id": "interior_biophilic_cooling_zone",
+        "host": "sill_planter_zone",
+        "thermal_effect": "visual_comfort_microclimate_support"
+      },
+      "hangingRail": {
+        "strategy_family": "biophilic_support",
+        "effect_profile_id": "interior_biophilic_cooling_zone",
+        "host": "left_wall_planting_zone",
+        "thermal_effect": "visual_comfort_microclimate_support"
+      },
+      "plantLadder": {
+        "strategy_family": "biophilic_support",
+        "effect_profile_id": "interior_biophilic_cooling_zone",
+        "host": "left_wall_planting_zone",
+        "thermal_effect": "visual_comfort_microclimate_support"
+      },
+      "trellis": {
+        "strategy_family": "biophilic_support",
+        "effect_profile_id": "interior_biophilic_cooling_zone",
+        "host": "right_wall_planting_zone",
+        "thermal_effect": "visual_comfort_microclimate_support"
+      },
+      "floorPlants": {
+        "strategy_family": "biophilic_support",
+        "effect_profile_id": "interior_biophilic_cooling_zone",
+        "host": "floor_planting_zone",
+        "thermal_effect": "visual_comfort_microclimate_support"
+      },
+      "outsideMarker": {
+        "strategy_family": "debug_orientation",
+        "effect_profile_id": null,
+        "host": "outside_side",
+        "thermal_effect": "none_debug_only"
+      }
+    }
+  }
+}

@@ -76,13 +76,103 @@ def _benchmark_rows(option: dict) -> str:
     return "".join(rows) or '<tr><td colspan="4">benchmark checks pending</td></tr>'
 
 
+
+def _package_comparison_rows(package: dict) -> str:
+    rows = []
+    for item in package.get("before_after", []):
+        before = item.get("before")
+        after = item.get("after")
+        unit = item.get("unit", "")
+        change = ""
+        try:
+            change_value = float(before) - float(after)
+            change = _display_value(round(change_value, 3))
+        except Exception:
+            change = "pending"
+        rows.append(
+            "<tr>"
+            f"<td>{escape(str(item.get('indicator', 'indicator')))}</td>"
+            f"<td>{escape(_display_value(before))} {escape(str(unit))}</td>"
+            f"<td>{escape(_display_value(after))} {escape(str(unit))}</td>"
+            f"<td>{escape(change)}</td>"
+            "</tr>"
+        )
+    return "".join(rows) or '<tr><td colspan="4">comparison pending</td></tr>'
+
+
+def _summary_metrics(items: list[dict], status: str = "pending") -> str:
+    metrics = []
+    for item in items[:4]:
+        before = item.get("before", item.get("baseline", ""))
+        after = item.get("after", item.get("proposed", ""))
+        unit = item.get("unit", "")
+        label = str(item.get("indicator", "indicator"))
+        metrics.append(
+            '<div class="metric">'
+            f'<div class="label">{escape(label)}</div>'
+            f'<div class="value">{escape(_display_value(before))} {escape(str(unit))} -> {escape(_display_value(after))} {escape(str(unit))}</div>'
+            '</div>'
+        )
+    metrics.append(
+        '<div class="metric">'
+        '<div class="label">benchmark</div>'
+        f'<div class="value"><span class="badge {_status_class(status)}">{escape(str(status or "pending"))}</span></div>'
+        '</div>'
+    )
+    return "".join(metrics) or '<div class="metric"><div class="label">comparison</div><div class="value">pending</div></div>'
+
+
+def _package_summary_section(package: dict, index: int) -> str:
+    status = package.get("benchmark_status", "pending")
+    return f"""
+      <section class="summary" data-strategy-id="{escape(str(package.get('package_id') or f'package_{index}'))}" data-option-key="option{index}" data-option-alt="option_{index}">
+        {_summary_metrics(package.get("before_after", []), status)}
+      </section>
+    """
+
+
+def _option_summary_section(option: dict, index: int) -> str:
+    strategy = option.get("strategy", {})
+    status = option.get("benchmark_result", {}).get("overall", "pending")
+    return f"""
+      <section class="summary" data-strategy-id="{escape(str(strategy.get('strategy_id') or f'option_{index}'))}" data-option-key="option{index}" data-option-alt="option_{index}">
+        {_summary_metrics(option.get("numerical_comparison", []), status)}
+      </section>
+    """
+
+
+def _package_section(package: dict, index: int) -> str:
+    status = package.get("benchmark_status", "pending")
+    confidence = package.get("confidence_level", "screening")
+    strategies = ", ".join(package.get("selected_strategy_names", [])[:5])
+    components = ", ".join(package.get("visual_generation", {}).get("component_ids", []))
+    return f"""
+      <section class="option" id="option-{index}" data-strategy-id="{escape(str(package.get('package_id') or f'package_{index}'))}" data-option-key="option{index}" data-option-alt="option_{index}">
+        <header class="optionHeader">
+          <span>option {index}</span>
+          <span>{escape(str(status))} | {escape(str(confidence))}</span>
+        </header>
+        <h2>{escape(str(package.get('package_name', f'option {index}')))}</h2>
+        <p>{escape(str(package.get('user_label', 'review this package against the baseline.')))}</p>
+        <div class="tableTitle">before and after</div>
+        <table>
+          <thead><tr><th>indicator</th><th>original</th><th>with package</th><th>change</th></tr></thead>
+          <tbody>{_package_comparison_rows(package)}</tbody>
+        </table>
+        <div class="tableTitle">included strategies</div>
+        <p>{escape(str(strategies or 'pending'))}</p>
+        <div class="tableTitle">3D components</div>
+        <p>{escape(str(components or 'pending'))}</p>
+      </section>
+    """
+
 def _option_section(option: dict, index: int) -> str:
     strategy = option.get("strategy", {})
     name = strategy.get("strategy_name") or f"option {index}"
     status = option.get("benchmark_result", {}).get("overall")
     confidence = option.get("confidence", {}).get("level")
     return f"""
-      <section class="option" id="option-{index}" data-strategy-id="{escape(str(strategy.get("strategy_id") or f"option_{index}"))}">
+      <section class="option" id="option-{index}" data-strategy-id="{escape(str(strategy.get("strategy_id") or f"option_{index}"))}" data-option-key="option{index}" data-option-alt="option_{index}">
         <header class="optionHeader">
           <span>option {index}</span>
           <span>{escape(str(status or 'pending'))} | {escape(str(confidence or 'confidence pending'))}</span>
@@ -104,9 +194,19 @@ def _option_section(option: dict, index: int) -> str:
 
 
 def export_validation_html(validation_options: dict) -> str:
-    baseline = validation_options.get("baseline", {})
+    baseline = validation_options.get("baseline", validation_options.get("baseline_indicators", {}))
+    packages = validation_options.get("packages", [])[:3]
     options = validation_options.get("validated_options", [])[:3]
-    option_sections = "".join(_option_section(option, index) for index, option in enumerate(options, start=1))
+    option_sections = (
+        "".join(_package_section(package, index) for index, package in enumerate(packages, start=1))
+        if packages
+        else "".join(_option_section(option, index) for index, option in enumerate(options, start=1))
+    )
+    summary_sections = (
+        "".join(_package_summary_section(package, index) for index, package in enumerate(packages, start=1))
+        if packages
+        else "".join(_option_summary_section(option, index) for index, option in enumerate(options, start=1))
+    )
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -121,7 +221,7 @@ def export_validation_html(validation_options: dict) -> str:
     body {{ margin: 0; background: var(--surface-primary); color: var(--ink-primary); font: 400 13px "DM Sans", Arial, sans-serif; }}
     body > header {{ align-items: center; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; min-height: 46px; padding: 0 14px; font: 400 10.5px "DM Mono", monospace; letter-spacing: 0.10em; color: var(--ink-tertiary); }}
     main {{ height: calc(100vh - 46px); overflow: auto; padding: 14px; }}
-    .baseline {{ display: grid; gap: 8px; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 14px; }}
+    .summary {{ display: grid; gap: 8px; grid-template-columns: repeat(5, minmax(0, 1fr)); margin-bottom: 14px; }}
     .metric, .option {{ border: 1px solid var(--border); background: var(--surface-secondary); padding: 12px; }}
     .label, th, .tableTitle {{ color: var(--ink-tertiary); font: 400 10px "DM Mono", monospace; text-align: left; }}
     .value, td, p, h2 {{ color: var(--ink-primary); font: 400 13px "DM Sans", Arial, sans-serif; }}
@@ -133,31 +233,31 @@ def export_validation_html(validation_options: dict) -> str:
     th, td {{ border-top: 1px solid var(--border); padding: 7px 5px; vertical-align: top; }}
     .badge {{ font: 400 10px "DM Mono", monospace; }}
     .pass {{ color: var(--pass); }} .warn {{ color: var(--warn); }} .fail {{ color: var(--fail); }} .pending {{ color: var(--ink-tertiary); }}
-    @media (max-width: 900px) {{ .baseline {{ grid-template-columns: 1fr 1fr; }} }}
+    @media (max-width: 900px) {{ .summary {{ grid-template-columns: 1fr 1fr; }} }}
   </style>
 </head>
 <body>
   <header><span>validation</span><span>before / after benchmark</span></header>
   <main>
-    <section class="baseline">
-      <div class="metric"><div class="label">original risk</div><div class="value">{escape(str(baseline.get('risk_level', 'pending')))}</div></div>
-      <div class="metric"><div class="label">operative temp</div><div class="value">{escape(_display_value(baseline.get('peak_indoor_operative_temperature_c', '')))} C</div></div>
-      <div class="metric"><div class="label">overheating</div><div class="value">{escape(_display_value(baseline.get('overheating_hours', '')))} h</div></div>
-      <div class="metric"><div class="label">room score</div><div class="value">{escape(_display_value(baseline.get('composite_room_risk_score', '')))}</div></div>
-    </section>
+    {summary_sections or '<section class="summary"><div class="metric"><div class="label">comparison</div><div class="value">pending</div></div></section>'}
     {option_sections or '<section class="option"><h2>validation pending</h2><p>Run retrofit validation to populate before/after comparison.</p></section>'}
   </main>
   <script>
-    const selectedStrategyId = new URLSearchParams(window.location.search).get("strategy_id") || "";
-    const options = Array.from(document.querySelectorAll(".option[data-strategy-id]"));
+    const params = new URLSearchParams(window.location.search);
+    const selectedStrategyId = params.get("strategy_id") || params.get("package_id") || "";
+    const normalize = (value) => String(value || "").replace(/_/g, "").toLowerCase();
+    const options = Array.from(document.querySelectorAll(".option[data-strategy-id], .summary[data-strategy-id]"));
     if (selectedStrategyId && options.length) {{
       let matched = false;
       options.forEach((option) => {{
-        const active = option.dataset.strategyId === selectedStrategyId;
+        const active = option.dataset.strategyId === selectedStrategyId
+          || normalize(option.dataset.optionKey) === normalize(selectedStrategyId)
+          || normalize(option.dataset.optionAlt) === normalize(selectedStrategyId)
+          || selectedStrategyId.includes(option.dataset.strategyId || "__no_match__");
         option.hidden = !active;
         matched = matched || active;
       }});
-      if (!matched) options.forEach((option) => option.hidden = false);
+      if (!matched) options.forEach((option) => option.hidden = true);
     }}
   </script>
 </body>

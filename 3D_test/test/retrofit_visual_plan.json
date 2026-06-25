@@ -1,0 +1,1256 @@
+{
+  "test_mode": {
+    "include_biophilic_test": true,
+    "note": "Biophilic test option is injected for 3D visualization only and is not treated as a primary validated thermal fix."
+  },
+  "source": {
+    "spatial_index": "data\\intermediate\\spatial_index_with_overrides.json",
+    "retrofit_validation_options": "data\\intermediate\\retrofit_validation_options.json",
+    "visual_retrofit_catalogue": "data\\input\\visual_retrofit_catalogue.json",
+    "hybrid_visual_asset_catalogue": "3D_test\\test\\hybrid_visual_asset_catalogue.json",
+    "visual_decision_rules": "3D_test\\test\\visual_decision_rules.json",
+    "building_info": "data\\input\\building_info.json",
+    "retrofit_constraints": "data\\input\\retrofit_constraints.json"
+  },
+  "room": {
+    "id": "ROOM_001",
+    "room_type": "s",
+    "floor": 4,
+    "is_top_floor": true,
+    "area_m2": 34.0,
+    "height_m": 5.0,
+    "facing_direction": "N"
+  },
+  "layout_points": [
+    {
+      "id": 0,
+      "xyz": [
+        3.2100337671997035,
+        0.0,
+        4.639159256342559
+      ]
+    },
+    {
+      "id": 1,
+      "xyz": [
+        3.210034278484681,
+        0.0,
+        -1.209259168015327
+      ]
+    },
+    {
+      "id": 2,
+      "xyz": [
+        1.275219160651997,
+        0.0,
+        -1.2092593371622369
+      ]
+    },
+    {
+      "id": 3,
+      "xyz": [
+        1.2752192490696996,
+        0.0,
+        -2.2206399669384127
+      ]
+    },
+    {
+      "id": 4,
+      "xyz": [
+        -0.17589208930481348,
+        0.0,
+        -2.220640093798595
+      ]
+    },
+    {
+      "id": 5,
+      "xyz": [
+        -0.1758918855596722,
+        0.0,
+        -4.551212849369783
+      ]
+    },
+    {
+      "id": 6,
+      "xyz": [
+        -1.5610436176444347,
+        0.0,
+        -4.551212970463593
+      ]
+    },
+    {
+      "id": 7,
+      "xyz": [
+        -1.561044421092256,
+        0.0,
+        4.639158839241657
+      ]
+    }
+  ],
+  "walls": [
+    {
+      "id": "ROOM_001_WALL_00",
+      "room_id": "ROOM_001",
+      "source_points": [
+        0,
+        1
+      ],
+      "start_xyz": [
+        3.2100337671997035,
+        0.0,
+        4.639159256342559
+      ],
+      "end_xyz": [
+        3.210034278484681,
+        0.0,
+        -1.209259168015327
+      ],
+      "height_m": 5.0,
+      "length_m": 5.848,
+      "estimated_area_m2": 29.242,
+      "orientation": "N",
+      "is_external": true,
+      "normal": [
+        0.9999999999999962,
+        0.0,
+        8.742277660006111e-08
+      ],
+      "plane_equation": [
+        0.9999999999999962,
+        0.0,
+        8.742277660006111e-08,
+        -2.710357594490062
+      ]
+    },
+    {
+      "id": "ROOM_001_WALL_01",
+      "room_id": "ROOM_001",
+      "source_points": [
+        1,
+        2
+      ],
+      "start_xyz": [
+        3.210034278484681,
+        0.0,
+        -1.209259168015327
+      ],
+      "end_xyz": [
+        1.275219160651997,
+        0.0,
+        -1.2092593371622369
+      ],
+      "height_m": 5.0,
+      "length_m": 1.935,
+      "estimated_area_m2": 9.674,
+      "orientation": "NE",
+      "is_external": false,
+      "normal": [
+        8.742277659699524e-08,
+        -0.0,
+        -0.9999999999999961
+      ],
+      "plane_equation": [
+        8.742277659699524e-08,
+        -0.0,
+        -0.9999999999999961,
+        -1.0210251212120094
+      ]
+    },
+    {
+      "id": "ROOM_001_WALL_02",
+      "room_id": "ROOM_001",
+      "source_points": [
+        2,
+        3
+      ],
+      "start_xyz": [
+        1.275219160651997,
+        0.0,
+        -1.2092593371622369
+      ],
+      "end_xyz": [
+        1.2752192490696996,
+        0.0,
+        -2.2206399669384127
+      ],
+      "height_m": 5.0,
+      "length_m": 1.011,
+      "estimated_area_m2": 5.057,
+      "orientation": "E",
+      "is_external": false,
+      "normal": [
+        0.9999999999999962,
+        0.0,
+        8.74227764847134e-08
+      ],
+      "plane_equation": [
+        0.9999999999999962,
+        0.0,
+        8.74227764847134e-08,
+        -1.0767174005508469
+      ]
+    },
+    {
+      "id": "ROOM_001_WALL_03",
+      "room_id": "ROOM_001",
+      "source_points": [
+        3,
+        4
+      ],
+      "start_xyz": [
+        1.2752192490696996,
+        0.0,
+        -2.2206399669384127
+      ],
+      "end_xyz": [
+        -0.17589208930481348,
+        0.0,
+        -2.220640093798595
+      ],
+      "height_m": 5.0,
+      "length_m": 1.451,
+      "estimated_area_m2": 7.256,
+      "orientation": "SE",
+      "is_external": false,
+      "normal": [
+        8.742277664230194e-08,
+        -0.0,
+        -0.9999999999999961
+      ],
+      "plane_equation": [
+        8.742277664230194e-08,
+        -0.0,
+        -0.9999999999999961,
+        -1.8749734044075084
+      ]
+    },
+    {
+      "id": "ROOM_001_WALL_04",
+      "room_id": "ROOM_001",
+      "source_points": [
+        4,
+        5
+      ],
+      "start_xyz": [
+        -0.17589208930481348,
+        0.0,
+        -2.220640093798595
+      ],
+      "end_xyz": [
+        -0.1758918855596722,
+        0.0,
+        -4.551212849369783
+      ],
+      "height_m": 5.0,
+      "length_m": 2.331,
+      "estimated_area_m2": 11.653,
+      "orientation": "S",
+      "is_external": false,
+      "normal": [
+        0.9999999999999962,
+        0.0,
+        8.742277656750314e-08
+      ],
+      "plane_equation": [
+        0.9999999999999962,
+        0.0,
+        8.742277656750314e-08,
+        0.148512744903565
+      ]
+    },
+    {
+      "id": "ROOM_001_WALL_05",
+      "room_id": "ROOM_001",
+      "source_points": [
+        5,
+        6
+      ],
+      "start_xyz": [
+        -0.1758918855596722,
+        0.0,
+        -4.551212849369783
+      ],
+      "end_xyz": [
+        -1.5610436176444347,
+        0.0,
+        -4.551212970463593
+      ],
+      "height_m": 5.0,
+      "length_m": 1.385,
+      "estimated_area_m2": 6.926,
+      "orientation": "SW",
+      "is_external": false,
+      "normal": [
+        8.742277634025721e-08,
+        -0.0,
+        -0.9999999999999962
+      ],
+      "plane_equation": [
+        8.742277634025721e-08,
+        -0.0,
+        -0.9999999999999962,
+        -3.842767274379745
+      ]
+    },
+    {
+      "id": "ROOM_001_WALL_06",
+      "room_id": "ROOM_001",
+      "source_points": [
+        6,
+        7
+      ],
+      "start_xyz": [
+        -1.5610436176444347,
+        0.0,
+        -4.551212970463593
+      ],
+      "end_xyz": [
+        -1.561044421092256,
+        0.0,
+        4.639158839241657
+      ],
+      "height_m": 5.0,
+      "length_m": 9.19,
+      "estimated_area_m2": 45.952,
+      "orientation": "W",
+      "is_external": false,
+      "normal": [
+        -0.9999999999999961,
+        0.0,
+        -8.742277657553416e-08
+      ],
+      "plane_equation": [
+        -0.9999999999999961,
+        0.0,
+        -8.742277657553416e-08,
+        -1.3180506110191395
+      ]
+    },
+    {
+      "id": "ROOM_001_WALL_07",
+      "room_id": "ROOM_001",
+      "source_points": [
+        7,
+        0
+      ],
+      "start_xyz": [
+        -1.561044421092256,
+        0.0,
+        4.639158839241657
+      ],
+      "end_xyz": [
+        3.2100337671997035,
+        0.0,
+        4.639159256342559
+      ],
+      "height_m": 5.0,
+      "length_m": 4.771,
+      "estimated_area_m2": 23.855,
+      "orientation": "NW",
+      "is_external": false,
+      "normal": [
+        -8.74227765362383e-08,
+        0.0,
+        0.9999999999999961
+      ],
+      "plane_equation": [
+        -8.74227765362383e-08,
+        0.0,
+        0.9999999999999961,
+        -3.917023646831528
+      ]
+    }
+  ],
+  "components": [
+    {
+      "id": "ROOM_001_WALL_03_WINDOW_01",
+      "component_type": "window",
+      "wall_id": "ROOM_001_WALL_03",
+      "estimated_area_m2": 0.249,
+      "width_m": 0.3,
+      "height_m": 0.829,
+      "bbox_px": [
+        164.11541748046875,
+        256.46112060546875,
+        219.9506072998047,
+        365.00189208984375
+      ],
+      "bbox_width_px": 55.835,
+      "bbox_height_px": 108.541,
+      "confidence": 0.7265625,
+      "source": "C:\\Users\\Morris\\OneDrive\\Desktop\\hvra_test_run\\data\\output\\spatial\\sam3\\wall_03\\window_meta.json",
+      "wall_fragment_image": "C:\\Users\\Morris\\OneDrive\\Desktop\\hvra_test_run\\data\\output\\spatial\\wall_sides\\wall_03.png",
+      "dimension_source": "sam3_bbox_scaled_to_lgtnet_wall_fragment"
+    },
+    {
+      "id": "ROOM_001_WALL_07_WINDOW_01",
+      "component_type": "window",
+      "wall_id": "ROOM_001_WALL_07",
+      "estimated_area_m2": 6.659,
+      "width_m": 1.554,
+      "height_m": 4.284,
+      "bbox_px": [
+        296.059326171875,
+        94.82284545898438,
+        584.7239379882812,
+        656.0264892578125
+      ],
+      "bbox_width_px": 288.665,
+      "bbox_height_px": 561.204,
+      "confidence": 0.70703125,
+      "source": "C:\\Users\\Morris\\OneDrive\\Desktop\\hvra_test_run\\data\\output\\spatial\\sam3\\wall_07\\window_meta.json",
+      "wall_fragment_image": "C:\\Users\\Morris\\OneDrive\\Desktop\\hvra_test_run\\data\\output\\spatial\\wall_sides\\wall_07.png",
+      "dimension_source": "sam3_bbox_scaled_to_lgtnet_wall_fragment"
+    }
+  ],
+  "opening_context": {
+    "opening_type": "sliding_glass_door",
+    "inferred_opening_type": "sliding_glass_door",
+    "override_used": true,
+    "wall_id": "ROOM_001_WALL_07",
+    "component_id": "ROOM_001_WALL_07_WINDOW_01",
+    "width_m": 1.554,
+    "height_m": 4.284,
+    "area_m2": 6.659,
+    "notes": [
+      "Largest detected window/door is used as the visual placement anchor.",
+      "Override with --opening-type when the visual test needs a specific morphology such as sliding_glass_door."
+    ]
+  },
+  "visual_decision_rules": {
+    "ruleset_id": "HVRA_3D_VISUAL_DECISION_RULES_V1",
+    "global_rules": [
+      "Exterior shading, awnings, trellis, vegetation-on-window, and facade-mounted systems require an external wall and facade permission/owner approval.",
+      "Balcony or planter-based strategies require confirmed balcony/outdoor maintenance access.",
+      "Interior curtains, drapes, roller shades, and plant corners are renter-friendlier because they do not alter the facade.",
+      "For sliding glass doors, avoid small slatted systems that obstruct sliding operation or frequent passage unless a product-specific track detail is confirmed."
+    ]
+  },
+  "hybrid_assets": {
+    "catalogue_id": "HVRA_3D_TEST_HYBRID_ASSETS_V1",
+    "purpose": "Test-only procedural visual variants before replacing with curated GLB assets.",
+    "asset_mode": "procedural_now_glb_ready_later",
+    "variants": [
+      {
+        "id": "curtain_drapes",
+        "label": "Drapes",
+        "family": "window_covering",
+        "generator": "curtain_drapes",
+        "strategy_binding": [
+          "internal_blinds"
+        ],
+        "placement": "inside detected window wall",
+        "future_glb_slot": "assets/window_coverings/drapes_soft_fold.glb",
+        "decision": {
+          "status": "allowed",
+          "opening_type": "sliding_glass_door",
+          "target_wall_id": "ROOM_001_WALL_07",
+          "placement_side": "interior",
+          "suitability": "good_for_sliding_glass_door",
+          "reasons": [
+            "Soft drapes can cover large glazed doors without modifying the facade."
+          ]
+        }
+      },
+      {
+        "id": "sheer_curtain",
+        "label": "Sheer curtain",
+        "family": "window_covering",
+        "generator": "sheer_curtain",
+        "strategy_binding": [
+          "internal_blinds"
+        ],
+        "placement": "inside detected window wall",
+        "future_glb_slot": "assets/window_coverings/sheer_curtain.glb",
+        "decision": {
+          "status": "allowed",
+          "opening_type": "sliding_glass_door",
+          "target_wall_id": "ROOM_001_WALL_07",
+          "placement_side": "interior",
+          "suitability": "good_for_daylight_diffusion",
+          "reasons": [
+            "Useful for visual comfort, but thermal benefit is limited unless paired with solar-control strategy."
+          ]
+        }
+      },
+      {
+        "id": "roller_shade",
+        "label": "Roller shade",
+        "family": "window_covering",
+        "generator": "roller_shade",
+        "strategy_binding": [
+          "internal_blinds"
+        ],
+        "placement": "inside detected window wall",
+        "future_glb_slot": "assets/window_coverings/roller_shade.glb",
+        "decision": {
+          "status": "conditional",
+          "opening_type": "sliding_glass_door",
+          "target_wall_id": "ROOM_001_WALL_07",
+          "placement_side": "interior",
+          "suitability": "conditional_for_large_doors",
+          "reasons": [
+            "For sliding doors, render as a wide or split shade and keep the passage side clear."
+          ]
+        }
+      },
+      {
+        "id": "vertical_blind",
+        "label": "Vertical blind",
+        "family": "window_covering",
+        "generator": "vertical_blind",
+        "strategy_binding": [
+          "internal_blinds"
+        ],
+        "placement": "inside full-height glazed opening or sliding door",
+        "future_glb_slot": "assets/window_coverings/vertical_blind.glb",
+        "decision": {
+          "status": "allowed",
+          "opening_type": "sliding_glass_door",
+          "target_wall_id": "ROOM_001_WALL_07",
+          "placement_side": "interior",
+          "suitability": "good_for_sliding_glass_door",
+          "reasons": [
+            "Vertical blinds are suitable for full-height sliding glazed openings because panels can move parallel to the door operation."
+          ]
+        }
+      },
+      {
+        "id": "venetian_blind",
+        "label": "Venetian blind",
+        "family": "window_covering",
+        "generator": "venetian_blind",
+        "strategy_binding": [
+          "internal_blinds"
+        ],
+        "placement": "inside detected window wall",
+        "future_glb_slot": "assets/window_coverings/venetian_blind.glb",
+        "decision": {
+          "status": "blocked",
+          "opening_type": "sliding_glass_door",
+          "target_wall_id": "ROOM_001_WALL_07",
+          "placement_side": "interior",
+          "suitability": "poor_for_sliding_glass_door",
+          "reasons": [
+            "Venetian blind is not suitable for sliding_glass_door.",
+            "Opening type sliding_glass_door is outside the allowed list."
+          ]
+        }
+      },
+      {
+        "id": "horizontal_fixed_shade",
+        "label": "Horizontal shade",
+        "family": "external_shading",
+        "generator": "horizontal_fixed_shade",
+        "strategy_binding": [
+          "external_shading_louvers"
+        ],
+        "placement": "outside detected external wall/window",
+        "future_glb_slot": "assets/shading/horizontal_fixed_louver.glb",
+        "decision": {
+          "status": "blocked",
+          "opening_type": "sliding_glass_door",
+          "target_wall_id": "ROOM_001_WALL_07",
+          "placement_side": "exterior",
+          "suitability": "conditional_external_work",
+          "reasons": [
+            "Facade-mounted retrofit requires owner/building approval and is blocked for the current constraints."
+          ]
+        }
+      },
+      {
+        "id": "vertical_movable_shade",
+        "label": "Vertical fins",
+        "family": "external_shading",
+        "generator": "vertical_movable_shade",
+        "strategy_binding": [
+          "external_shading_louvers"
+        ],
+        "placement": "outside detected external wall/window",
+        "future_glb_slot": "assets/shading/vertical_fins.glb",
+        "decision": {
+          "status": "blocked",
+          "opening_type": "sliding_glass_door",
+          "target_wall_id": "ROOM_001_WALL_07",
+          "placement_side": "exterior",
+          "suitability": "conditional_external_work",
+          "reasons": [
+            "Facade-mounted retrofit requires owner/building approval and is blocked for the current constraints."
+          ]
+        }
+      },
+      {
+        "id": "awning_shade",
+        "label": "Awning",
+        "family": "external_shading",
+        "generator": "awning_shade",
+        "strategy_binding": [
+          "external_shading_louvers",
+          "window_external_shutters"
+        ],
+        "placement": "outside above detected window",
+        "future_glb_slot": "assets/shading/awning.glb",
+        "decision": {
+          "status": "blocked",
+          "opening_type": "sliding_glass_door",
+          "target_wall_id": "ROOM_001_WALL_07",
+          "placement_side": "exterior",
+          "suitability": "conditional_external_work",
+          "reasons": [
+            "Facade-mounted retrofit requires owner/building approval and is blocked for the current constraints."
+          ]
+        }
+      },
+      {
+        "id": "trellis_shade",
+        "label": "Trellis",
+        "family": "biophilic_shading",
+        "generator": "trellis_shade",
+        "strategy_binding": [
+          "green_pergola",
+          "balcony_planter_shading"
+        ],
+        "placement": "outside detected external wall/window",
+        "future_glb_slot": "assets/shading/trellis.glb",
+        "decision": {
+          "status": "blocked",
+          "opening_type": "sliding_glass_door",
+          "target_wall_id": "ROOM_001_WALL_07",
+          "placement_side": "exterior",
+          "suitability": "conditional_biophilic_shading",
+          "reasons": [
+            "Facade-mounted retrofit requires owner/building approval and is blocked for the current constraints.",
+            "No balcony/outdoor maintenance access is confirmed."
+          ]
+        }
+      },
+      {
+        "id": "vegetation_window",
+        "label": "Vegetation on window",
+        "family": "biophilic_shading",
+        "generator": "vegetation_window",
+        "strategy_binding": [
+          "green_pergola",
+          "balcony_planter_shading"
+        ],
+        "placement": "outside detected external wall/window",
+        "future_glb_slot": "assets/plants/window_climber.glb",
+        "decision": {
+          "status": "blocked",
+          "opening_type": "sliding_glass_door",
+          "target_wall_id": "ROOM_001_WALL_07",
+          "placement_side": "exterior",
+          "suitability": "conditional_biophilic_shading",
+          "reasons": [
+            "Facade-mounted retrofit requires owner/building approval and is blocked for the current constraints.",
+            "No balcony/outdoor maintenance access is confirmed."
+          ]
+        }
+      },
+      {
+        "id": "plant_corner_dense",
+        "label": "Plant corner",
+        "family": "biophilic_resilience",
+        "generator": "plant_corner_dense",
+        "strategy_binding": [
+          "interior_biophilic_cooling_zone"
+        ],
+        "placement": "daylight interior corner",
+        "future_glb_slot": "assets/plants/interior_plant_cluster.glb",
+        "decision": {
+          "status": "allowed",
+          "opening_type": "sliding_glass_door",
+          "target_wall_id": "ROOM_001_WALL_07",
+          "placement_side": "interior",
+          "suitability": "supportive_visual_comfort_only",
+          "reasons": [
+            "Interior plant corner is allowed as a supportive wellbeing/visual option, not a benchmark-passing thermal fix."
+          ]
+        }
+      }
+    ],
+    "decision_ruleset_id": "HVRA_3D_VISUAL_DECISION_RULES_V1"
+  },
+  "building_info": {
+    "building_id": "BLD_001",
+    "room_id": "ROOM_001",
+    "room_type": "s",
+    "floor": 4,
+    "is_top_floor": true,
+    "room_area_m2": 34.0,
+    "room_height_m": 5.0,
+    "facing_direction": "N",
+    "external_facades": 1,
+    "window_area_m2": null,
+    "wall_area_m2": null,
+    "glazing_type": "single_glazing",
+    "construction_era": "1960_1979",
+    "roof_exposed": true,
+    "has_external_shading": false,
+    "has_balcony": false,
+    "known_limitations": [
+      "no_ifc_model",
+      "image_based_estimation"
+    ]
+  },
+  "constraints": {
+    "constraint_id": "CONSTRAINT_001",
+    "budget_level": "low",
+    "max_budget_eur": 1500,
+    "disruption_tolerance": "low",
+    "ownership_status": "renter",
+    "facade_modification_allowed": false,
+    "heritage_restriction": "unknown",
+    "construction_permission_required": true,
+    "preferred_strategy_type": [
+      "low_cost",
+      "reversible",
+      "low_disruption"
+    ],
+    "excluded_strategy_type": [
+      "major_structural_change",
+      "full_window_replacement"
+    ]
+  },
+  "boundary_rules": [
+    "Roof and ceiling-roof visuals are valid only for top-floor, roof-exposed units with owner/building approval.",
+    "Wall insulation reinforcement is rendered as an interior lining over the existing wall; it must not extend outward beyond the facade.",
+    "Older-building external, roof, structural, and full-window retrofits remain conditional until permissions and moisture/building-physics checks pass."
+  ],
+  "options": [
+    {
+      "rank": 1,
+      "strategy_id": "interior_biophilic_cooling_zone",
+      "strategy_name": "Plant cooling corner",
+      "status": "visual_test_only",
+      "confidence": "low",
+      "final_score": null,
+      "visual_asset_type": "interior_plant_cluster",
+      "render_layer": "interior_object",
+      "placement_rule": "Place in a daylight corner near but not blocking the window.",
+      "geometry_rule": "Cluster of potted plants and optional low shelf within occupied zone.",
+      "material_rule": "varied green foliage, ceramic or timber pots.",
+      "wall_ids": [
+        "ROOM_001_WALL_00"
+      ],
+      "surface_ids": [
+        "ROOM_001_FLOOR"
+      ],
+      "numerical_comparison": [],
+      "recommendation": "Test-only biophilic visualization. Treat as supportive comfort/resilience, not a standalone benchmark-passing thermal fix.",
+      "test_only": true
+    },
+    {
+      "rank": 2,
+      "strategy_id": "night_purge_ventilation",
+      "strategy_name": "Night purge ventilation behavioural protocol",
+      "status": "partial_pass",
+      "confidence": "medium",
+      "final_score": 0.703,
+      "visual_asset_type": "operation_overlay",
+      "render_layer": "flow_overlay",
+      "placement_rule": "Highlight operable window/door path used for night or cross ventilation.",
+      "geometry_rule": "Use arrows and small opening-angle marker; no permanent object unless secure limiter is selected.",
+      "material_rule": "blue airflow arrows; small metal limiter for secure night vent.",
+      "wall_ids": [
+        "ROOM_001_WALL_00"
+      ],
+      "surface_ids": [
+        "ROOM_001_CEILING"
+      ],
+      "numerical_comparison": [
+        {
+          "indicator": "Peak Indoor Operative Temperature",
+          "unit": "C",
+          "baseline": 33.014,
+          "proposed": 32.014,
+          "change": 1.0
+        },
+        {
+          "indicator": "Heat Stress WBGT",
+          "unit": "C-WBGT",
+          "baseline": 26.936,
+          "proposed": 26.536,
+          "change": 0.4
+        },
+        {
+          "indicator": "Overheating Hours",
+          "unit": "weighted hours",
+          "baseline": 698.0,
+          "proposed": 474.64,
+          "change": "32.0%"
+        },
+        {
+          "indicator": "Nocturnal Recovery Score",
+          "unit": "0-1 risk",
+          "baseline": 0.871,
+          "proposed": 0.479,
+          "change": 0.392
+        },
+        {
+          "indicator": "Composite Room Risk Score",
+          "unit": "0-1 risk",
+          "baseline": 0.671,
+          "proposed": 0.506,
+          "change": 0.165
+        },
+        {
+          "indicator": "Final Risk Score",
+          "unit": "0-1 risk",
+          "baseline": 1.0,
+          "proposed": 0.703,
+          "change": "29.7%"
+        }
+      ],
+      "recommendation": "Proceed only as a partial improvement; consider combining with ventilation or external shading measures."
+    },
+    {
+      "rank": 3,
+      "strategy_id": "secure_night_vent_limiter",
+      "strategy_name": "Secure night-vent opening limiter",
+      "status": "partial_pass",
+      "confidence": "medium",
+      "final_score": 0.819,
+      "visual_asset_type": "operation_overlay",
+      "render_layer": "flow_overlay",
+      "placement_rule": "Highlight operable window/door path used for night or cross ventilation.",
+      "geometry_rule": "Use arrows and small opening-angle marker; no permanent object unless secure limiter is selected.",
+      "material_rule": "blue airflow arrows; small metal limiter for secure night vent.",
+      "wall_ids": [
+        "ROOM_001_WALL_00"
+      ],
+      "surface_ids": [
+        "ROOM_001_CEILING"
+      ],
+      "numerical_comparison": [
+        {
+          "indicator": "Peak Indoor Operative Temperature",
+          "unit": "C",
+          "baseline": 33.014,
+          "proposed": 32.114,
+          "change": 0.9
+        },
+        {
+          "indicator": "Heat Stress WBGT",
+          "unit": "C-WBGT",
+          "baseline": 26.936,
+          "proposed": 26.586,
+          "change": 0.35
+        },
+        {
+          "indicator": "Overheating Hours",
+          "unit": "weighted hours",
+          "baseline": 698.0,
+          "proposed": 488.6,
+          "change": "30.0%"
+        },
+        {
+          "indicator": "Nocturnal Recovery Score",
+          "unit": "0-1 risk",
+          "baseline": 0.871,
+          "proposed": 0.54,
+          "change": 0.331
+        },
+        {
+          "indicator": "Composite Room Risk Score",
+          "unit": "0-1 risk",
+          "baseline": 0.671,
+          "proposed": 0.532,
+          "change": 0.139
+        },
+        {
+          "indicator": "Final Risk Score",
+          "unit": "0-1 risk",
+          "baseline": 1.0,
+          "proposed": 0.819,
+          "change": "18.1%"
+        }
+      ],
+      "recommendation": "Proceed only as a partial improvement; consider combining with ventilation or external shading measures."
+    },
+    {
+      "rank": 4,
+      "strategy_id": "cross_ventilation_behaviour",
+      "strategy_name": "Cross-ventilation behavioural protocol",
+      "status": "partial_pass",
+      "confidence": "medium",
+      "final_score": 0.86,
+      "visual_asset_type": "operation_overlay",
+      "render_layer": "flow_overlay",
+      "placement_rule": "Highlight operable window/door path used for night or cross ventilation.",
+      "geometry_rule": "Use arrows and small opening-angle marker; no permanent object unless secure limiter is selected.",
+      "material_rule": "blue airflow arrows; small metal limiter for secure night vent.",
+      "wall_ids": [
+        "ROOM_001_WALL_00"
+      ],
+      "surface_ids": [
+        "ROOM_001_CEILING"
+      ],
+      "numerical_comparison": [
+        {
+          "indicator": "Peak Indoor Operative Temperature",
+          "unit": "C",
+          "baseline": 33.014,
+          "proposed": 32.114,
+          "change": 0.9
+        },
+        {
+          "indicator": "Heat Stress WBGT",
+          "unit": "C-WBGT",
+          "baseline": 26.936,
+          "proposed": 26.586,
+          "change": 0.35
+        },
+        {
+          "indicator": "Overheating Hours",
+          "unit": "weighted hours",
+          "baseline": 698.0,
+          "proposed": 523.5,
+          "change": "25.0%"
+        },
+        {
+          "indicator": "Nocturnal Recovery Score",
+          "unit": "0-1 risk",
+          "baseline": 0.871,
+          "proposed": 0.61,
+          "change": 0.261
+        },
+        {
+          "indicator": "Composite Room Risk Score",
+          "unit": "0-1 risk",
+          "baseline": 0.671,
+          "proposed": 0.552,
+          "change": 0.119
+        },
+        {
+          "indicator": "Final Risk Score",
+          "unit": "0-1 risk",
+          "baseline": 1.0,
+          "proposed": 0.86,
+          "change": "14.0%"
+        }
+      ],
+      "recommendation": "Proceed only as a partial improvement; consider combining with ventilation or external shading measures."
+    },
+    {
+      "rank": 5,
+      "strategy_id": "interior_opening_improvement",
+      "strategy_name": "Interior opening / transom addition",
+      "status": "partial_pass",
+      "confidence": "medium",
+      "final_score": 0.914,
+      "visual_asset_type": "interior_transom_or_door_grille",
+      "render_layer": "interior_object",
+      "placement_rule": "Attach above/within interior door or partition path.",
+      "geometry_rule": "Small transom slot or grille object aligned with internal airflow path.",
+      "material_rule": "painted grille/transom frame.",
+      "wall_ids": [
+        "ROOM_001_WALL_00"
+      ],
+      "surface_ids": [
+        "ROOM_001_CEILING"
+      ],
+      "numerical_comparison": [
+        {
+          "indicator": "Peak Indoor Operative Temperature",
+          "unit": "C",
+          "baseline": 33.014,
+          "proposed": 32.114,
+          "change": 0.9
+        },
+        {
+          "indicator": "Heat Stress WBGT",
+          "unit": "C-WBGT",
+          "baseline": 26.936,
+          "proposed": 26.636,
+          "change": 0.3
+        },
+        {
+          "indicator": "Overheating Hours",
+          "unit": "weighted hours",
+          "baseline": 698.0,
+          "proposed": 544.44,
+          "change": "22.0%"
+        },
+        {
+          "indicator": "Nocturnal Recovery Score",
+          "unit": "0-1 risk",
+          "baseline": 0.871,
+          "proposed": 0.679,
+          "change": 0.192
+        },
+        {
+          "indicator": "Composite Room Risk Score",
+          "unit": "0-1 risk",
+          "baseline": 0.671,
+          "proposed": 0.579,
+          "change": 0.092
+        },
+        {
+          "indicator": "Final Risk Score",
+          "unit": "0-1 risk",
+          "baseline": 1.0,
+          "proposed": 0.914,
+          "change": "8.6%"
+        }
+      ],
+      "recommendation": "Proceed only as a partial improvement; consider combining with ventilation or external shading measures."
+    },
+    {
+      "rank": 6,
+      "strategy_id": "wall_insulation_reinforcement_layer",
+      "strategy_name": "Wall insulation reinforcement layer",
+      "status": "partial_pass",
+      "confidence": "medium",
+      "final_score": 0.951,
+      "visual_asset_type": "wall_layer_material",
+      "render_layer": "surface_layer",
+      "placement_rule": "Place as an interior lining on the room-facing side of selected external wall surfaces.",
+      "geometry_rule": "Thin inward offset surface layer over the existing wall; do not extend beyond the exterior facade plane.",
+      "material_rule": "light internal insulated lining / reinforced plasterboard finish.",
+      "wall_ids": [
+        "ROOM_001_WALL_00"
+      ],
+      "surface_ids": [
+        "ROOM_001_CEILING"
+      ],
+      "numerical_comparison": [
+        {
+          "indicator": "Peak Indoor Operative Temperature",
+          "unit": "C",
+          "baseline": 33.014,
+          "proposed": 31.814,
+          "change": 1.2
+        },
+        {
+          "indicator": "Heat Stress WBGT",
+          "unit": "C-WBGT",
+          "baseline": 26.936,
+          "proposed": 26.586,
+          "change": 0.35
+        },
+        {
+          "indicator": "Overheating Hours",
+          "unit": "weighted hours",
+          "baseline": 698.0,
+          "proposed": 558.4,
+          "change": "20.0%"
+        },
+        {
+          "indicator": "Nocturnal Recovery Score",
+          "unit": "0-1 risk",
+          "baseline": 0.871,
+          "proposed": 0.714,
+          "change": 0.157
+        },
+        {
+          "indicator": "Composite Room Risk Score",
+          "unit": "0-1 risk",
+          "baseline": 0.671,
+          "proposed": 0.599,
+          "change": 0.072
+        },
+        {
+          "indicator": "Final Risk Score",
+          "unit": "0-1 risk",
+          "baseline": 1.0,
+          "proposed": 0.951,
+          "change": "4.9%"
+        }
+      ],
+      "recommendation": "Proceed only as a partial improvement; consider combining with ventilation or external shading measures."
+    },
+    {
+      "rank": 7,
+      "strategy_id": "phase_change_materials",
+      "strategy_name": "Phase-change materials in wall assembly",
+      "status": "partial_pass",
+      "confidence": "medium",
+      "final_score": 0.956,
+      "visual_asset_type": "pcm_panel_layer",
+      "render_layer": "surface_layer",
+      "placement_rule": "Apply as interior wall/ceiling panel layer where thermal buffering is proposed.",
+      "geometry_rule": "Thin modular panels on selected wall or ceiling.",
+      "material_rule": "subtle panelized interior finish.",
+      "wall_ids": [
+        "ROOM_001_WALL_00"
+      ],
+      "surface_ids": [
+        "ROOM_001_CEILING"
+      ],
+      "numerical_comparison": [
+        {
+          "indicator": "Peak Indoor Operative Temperature",
+          "unit": "C",
+          "baseline": 33.014,
+          "proposed": 32.214,
+          "change": 0.8
+        },
+        {
+          "indicator": "Heat Stress WBGT",
+          "unit": "C-WBGT",
+          "baseline": 26.936,
+          "proposed": 26.686,
+          "change": 0.25
+        },
+        {
+          "indicator": "Overheating Hours",
+          "unit": "weighted hours",
+          "baseline": 698.0,
+          "proposed": 572.36,
+          "change": "18.0%"
+        },
+        {
+          "indicator": "Nocturnal Recovery Score",
+          "unit": "0-1 risk",
+          "baseline": 0.871,
+          "proposed": 0.627,
+          "change": 0.244
+        },
+        {
+          "indicator": "Composite Room Risk Score",
+          "unit": "0-1 risk",
+          "baseline": 0.671,
+          "proposed": 0.611,
+          "change": 0.06
+        },
+        {
+          "indicator": "Final Risk Score",
+          "unit": "0-1 risk",
+          "baseline": 1.0,
+          "proposed": 0.956,
+          "change": "4.4%"
+        }
+      ],
+      "recommendation": "Proceed only as a partial improvement; consider combining with ventilation or external shading measures."
+    },
+    {
+      "rank": 8,
+      "strategy_id": "internal_wall_insulation",
+      "strategy_name": "Internal wall insulation",
+      "status": "partial_pass",
+      "confidence": "medium",
+      "final_score": 0.983,
+      "visual_asset_type": "wall_layer_material",
+      "render_layer": "surface_layer",
+      "placement_rule": "Place as an interior lining on the room-facing side of selected external wall surfaces.",
+      "geometry_rule": "Thin inward offset surface layer over the existing wall; do not extend beyond the exterior facade plane.",
+      "material_rule": "light internal insulated lining / reinforced plasterboard finish.",
+      "wall_ids": [
+        "ROOM_001_WALL_00"
+      ],
+      "surface_ids": [
+        "ROOM_001_CEILING"
+      ],
+      "numerical_comparison": [
+        {
+          "indicator": "Peak Indoor Operative Temperature",
+          "unit": "C",
+          "baseline": 33.014,
+          "proposed": 32.014,
+          "change": 1.0
+        },
+        {
+          "indicator": "Heat Stress WBGT",
+          "unit": "C-WBGT",
+          "baseline": 26.936,
+          "proposed": 26.636,
+          "change": 0.3
+        },
+        {
+          "indicator": "Overheating Hours",
+          "unit": "weighted hours",
+          "baseline": 698.0,
+          "proposed": 586.32,
+          "change": "16.0%"
+        },
+        {
+          "indicator": "Nocturnal Recovery Score",
+          "unit": "0-1 risk",
+          "baseline": 0.871,
+          "proposed": 0.749,
+          "change": 0.122
+        },
+        {
+          "indicator": "Composite Room Risk Score",
+          "unit": "0-1 risk",
+          "baseline": 0.671,
+          "proposed": 0.615,
+          "change": 0.056
+        },
+        {
+          "indicator": "Final Risk Score",
+          "unit": "0-1 risk",
+          "baseline": 1.0,
+          "proposed": 0.983,
+          "change": "1.7%"
+        }
+      ],
+      "recommendation": "Proceed only as a partial improvement; consider combining with ventilation or external shading measures."
+    },
+    {
+      "rank": 9,
+      "strategy_id": "internal_blinds",
+      "strategy_name": "Internal roller blinds",
+      "status": "partial_pass",
+      "confidence": "medium",
+      "final_score": 1.0,
+      "visual_asset_type": "interior_blind_plane",
+      "render_layer": "interior_overlay",
+      "placement_rule": "Place just inside the selected window plane.",
+      "geometry_rule": "Thin semi-opaque sheet covering glazing.",
+      "material_rule": "light reflective fabric; opacity adjustable.",
+      "wall_ids": [
+        "ROOM_001_WALL_00"
+      ],
+      "surface_ids": [
+        "ROOM_001_CEILING"
+      ],
+      "numerical_comparison": [
+        {
+          "indicator": "Peak Indoor Operative Temperature",
+          "unit": "C",
+          "baseline": 33.014,
+          "proposed": 32.014,
+          "change": 1.0
+        },
+        {
+          "indicator": "Heat Stress WBGT",
+          "unit": "C-WBGT",
+          "baseline": 26.936,
+          "proposed": 26.586,
+          "change": 0.35
+        },
+        {
+          "indicator": "Overheating Hours",
+          "unit": "weighted hours",
+          "baseline": 698.0,
+          "proposed": 558.4,
+          "change": "20.0%"
+        },
+        {
+          "indicator": "Nocturnal Recovery Score",
+          "unit": "0-1 risk",
+          "baseline": 0.871,
+          "proposed": 0.81,
+          "change": 0.061
+        },
+        {
+          "indicator": "Composite Room Risk Score",
+          "unit": "0-1 risk",
+          "baseline": 0.671,
+          "proposed": 0.645,
+          "change": 0.026
+        },
+        {
+          "indicator": "Final Risk Score",
+          "unit": "0-1 risk",
+          "baseline": 1.0,
+          "proposed": 1.0,
+          "change": "0.0%"
+        }
+      ],
+      "recommendation": "Proceed only as a partial improvement; consider combining with ventilation or external shading measures."
+    }
+  ]
+}

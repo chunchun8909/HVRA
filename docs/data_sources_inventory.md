@@ -7,7 +7,7 @@ This document gives a project-level source inventory. Detailed source tables liv
 | Segment | Current source/input | Use |
 | --- | --- | --- |
 | Pano image | `data/input/images/pano_image/` | LGTNet room layout, wall count, floor/ceiling/wall texture extraction. |
-| Perspective image | `data/input/images/perspective_image/` | Final visual reference and future generated perspective comparison. |
+| Perspective image | `data/input/images/perspective_image/` | Legacy/deactivated; current visual output is the 3D room preview with retrofit components. |
 | LGTNet output | `data/output/spatial/lgtnet/` | Room polygon/layout used by scaling and viewer. |
 | SAM3 output | `data/output/spatial/sam3/` | Window segmentation on wall fragments. Furniture/door are not required for calculation. |
 
@@ -36,8 +36,10 @@ This document gives a project-level source inventory. Detailed source tables liv
 
 | Segment | Current source/input | Use |
 | --- | --- | --- |
-| Static catalogue | `data/input/strategy_catalogue.json` | Source of truth for strategy IDs, names, categories, constraints, cost/carbon ranges, and effect-profile mapping. |
-| Catalogue documentation | [Strategy Catalogue](strategy_catalogue.md) | Human-readable list of the 20 strategy entries. |
+| Static catalogue | data/input/strategy_catalogue.json | Source of truth for strategy IDs, names, categories, constraints, cost/carbon ranges, evidence profiles, visual profiles, and effect-profile mapping. |
+| Strategy evidence map | data/input/strategy_evidence_map.json | Evidence level, source IDs, confidence, and review flags for each strategy. |
+| Visual retrofit catalogue | data/input/visual_retrofit_catalogue.json | 3D asset type, target surface, placement, geometry, material, and render-layer rules. |
+| Catalogue documentation | [Strategy Catalogue](strategy_catalogue.md) | Human-readable list of the 24 strategy entries plus evidence/visual catalogue links. |
 | Combo method | [Thermal Combo Screening](thermal_combo_screening.md) | Screening formula for future combined strategy packages. |
 
 ## Generated Views

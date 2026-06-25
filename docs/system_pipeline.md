@@ -78,9 +78,17 @@ Diagnosis KG Export
 - generated JSON/HTML trace: Wall/Component -> Problem
         |
         v
-RAG Manual Check
-- local PDFs and source metadata
-- keyword/vector/hybrid retrieval
+Retrofit Feasibility Boundary
+- checks building_info.json and retrofit_constraints.json
+- blocks roof-only strategies unless the room is top-floor and roof-exposed
+- keeps renter/owner-approval roof work conditional
+- keeps older-building facade, roof, structural, and full-window works conditional until permission and building-physics review
+- treats wall insulation reinforcement as interior lining over existing wall surfaces
+        |
+        v
+Semantic GraphRAG Manual Check
+- local PDFs, source metadata, and strategy_evidence_map.json
+- keyword/vector/hybrid retrieval plus catalogue evidence confidence
 - outputs manual_check_result.json
         |
         v
@@ -101,7 +109,7 @@ Retrofit Validation Engine
 Strategy Validation Checkpoint
 - data/checkpoints/08_strategy_validation
 - LLM/user chooses, combines, revises, reruns, accepts, or stops
-- interface exposes the top three validated options as phase 3 buttons
+- interface exposes three packaged retrofit options as phase 3 buttons
         |
         v
 Selected Retrofit Validation
@@ -116,7 +124,7 @@ Decision and Checkpoint KG Export
         |
         v
 Gemini Engine
-- builds visual prompt
+- builds visual prompt using visual_retrofit_catalogue.json placement rules
 - mock or real image generation
         |
         v
@@ -215,7 +223,7 @@ data/intermediate/risk_map.json
 risk_map/dataset/infrared_city/infrared_city_context.json
 ```
 
-Infrared City support is live when `USE_INFRARED_CITY=true`. The provider uses `infrared-sdk` to fetch buildings, vegetation, ground materials, nearest weather, wind speed, sky view factor, direct sun hours, solar radiation, and UTCI for the site polygon. Results are cached unless `INFRARED_CITY_FORCE_REFRESH=true`.
+Infrared City support is live when `USE_INFRARED_CITY=true`. The provider uses `infrared-sdk` to fetch buildings, vegetation, ground materials, nearest weather, wind speed, sky view factor, direct sun hours, solar radiation, and UTCI for the site polygon. Results are cached unless `INFRARED_CITY_FORCE_REFRESH=true`. Cached sky-view factor values are normalized to `0-1` before they are passed into diagnosis and risk scoring.
 
 ### `diagnosis_engine/`
 
@@ -364,16 +372,15 @@ room_3d_view.html?viewer_mode=review
 
 Phase progression is automatic once each required checkpoint is satisfied:
 
-- Phase 1 input gathering collects address or coordinates, room basics, resident context, and the two images.
-- Phase 1.5 site-context review displays the backend-precomputed risk-map checkpoint before room verification.
+- Phase 1 input gathering collects address or coordinates, room basics, resident context, constraints, and the room/pano image.
+- Risk-map context is currently used as backend data for diagnosis; the separate visual checkpoint is deactivated.
 - Phase 2 room review saves spatial overrides, confirms wall orientation/window inclusion, runs the remaining pipeline, and moves to Phase 3.
-- Phase 3 shows the top three retrofit options, room overlays, knowledge-graph links, numerical validation, and the final report.
+- Phase 3 shows three retrofit packages, the original room view, the full 3D component preview, numerical validation, and the final report.
 
 The interface uses loading transitions between phases so the user sees the backend work instead of a frozen screen:
 
 ```text
-Phase 1 -> checking site context -> Phase 1.5
-Phase 1.5 -> building room model -> Phase 2
+Phase 1 -> building room model -> Phase 2
 Phase 2 -> running diagnosis and upgrades -> Phase 3
 ```
 
@@ -400,12 +407,13 @@ Used to inspect:
 
 ### Phase 3 Strategy Selector
 
-In the interface review phase, the top-left of the visualization panel shows three retrofit option buttons:
+In the interface review phase, the top-left of the visualization panel shows three retrofit option buttons plus an `all` button:
 
 ```text
 option 1
 option 2
 option 3
+all
 ```
 
 They are populated from:
@@ -428,6 +436,8 @@ links
 check
 report
 ```
+
+In Phase 3 review mode, the `room` view remains `data/output/spatial/room_3d_view.html`. The `components` view is a second room iframe served from `data/output/spatial/room_3d_component_view.html`; it follows `3D_test/one_wall_spatial_logic` for interior/exterior placement, opening no-go zones, wall-hosted planting, shading, glazing tint, fan, and insulation placeholders. The `all` button sends the dynamically ranked top three package ids through `strategy_ids`, while each individual option sends one `strategy_id`.
 
 ## Commands
 
@@ -484,25 +494,10 @@ Compile check:
 
 The Risk Map 3D test view is a backend visual-inspection page for Phase 1 location context. It now receives backend-prepared visual geometry: Barcelona-wide road/building contours, local 500 m road/building contours, and local 3D building extrusions. The current local geometry source is `cataluna-260528-free.shp.zip`; footprints are real OSM geometry, while heights are estimated unless Infrared City mesh geometry becomes available.
 
-Infrared City remains integrated for analysis context through the cached `infrared_city_context.json` summary. The current cache contains min/mean/max, bounds, and grid shape for wind speed, sky view factor, direct sun hours, solar radiation, and UTCI. A true pixel-accurate Infrared heat map will require storing the raw `merged_grid` arrays from the SDK output.
+Infrared City remains integrated for analysis context through `infrared_city_context.json`. The provider now preserves compact downsampled cells from SDK `result.merged_grid` when a live run succeeds, while also storing min/mean/max, bounds, and grid shape for wind speed, sky view factor, direct sun hours, solar radiation, and UTCI. The viewer avoids fake heat-map pixels from summaries. The current local cache remains summary-only because the latest live refresh returned `SUBSCRIPTION_INACTIVE`.
 
-## Risk Map Checkpoint Stage
+## Risk Map Visualization Status
 
-The Risk Map visual is treated as Phase 1.5: a precomputed checkpoint between Phase 1 case setup and Phase 2 room/spatial verification. The backend prepares a simplified visual payload first, then the interface only displays the result: simple local map geometry, separate heat-analysis layers, and optional aligned 3D buildings after the site is chosen. This avoids live browser-side analysis and keeps map, boundary, and building geometry in one consistent coordinate frame.
+The Risk Map remains a backend context engine for diagnosis. It prepares site, EPW, urban geometry, vegetation, cooling-access, and optional Infrared City values, then passes those values into diagnosis. The separate Phase 1.5 visual checkpoint has been deactivated because the current Infrared account returns `SUBSCRIPTION_INACTIVE` for live raster analysis and the visual layer is not adding enough value without real cells.
 
-The current interface embeds this checkpoint inside the same split layout used by later phases: LLM chat on the left, and an integrated site panel plus 3D/canvas view on the right. The standalone risk-map page remains a development view, but Phase 1.5 is now part of the normal phase flow.
-
-Current display contract:
-
-```text
-risk map backend/cache -> risk_map_context.json -> risk map checkpoint viewer
-```
-
-The checkpoint uses local OSM footprints for visual alignment and Infrared City for analysis values. True pixel-accurate Infrared raster layers still require storing raw merged-grid cells from the Infrared SDK output; the current cache provides summary statistics, bounds, and grid shape.
-
-
-
-
-
-
-
+The standalone risk-map 3D test view remains available for development only. It should not be treated as part of the user-facing phase flow until a reliable raster source is available.

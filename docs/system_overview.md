@@ -8,7 +8,7 @@ HVRA is a backend-first Heat Vulnerability Retrofit Assistant. It helps inspect 
 | --- | --- | --- | --- |
 | Interface API | `app.py` | FastAPI backend for the React interface and checkpoint save/continue routes. | API responses, saved overrides |
 | LLM Agent | `llm_agent/` | Ollama-backed or mock JSON generation for case interpretation, strategy ranking, and consistency review. | `interpreted_case.json`, `strategy_options.json`, `llm_review.json` |
-| Spatial Engine | `spatial_engine/` | Pano image processing, LGTNet layout, scaling, SAM3 wall-fragment segmentation, wall/floor/ceiling textures, 3D room view. | `spatial_index.json`, `room_3d_view.html` |
+| Spatial Engine | `spatial_engine/` | Pano image processing, LGTNet layout, scaling, SAM3 wall-fragment segmentation, wall/floor/ceiling textures, 3D room view and second strategy-component room view. | `spatial_index.json`, `room_3d_view.html`, `room_3d_component_view.html` |
 | Risk Map | `risk_map/` | EPW and urban-context extraction, optional Infrared City context, site/environmental context for diagnosis. | `risk_map.json` |
 | Diagnosis Engine | `diagnosis_engine/` | Deterministic heat-risk calculations. No hidden LLM scoring. | `diagnosis_result.json` |
 | Problem Map | `diagnosis_engine/problem_map_builder.py` | Assigns calculated problems to room/surface targets. | `problem_map.json` |
@@ -16,7 +16,7 @@ HVRA is a backend-first Heat Vulnerability Retrofit Assistant. It helps inspect 
 | Validation Engine | `validation_engine/` | Baseline/proposed indicator comparison, benchmark pass/fail, confidence gate, combo screening method. | `retrofit_validation_options.json`, `retrofit_validation.json` |
 | Checkpoint Engine | `checkpoint_engine/` | Creates stage checkpoint packages and routes decisions. | `data/checkpoints/*` |
 | Knowledge Graph | `knowledge_graph/` | local KG JSON/HTML generation; optional Neo4j graph writing. | `kg_view_data.json`, `kg_view.html` |
-| Gemini Engine | `gemini_engine/` | Visual prompt/result layer for future generated design images. | `gemini_prompt.json`, `gemini_result.json` |
+| Gemini Engine | `gemini_engine/` | Visual prompt/result layer using controlled retrofit placement rules for future generated design images. | `gemini_prompt.json`, `gemini_result.json` |
 | Report Engine | `report_engine/` | Final JSON, Markdown, and HTML report compilation. | `final_report.json`, `final_report.md`, `final_report_view.html` |
 
 ## ML / AI Models and External Systems
@@ -35,11 +35,9 @@ HVRA is a backend-first Heat Vulnerability Retrofit Assistant. It helps inspect 
 
 ```text
 Phase 1: user input through chat/instructions
-Phase 1.5: site context / risk-map checkpoint
+Risk map context is backend-only for now; no separate visual phase.
 Phase 2: spatial V&V, wall orientation, window inclusion check
-Phase 3: top three retrofit options, room/KG/check/report review
+Phase 3: three retrofit packages, room/component/check/report review
 ```
 
 The system is designed so each checkpoint can update three synchronized views: canonical JSON, generated KG view, and HTML/3D review views. The interface now uses a compact 60 percent production scale, while `phase_check.html` keeps 50/60/75/100 scale buttons only for QA.
-
-

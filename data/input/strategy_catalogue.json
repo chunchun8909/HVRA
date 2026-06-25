@@ -1,10 +1,15 @@
 {
-  "catalogue_id": "HVRA_STRATEGY_LIBRARY_V1",
+  "catalogue_id": "HVRA_STRATEGY_LIBRARY_V2",
   "source_reference": "HVRA_build_reference_4.md",
   "notes": [
     "Static strategy catalogue used before LLM ranking.",
     "LLM should rank and explain only strategies supplied by this catalogue/evidence stage.",
-    "Delta temperature values are screening ranges, not simulation outputs."
+    "Delta temperature values are screening ranges, not simulation outputs.",
+    "Each strategy now carries evidence_profile_id and visual_profile_id for RAG and 3D generation linkage.",
+    "Biophilic/interior planting measures are support or visual-comfort measures unless paired with stronger shading/envelope/ventilation actions.",
+    "Roof and ceiling-roof strategies are conditional: apply only when the unit is top-floor, roof-exposed, and owner/building approval is feasible.",
+    "Older-building retrofit boundary: external facade, roof, structural, and full-window changes require permission and building-physics review before being treated as implementable.",
+    "Wall insulation reinforcement is treated as an interior-side lining over the existing wall surface, not an outward extension beyond the facade."
   ],
   "strategies": [
     {
@@ -49,7 +54,12 @@
       "restriction": "May be restricted when facade modification, heritage protection, or external permissions are not allowed.",
       "notes": "Intercepts radiation before it enters glazing; normally more effective than internal shading.",
       "literature_source": "IDAE (2011); Henze et al. (2004), Energy and Buildings",
-      "effect_profile_id": "external_shading"
+      "effect_profile_id": "external_shading",
+      "user_facing_name": "External louvers / brise-soleil",
+      "evidence_profile_id": "external_shading_louvers",
+      "visual_profile_id": "external_shading_louvers",
+      "evidence_confidence": "medium",
+      "effect_basis": "screening_assumption_supported_by_catalogue_evidence"
     },
     {
       "strategy_id": "internal_blinds",
@@ -96,7 +106,12 @@
       "restriction": "Lower cooling effectiveness than external shading because radiation has already entered the room.",
       "notes": "Rank last among shading options when external options are feasible.",
       "literature_source": "ASHRAE Fundamentals Handbook, internal shading SHGC reduction tables",
-      "effect_profile_id": "internal_blinds"
+      "effect_profile_id": "internal_blinds",
+      "user_facing_name": "Internal roller blinds",
+      "evidence_profile_id": "internal_blinds",
+      "visual_profile_id": "internal_blinds",
+      "evidence_confidence": "medium",
+      "effect_basis": "screening_assumption_supported_by_catalogue_evidence"
     },
     {
       "strategy_id": "solar_control_glazing",
@@ -138,7 +153,12 @@
       "restriction": "May be unsuitable where full window replacement is excluded or tenancy restrictions apply.",
       "notes": "Best when existing glazing has high solar heat gain coefficient.",
       "literature_source": "CTE DB-HE 2022; Perez-Lombard et al. (2008), Energy and Buildings",
-      "effect_profile_id": "solar_control_glazing"
+      "effect_profile_id": "solar_control_glazing",
+      "user_facing_name": "Solar control glazing replacement",
+      "evidence_profile_id": "solar_control_glazing",
+      "visual_profile_id": "solar_control_glazing",
+      "evidence_confidence": "medium",
+      "effect_basis": "screening_assumption_supported_by_catalogue_evidence"
     },
     {
       "strategy_id": "green_pergola",
@@ -180,7 +200,12 @@
       "restriction": "Requires outdoor access, maintenance, and permission for facade or balcony intervention.",
       "notes": "Adds shading plus local evaporative cooling benefit.",
       "literature_source": "Perez et al. (2011), Energy and Buildings",
-      "effect_profile_id": "green_pergola"
+      "effect_profile_id": "green_pergola",
+      "user_facing_name": "Green pergola / climbing vegetation",
+      "evidence_profile_id": "green_pergola",
+      "visual_profile_id": "green_pergola",
+      "evidence_confidence": "low_medium",
+      "effect_basis": "screening_assumption_supported_by_catalogue_evidence"
     },
     {
       "strategy_id": "window_enlargement",
@@ -228,7 +253,12 @@
       "restriction": "Requires structural check and is unsuitable when major structural change is excluded.",
       "notes": "Only useful when it creates or improves a meaningful ventilation path.",
       "literature_source": "EN 15242; Givoni (1992), Energy and Buildings",
-      "effect_profile_id": "window_enlargement"
+      "effect_profile_id": "window_enlargement",
+      "user_facing_name": "Window enlargement",
+      "evidence_profile_id": "window_enlargement",
+      "visual_profile_id": "window_enlargement",
+      "evidence_confidence": "medium_low",
+      "effect_basis": "screening_assumption_supported_by_catalogue_evidence"
     },
     {
       "strategy_id": "interior_opening_improvement",
@@ -265,7 +295,12 @@
       "restriction": "Only applies when a secondary internal airflow path can be made safely.",
       "notes": "Creates partial stack-effect ventilation path with low disruption.",
       "literature_source": "Allard (1998), Natural Ventilation in Buildings",
-      "effect_profile_id": "interior_opening_improvement"
+      "effect_profile_id": "interior_opening_improvement",
+      "user_facing_name": "Interior opening / transom addition",
+      "evidence_profile_id": "interior_opening_improvement",
+      "visual_profile_id": "interior_opening_improvement",
+      "evidence_confidence": "medium_low",
+      "effect_basis": "screening_assumption_supported_by_catalogue_evidence"
     },
     {
       "strategy_id": "stack_effect_roof_vent",
@@ -285,11 +320,15 @@
       "carbon_kgco2e_m2_max": 8,
       "applicability_conditions": [
         "roof_exposed = true",
-        "top floor or upper floors"
+        "top floor or upper floors",
+        "unit_is_top_floor = true",
+        "owner_or_building_approval_feasible = true"
       ],
       "constraint_tags": [
-        "roof_work",
-        "permission_possible"
+        "conditional_roof_access",
+        "owner_approval_required",
+        "permission_possible",
+        "roof_work"
       ],
       "keywords": [
         "ventilation",
@@ -298,10 +337,15 @@
         "top floor",
         "chimney"
       ],
-      "restriction": "Only applies to roof-exposed or upper-floor rooms with feasible vertical exhaust path.",
+      "restriction": "Conditional roof/top-floor measure: not all units can access or modify the roof; requires top-floor exposure and owner/building approval.",
       "notes": "Can improve buoyancy-driven ventilation during warm periods.",
       "literature_source": "Santamouris and Asimakopoulos (1996), Passive Cooling of Buildings",
-      "effect_profile_id": "stack_effect_roof_vent"
+      "effect_profile_id": "stack_effect_roof_vent",
+      "user_facing_name": "Stack-effect roof vent",
+      "evidence_profile_id": "stack_effect_roof_vent",
+      "visual_profile_id": "stack_effect_roof_vent",
+      "evidence_confidence": "medium_low",
+      "effect_basis": "screening_assumption_supported_by_catalogue_evidence"
     },
     {
       "strategy_id": "night_purge_ventilation",
@@ -348,7 +392,12 @@
       "restriction": "Exclude when outdoor heatwave night air remains too warm, or security/noise constraints prevent safe opening.",
       "notes": "Targets nocturnal recovery more than daytime peak temperature.",
       "literature_source": "Blondeau et al. (1997), Solar Energy",
-      "effect_profile_id": "night_purge_ventilation"
+      "effect_profile_id": "night_purge_ventilation",
+      "user_facing_name": "Night purge ventilation behavioural protocol",
+      "evidence_profile_id": "night_purge_ventilation",
+      "visual_profile_id": "night_purge_ventilation",
+      "evidence_confidence": "medium_low",
+      "effect_basis": "screening_assumption_supported_by_catalogue_evidence"
     },
     {
       "strategy_id": "external_wall_insulation_etics",
@@ -393,7 +442,12 @@
       "restriction": "Usually restricted by heritage, facade permission, or community approval.",
       "notes": "Improves conductive heat transfer but may not solve solar gain alone.",
       "literature_source": "IDAE (2016); CTE DB-HE 2022",
-      "effect_profile_id": "external_wall_insulation"
+      "effect_profile_id": "external_wall_insulation",
+      "user_facing_name": "External wall insulation - ETICS system",
+      "evidence_profile_id": "external_wall_insulation_etics",
+      "visual_profile_id": "external_wall_insulation_etics",
+      "evidence_confidence": "medium",
+      "effect_basis": "screening_assumption_supported_by_catalogue_evidence"
     },
     {
       "strategy_id": "roof_insulation",
@@ -413,11 +467,15 @@
       "carbon_kgco2e_m2_max": 10,
       "applicability_conditions": [
         "roof_exposed = true",
-        "roof_U_value > 1.5"
+        "roof_U_value > 1.5",
+        "unit_is_top_floor = true",
+        "owner_or_building_approval_feasible = true"
       ],
       "constraint_tags": [
-        "roof_work",
-        "medium_cost"
+        "conditional_roof_access",
+        "medium_cost",
+        "owner_approval_required",
+        "roof_work"
       ],
       "keywords": [
         "roof",
@@ -427,10 +485,15 @@
         "U-value",
         "envelope"
       ],
-      "restriction": "Only relevant for roof-exposed/top-floor rooms.",
+      "restriction": "Conditional roof/top-floor measure: not all units can access or modify the roof; requires top-floor exposure and owner/building approval.",
       "notes": "Can be combined with cool roof coating.",
       "literature_source": "IDAE (2016); Synnefa et al. (2007), Energy and Buildings",
-      "effect_profile_id": "roof_insulation"
+      "effect_profile_id": "roof_insulation",
+      "user_facing_name": "Roof insulation membrane",
+      "evidence_profile_id": "roof_insulation",
+      "visual_profile_id": "roof_insulation",
+      "evidence_confidence": "medium",
+      "effect_basis": "screening_assumption_supported_by_catalogue_evidence"
     },
     {
       "strategy_id": "cool_roof_coating",
@@ -450,11 +513,15 @@
       "carbon_kgco2e_m2_max": 4,
       "applicability_conditions": [
         "roof_exposed = true",
-        "flat roof confirmed"
+        "flat roof confirmed",
+        "unit_is_top_floor = true",
+        "owner_or_building_approval_feasible = true"
       ],
       "constraint_tags": [
-        "roof_work",
-        "low_cost"
+        "conditional_roof_access",
+        "low_cost",
+        "owner_approval_required",
+        "roof_work"
       ],
       "keywords": [
         "cool roof",
@@ -464,10 +531,15 @@
         "roof",
         "solar"
       ],
-      "restriction": "Requires roof access and suitable roof surface.",
+      "restriction": "Conditional roof/top-floor measure: not all units can access or modify the roof; requires top-floor exposure and owner/building approval.",
       "notes": "High cost-effectiveness for top-floor rooms.",
       "literature_source": "Synnefa et al. (2007); Santamouris et al. (2011), Solar Energy",
-      "effect_profile_id": "cool_roof_coating"
+      "effect_profile_id": "cool_roof_coating",
+      "user_facing_name": "Cool roof reflective coating",
+      "evidence_profile_id": "cool_roof_coating",
+      "visual_profile_id": "cool_roof_coating",
+      "evidence_confidence": "medium",
+      "effect_basis": "screening_assumption_supported_by_catalogue_evidence"
     },
     {
       "strategy_id": "phase_change_materials",
@@ -503,7 +575,12 @@
       "restriction": "Shifts peak timing rather than fully removing heat; needs compatible night cooling strategy.",
       "notes": "LLM should clearly state peak-shift behavior.",
       "literature_source": "Kuznik et al. (2011), Renewable and Sustainable Energy Reviews",
-      "effect_profile_id": "phase_change_materials"
+      "effect_profile_id": "phase_change_materials",
+      "user_facing_name": "Phase-change materials in wall assembly",
+      "evidence_profile_id": "phase_change_materials",
+      "visual_profile_id": "phase_change_materials",
+      "evidence_confidence": "medium_low",
+      "effect_basis": "screening_assumption_supported_by_catalogue_evidence"
     },
     {
       "strategy_id": "courtyard_greening",
@@ -537,7 +614,12 @@
       "restriction": "Building-level intervention; needs shared ownership or municipal coordination.",
       "notes": "Ambient cooling benefit for adjacent rooms.",
       "literature_source": "Santamouris et al. (2001), Solar Energy",
-      "effect_profile_id": "courtyard_greening"
+      "effect_profile_id": "courtyard_greening",
+      "user_facing_name": "Courtyard greening",
+      "evidence_profile_id": "courtyard_greening",
+      "visual_profile_id": "courtyard_greening",
+      "evidence_confidence": "low_medium",
+      "effect_basis": "screening_assumption_supported_by_catalogue_evidence"
     },
     {
       "strategy_id": "shared_cooling_refuge",
@@ -572,7 +654,12 @@
       "restriction": "Not a direct room retrofit; should be shown as resilience support, not room performance improvement.",
       "notes": "Improves health resilience rather than room thermal benchmark directly.",
       "literature_source": "WHO (2011), Heat and Health",
-      "effect_profile_id": "shared_cooling_refuge"
+      "effect_profile_id": "shared_cooling_refuge",
+      "user_facing_name": "Shared ground-floor cooling refuge",
+      "evidence_profile_id": "shared_cooling_refuge",
+      "visual_profile_id": "shared_cooling_refuge",
+      "evidence_confidence": "contextual",
+      "effect_basis": "screening_assumption_supported_by_catalogue_evidence"
     },
     {
       "strategy_id": "street_tree_canopy",
@@ -612,7 +699,12 @@
       "restriction": "Municipal or streetscape intervention; not controlled by individual room occupant.",
       "notes": "May reduce ambient exposure at facade scale.",
       "literature_source": "Bowler et al. (2010), Landscape and Urban Planning",
-      "effect_profile_id": "street_tree_canopy"
+      "effect_profile_id": "street_tree_canopy",
+      "user_facing_name": "Street tree canopy on SW elevation",
+      "evidence_profile_id": "street_tree_canopy",
+      "visual_profile_id": "street_tree_canopy",
+      "evidence_confidence": "low_medium",
+      "effect_basis": "screening_assumption_supported_by_catalogue_evidence"
     },
     {
       "strategy_id": "internal_wall_insulation",
@@ -654,10 +746,15 @@
         "envelope",
         "U-value"
       ],
-      "restriction": "Reduces room area and requires careful cold bridge/detailing review.",
-      "notes": "More feasible than ETICS where external facade changes are restricted.",
+      "restriction": "Interior-side retrofit over the existing wall; requires moisture, condensation, thermal-bridge, and usable-area review before specification.",
+      "notes": "Interior-side thermal lining applied over the existing wall surface; show as an inward layer, not as an outward facade extension.",
       "literature_source": "IDAE (2016); CTE DB-HE 2022",
-      "effect_profile_id": "internal_wall_insulation"
+      "effect_profile_id": "internal_wall_insulation",
+      "user_facing_name": "Internal wall insulation",
+      "evidence_profile_id": "internal_wall_insulation",
+      "visual_profile_id": "internal_wall_insulation",
+      "evidence_confidence": "medium",
+      "effect_basis": "screening_assumption_supported_by_catalogue_evidence"
     },
     {
       "strategy_id": "wall_insulation_reinforcement_layer",
@@ -704,10 +801,15 @@
         "U-value",
         "thermal bridge"
       ],
-      "restriction": "Requires moisture, condensation, and thermal-bridge detailing review before specification.",
-      "notes": "Interior-side reinforced thermal lining for walls where full ETICS is restricted or too disruptive; stronger than light lining but less invasive than external facade retrofit.",
+      "restriction": "Interior-side retrofit over the existing wall; requires moisture, condensation, thermal-bridge, and usable-area review before specification.",
+      "notes": "Interior-side thermal lining applied over the existing wall surface; show as an inward layer, not as an outward facade extension.",
       "literature_source": "IDAE (2016); CTE DB-HE 2022; EN ISO 13788 moisture/condensation risk logic",
-      "effect_profile_id": "wall_insulation_reinforcement_layer"
+      "effect_profile_id": "wall_insulation_reinforcement_layer",
+      "user_facing_name": "Wall insulation reinforcement layer",
+      "evidence_profile_id": "wall_insulation_reinforcement_layer",
+      "visual_profile_id": "wall_insulation_reinforcement_layer",
+      "evidence_confidence": "medium",
+      "effect_basis": "screening_assumption_supported_by_catalogue_evidence"
     },
     {
       "strategy_id": "cool_facade_paint",
@@ -750,7 +852,12 @@
       "restriction": "Heritage zones, community approval, or colour rules may restrict this option.",
       "notes": "Potentially high cost-effectiveness for dark solar-exposed walls.",
       "literature_source": "Synnefa et al. (2007); Santamouris et al. (2011), Solar Energy",
-      "effect_profile_id": "cool_facade_paint"
+      "effect_profile_id": "cool_facade_paint",
+      "user_facing_name": "Cool / reflective facade paint",
+      "evidence_profile_id": "cool_facade_paint",
+      "visual_profile_id": "cool_facade_paint",
+      "evidence_confidence": "medium",
+      "effect_basis": "screening_assumption_supported_by_catalogue_evidence"
     },
     {
       "strategy_id": "window_external_shutters",
@@ -792,7 +899,12 @@
       "restriction": "Most suitable when a shutter box already exists or facade rules allow shutters.",
       "notes": "Common in Barcelona and may be more accepted than new louvers.",
       "literature_source": "IDAE (2011)",
-      "effect_profile_id": "external_shutters"
+      "effect_profile_id": "external_shutters",
+      "user_facing_name": "External shutters",
+      "evidence_profile_id": "window_external_shutters",
+      "visual_profile_id": "window_external_shutters",
+      "evidence_confidence": "medium",
+      "effect_basis": "screening_assumption_supported_by_catalogue_evidence"
     },
     {
       "strategy_id": "cross_ventilation_behaviour",
@@ -838,7 +950,215 @@
       "restriction": "Only eligible when the room/apartment already has a usable cross-ventilation path.",
       "notes": "Protocol intervention: which windows to open, when, and in what sequence.",
       "literature_source": "Givoni (1992); Allard (1998)",
-      "effect_profile_id": "cross_ventilation_behaviour"
+      "effect_profile_id": "cross_ventilation_behaviour",
+      "user_facing_name": "Cross-ventilation behavioural protocol",
+      "evidence_profile_id": "cross_ventilation_behaviour",
+      "visual_profile_id": "cross_ventilation_behaviour",
+      "evidence_confidence": "medium_low",
+      "effect_basis": "screening_assumption_supported_by_catalogue_evidence"
+    },
+    {
+      "strategy_id": "ceiling_fan_air_movement",
+      "strategy_name": "Ceiling fan air movement",
+      "user_facing_name": "Ceiling fan",
+      "category": "air_movement",
+      "scope": "room",
+      "target_components": [
+        "ceiling",
+        "occupied_zone"
+      ],
+      "applicable_facades": [],
+      "delta_t_min_c": 0.0,
+      "delta_t_max_c": 0.8,
+      "cost_eur_m2_min": 8,
+      "cost_eur_m2_max": 25,
+      "carbon_kgco2e_m2_min": 1,
+      "carbon_kgco2e_m2_max": 4,
+      "applicability_conditions": [
+        "heat_stress_or_operational_comfort_problem = true",
+        "ceiling height and electrical point feasible",
+        "does not replace ventilation when indoor air is hotter than outdoor night air"
+      ],
+      "constraint_tags": [
+        "low_disruption",
+        "medium_cost",
+        "reversible_possible",
+        "electrical_work"
+      ],
+      "keywords": [
+        "fan",
+        "air movement",
+        "elevated air speed",
+        "thermal comfort",
+        "ceiling"
+      ],
+      "restriction": "Improves perceived comfort through air speed but does not remove heat or reduce indoor air temperature by itself.",
+      "notes": "Useful as a comfort-support measure, especially for vulnerable users, but should not be counted as an envelope or solar-gain fix.",
+      "literature_source": "ASHRAE 55-2023 elevated air speed logic; LBNL thermal comfort guidance",
+      "effect_profile_id": "ceiling_fan_air_movement",
+      "evidence_profile_id": "ceiling_fan_air_movement",
+      "visual_profile_id": "ceiling_fan_air_movement",
+      "effect_basis": "standard_supported_comfort_adjustment",
+      "evidence_confidence": "medium"
+    },
+    {
+      "strategy_id": "secure_night_vent_limiter",
+      "strategy_name": "Secure night-vent opening limiter",
+      "user_facing_name": "Secure night ventilation",
+      "category": "ventilation",
+      "scope": "room",
+      "target_components": [
+        "window"
+      ],
+      "applicable_facades": [
+        "N",
+        "NE",
+        "E",
+        "SE",
+        "S",
+        "SW",
+        "W",
+        "NW"
+      ],
+      "delta_t_min_c": 0.5,
+      "delta_t_max_c": 1.5,
+      "cost_eur_m2_min": 20,
+      "cost_eur_m2_max": 80,
+      "carbon_kgco2e_m2_min": 1,
+      "carbon_kgco2e_m2_max": 3,
+      "applicability_conditions": [
+        "nocturnal_recovery_fail = true",
+        "night_purge_ventilation useful but security/noise constraint present",
+        "existing operable window confirmed"
+      ],
+      "constraint_tags": [
+        "low_disruption",
+        "renter_possible",
+        "security_support",
+        "low_cost"
+      ],
+      "keywords": [
+        "night ventilation",
+        "secure opening",
+        "window restrictor",
+        "purge",
+        "overheating"
+      ],
+      "restriction": "Requires an operable window and does not help when outdoor night temperatures remain too high.",
+      "notes": "Converts night-purge behaviour into a safer operational retrofit by allowing partial secure opening.",
+      "literature_source": "CIBSE TM59 overheating guidance; EN 16798 ventilation logic; ASHRAE 62.1 ventilation principles",
+      "effect_profile_id": "secure_night_vent_limiter",
+      "evidence_profile_id": "secure_night_vent_limiter",
+      "visual_profile_id": "secure_night_vent_limiter",
+      "effect_basis": "standard_supported_operational_retrofit",
+      "evidence_confidence": "medium"
+    },
+    {
+      "strategy_id": "balcony_planter_shading",
+      "strategy_name": "Balcony planter shading",
+      "user_facing_name": "Balcony planting shade",
+      "category": "biophilic_shading",
+      "scope": "room",
+      "target_components": [
+        "balcony",
+        "window",
+        "external_wall"
+      ],
+      "applicable_facades": [
+        "S",
+        "SW",
+        "SE",
+        "W"
+      ],
+      "delta_t_min_c": 0.3,
+      "delta_t_max_c": 1.0,
+      "cost_eur_m2_min": 30,
+      "cost_eur_m2_max": 120,
+      "carbon_kgco2e_m2_min": -1,
+      "carbon_kgco2e_m2_max": 2,
+      "applicability_conditions": [
+        "balcony or external sill/rail exists",
+        "solar_gain_score > 0.5",
+        "maintenance and irrigation acceptable"
+      ],
+      "constraint_tags": [
+        "biophilic",
+        "maintenance_required",
+        "low_to_medium_cost",
+        "reversible_possible"
+      ],
+      "keywords": [
+        "biophilic",
+        "planter",
+        "vegetation",
+        "balcony",
+        "shading",
+        "green"
+      ],
+      "restriction": "Requires outdoor edge/balcony space and should not block safe window operation or daylight excessively.",
+      "notes": "A visual and micro-shading measure; use as a complementary strategy rather than the only thermal fix.",
+      "literature_source": "Perez et al. green facade review; Smart Cities envelope retrofit guidance; urban greening literature",
+      "effect_profile_id": "balcony_planter_shading",
+      "evidence_profile_id": "balcony_planter_shading",
+      "visual_profile_id": "balcony_planter_shading",
+      "effect_basis": "research_supported_biophilic_screening",
+      "evidence_confidence": "low_medium"
+    },
+    {
+      "strategy_id": "interior_biophilic_cooling_zone",
+      "strategy_name": "Interior biophilic cooling zone",
+      "user_facing_name": "Plant cooling corner",
+      "category": "biophilic_resilience",
+      "scope": "room",
+      "target_components": [
+        "occupied_zone",
+        "window",
+        "interior_corner"
+      ],
+      "applicable_facades": [
+        "N",
+        "NE",
+        "E",
+        "SE",
+        "S",
+        "SW",
+        "W",
+        "NW"
+      ],
+      "delta_t_min_c": 0.0,
+      "delta_t_max_c": 0.3,
+      "cost_eur_m2_min": 10,
+      "cost_eur_m2_max": 60,
+      "carbon_kgco2e_m2_min": -1,
+      "carbon_kgco2e_m2_max": 1,
+      "applicability_conditions": [
+        "user requests biophilic or low-disruption measure",
+        "daylight and maintenance feasible",
+        "not used as primary benchmark-passing thermal measure"
+      ],
+      "constraint_tags": [
+        "biophilic",
+        "low_cost",
+        "reversible",
+        "renter_friendly",
+        "support_measure"
+      ],
+      "keywords": [
+        "biophilic",
+        "plants",
+        "comfort",
+        "cooling corner",
+        "wellbeing",
+        "low cost"
+      ],
+      "restriction": "Should be presented as comfort/resilience support, not as a guaranteed room-temperature reduction.",
+      "notes": "Useful for user acceptability and visual design; thermal effect is low-confidence and should not drive benchmark pass/fail.",
+      "literature_source": "Urban green infrastructure and heat-health adaptation literature; not a direct room thermal compliance source",
+      "effect_profile_id": "interior_biophilic_cooling_zone",
+      "evidence_profile_id": "interior_biophilic_cooling_zone",
+      "visual_profile_id": "interior_biophilic_cooling_zone",
+      "effect_basis": "supportive_low_confidence_resilience_measure",
+      "evidence_confidence": "low"
     }
   ]
 }

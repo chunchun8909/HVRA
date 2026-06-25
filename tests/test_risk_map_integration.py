@@ -120,6 +120,15 @@ def test_risk_map():
         if settings.use_infrared_city and not infrared_context.get("available"):
             print(f"  ERROR Infrared City expected but unavailable: {infrared_context.get('reason')}")
             return False
+        if infrared_context.get("available"):
+            sky_view = risk_map.get("urban_context", {}).get("sky_view_factor")
+            if sky_view is None or not (0.0 <= float(sky_view) <= 1.0):
+                print(f"  ERROR Infrared sky-view factor must be normalized to 0-1, got: {sky_view}")
+                return False
+            if risk_map.get("infrared_city_heat_exposure") is None:
+                print("  ERROR Infrared heat exposure score was not computed.")
+                return False
+            print(f"  OK Infrared sky-view factor normalized: {sky_view}")
     except Exception as e:
         print(f"  âœ— Error building risk map: {e}")
         return False
@@ -205,6 +214,7 @@ def test_risk_map():
 if __name__ == "__main__":
     success = test_risk_map()
     sys.exit(0 if success else 1)
+
 
 
 

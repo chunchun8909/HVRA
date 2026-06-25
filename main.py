@@ -26,6 +26,12 @@ from utils.file_io import read_json, write_json, write_text
 from utils.logger import step
 from validation_engine import validate_retrofit, validate_retrofit_options
 from validation_engine.html_exporter import export_validation_html
+from validation_engine.strategy_scenario_generator import generate_retrofit_generation_scenarios
+from scripts.build_phase3_strategy_packages import build_packages
+
+
+def _load_optional(path) -> dict:
+    return read_json(path) if path.exists() else {}
 
 
 def _save_intermediate(name: str, payload: dict) -> dict:
@@ -134,12 +140,44 @@ def main() -> None:
         "retrofit_validation_options.json",
         validate_retrofit_options(diagnosis_result, problem_map, strategy_options, spatial_index),
     )
-    write_text(OUTPUT_DIR / "validation_view.html", export_validation_html(retrofit_validation_options))
-    strategy_validation_checkpoint = create_strategy_validation_checkpoint(retrofit_validation_options)
+    step("Generating Phase 3 retrofit packages")
+    retrofit_generation_scenarios = _save_intermediate(
+        "retrofit_generation_scenarios.json",
+        generate_retrofit_generation_scenarios(diagnosis_result, strategy_options, limit=9),
+    )
+    phase3_strategy_packages = _save_intermediate("phase3_strategy_packages.json", build_packages())
+    validation_view_payload = dict(phase3_strategy_packages)
+    validation_view_payload["baseline"] = retrofit_validation_options.get("baseline", {})
+    write_text(OUTPUT_DIR / "validation_view.html", export_validation_html(validation_view_payload))
+    package_options = phase3_strategy_packages.get("packages", [])
+    strategy_validation_stage_result = {
+        **retrofit_validation_options,
+        "phase3_strategy_packages": phase3_strategy_packages,
+        "packages": package_options,
+        "recommended_package_id": package_options[0].get("package_id") if package_options else None,
+        "recommended_option_id": package_options[0].get("package_id") if package_options else retrofit_validation_options.get("recommended_option_id"),
+    }
+    strategy_validation_checkpoint = create_strategy_validation_checkpoint(strategy_validation_stage_result)
     validated_options = retrofit_validation_options.get("validated_options", [])
     if not validated_options:
         raise RuntimeError("No retrofit options were validated.")
-    recommended_strategy = validated_options[0]["strategy"]
+    recommended_strategy = dict(validated_options[0]["strategy"])
+    target_wall_id = next(
+        (
+            target.get("wall_id")
+            for problem in problem_map.get("problems", [])
+            for target in problem.get("spatial_targets", [])
+            if target.get("wall_id")
+        ),
+        None,
+    )
+    if target_wall_id:
+        target_problem = (problem_map.get("problems") or [{}])[0].get("id", "current diagnosis")
+        target_wall = next((wall for wall in spatial_index.get("walls", []) if wall.get("id") == target_wall_id), {})
+        orientation = target_wall.get("orientation")
+        recommended_strategy["target_wall_id"] = target_wall_id
+        recommended_strategy["target_orientation"] = orientation
+        recommended_strategy["rationale"] = f"Responds to {target_problem} on wall {target_wall_id}" + (f" ({orientation})" if orientation else "") + "."
 
     step("Saving automatic test user selection")
     user_selection = _save_intermediate(
@@ -190,6 +228,8 @@ def main() -> None:
         "manual_check": manual_check,
         "strategy_options": strategy_options,
         "retrofit_validation_options": retrofit_validation_options,
+        "retrofit_generation_scenarios": retrofit_generation_scenarios,
+        "phase3_strategy_packages": phase3_strategy_packages,
         "strategy_validation_checkpoint": strategy_validation_checkpoint,
         "user_selection": user_selection,
         "retrofit_validation": retrofit_validation,
@@ -215,4 +255,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
 

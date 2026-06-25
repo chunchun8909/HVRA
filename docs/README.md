@@ -13,7 +13,7 @@ This folder contains the human-facing documentation for the HVRA backend and int
 | [Data Sources Inventory](data_sources_inventory.md) | Dataset inventory organized by implemented segment: spatial, risk map, RAG, strategy catalogue, and generated outputs. |
 | [RAG Sources Inventory](rag_sources_inventory.md) | Raw PDF inventory, metadata coverage, extraction status, and RAG rebuild notes. |
 | [Risk Map Data Inventory](risk_map_data_inventory.md) | GIS, EPW, Infrared City, and contextual heat-risk datasets. |
-| [Strategy Catalogue](strategy_catalogue.md) | Static retrofit strategy catalogue and how it enters ranking/validation. |
+| [Strategy Catalogue](strategy_catalogue.md) | Static retrofit strategy catalogue plus evidence and 3D visual-placement mapping. |
 | [Diagnosis Weighting](diagnosis_weighting.md) | Literature-informed heat-risk composite weights and rationale. |
 | [Thermal Combo Screening](thermal_combo_screening.md) | Screening method for combined retrofit strategy effects. |
 | [Interface Spec](interface_spec.md) | Current interface phases, formatting, and checkpoint review direction. |
@@ -31,4 +31,8 @@ canonical JSON -> report output
 JSON files under `data/input/`, `data/intermediate/`, `data/checkpoints/`, and `data/output/` are the source of truth for current test runs. KG HTML and other HTML outputs are generated views for review and traceability.
 
 
+
+
+
+- [Security and Privacy](security_privacy.md) - local secrets, ignored data, and pre-push checks.
 

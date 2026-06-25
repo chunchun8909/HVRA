@@ -12,6 +12,9 @@ from llm_agent.review_loop import run_review_loop
 from report_engine.html_exporter import export_html
 from report_engine.markdown_exporter import export_markdown
 from report_engine.report_compiler import compile_report
+from scripts.build_phase3_strategy_packages import build_packages
+from validation_engine.html_exporter import export_validation_html
+from validation_engine.strategy_scenario_generator import generate_retrofit_generation_scenarios
 from utils.config import CHECKPOINT_DIR, INPUT_DIR, INTERMEDIATE_DIR, OUTPUT_DIR, load_settings
 from utils.file_io import read_json, write_json, write_text
 from utils.logger import step
@@ -46,6 +49,18 @@ def _continue_after_selection(settings) -> None:
     )
     problem_map = read_json(INTERMEDIATE_DIR / "problem_map.json")
     user_selection = read_json(INTERMEDIATE_DIR / "user_selection.json")
+
+    step("Refreshing Phase 3 retrofit packages")
+    diagnosis_result = read_json(INTERMEDIATE_DIR / "diagnosis_result.json")
+    strategy_options = read_json(INTERMEDIATE_DIR / "strategy_options.json")
+    retrofit_validation_options = read_json(INTERMEDIATE_DIR / "retrofit_validation_options.json")
+    retrofit_generation_scenarios = generate_retrofit_generation_scenarios(diagnosis_result, strategy_options, limit=9)
+    write_json(INTERMEDIATE_DIR / "retrofit_generation_scenarios.json", retrofit_generation_scenarios)
+    phase3_strategy_packages = build_packages()
+    write_json(INTERMEDIATE_DIR / "phase3_strategy_packages.json", phase3_strategy_packages)
+    validation_view_payload = dict(phase3_strategy_packages)
+    validation_view_payload["baseline"] = retrofit_validation_options.get("baseline", {})
+    write_text(OUTPUT_DIR / "validation_view.html", export_validation_html(validation_view_payload))
 
     step("Writing checkpoint-selected decision graph")
     try:
@@ -85,11 +100,13 @@ def _continue_after_selection(settings) -> None:
         "interpreted_case": interpreted_case,
         "spatial_index": spatial_index,
         "risk_map": _load_optional(INTERMEDIATE_DIR / "risk_map.json"),
-        "diagnosis_result": read_json(INTERMEDIATE_DIR / "diagnosis_result.json"),
+        "diagnosis_result": diagnosis_result,
         "problem_map": problem_map,
         "manual_check": _load_optional(INTERMEDIATE_DIR / "manual_check_result.json"),
-        "strategy_options": read_json(INTERMEDIATE_DIR / "strategy_options.json"),
-        "retrofit_validation_options": read_json(INTERMEDIATE_DIR / "retrofit_validation_options.json"),
+        "strategy_options": strategy_options,
+        "retrofit_validation_options": retrofit_validation_options,
+        "retrofit_generation_scenarios": retrofit_generation_scenarios,
+        "phase3_strategy_packages": phase3_strategy_packages,
         "strategy_validation_checkpoint": read_json(CHECKPOINT_DIR / "08_strategy_validation" / "checkpoint.json"),
         "user_selection": user_selection,
         "retrofit_validation": read_json(INTERMEDIATE_DIR / "retrofit_validation.json"),

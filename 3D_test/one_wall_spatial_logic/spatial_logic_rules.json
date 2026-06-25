@@ -1,0 +1,54 @@
+{
+    "test_id":  "HVRA_ONE_WALL_SPATIAL_LOGIC_V2",
+    "purpose":  "Clean isolated placement rules for 3D retrofit components before reconnecting to LGTNet room geometry.",
+    "coordinate_contract":  {
+                                "wall_plane":  "z = 0",
+                                "interior_side":  "+z",
+                                "exterior_side":  "-z",
+                                "floor":  "y = 0"
+                            },
+    "zones":  [
+                  {
+                      "id":  "opening_no_go_zone",
+                      "meaning":  "No plants, shelves, ladders, or trellis should block the active glazed/sliding-door path."
+                  },
+                  {
+                      "id":  "left_wall_planting_zone",
+                      "meaning":  "Wall-hosted planting can mount beside the opening on the interior wall face."
+                  },
+                  {
+                      "id":  "right_wall_planting_zone",
+                      "meaning":  "Wall-hosted planting can mount beside the opening on the interior wall face."
+                  },
+                  {
+                      "id":  "floor_planting_zone",
+                      "meaning":  "Large floor vegetation can sit inside the room if circulation remains clear."
+                  }
+              ],
+    "component_rules":  {
+                            "curtain":  "opening-mounted rail above the opening, many thin continuous fabric strips inside only",
+                            "planterShelf":  "wall-mounted back plate, shelf projects inward, pots sit on shelf",
+                            "hangingRail":  "wall/ceiling-adjacent rail, cords hang into room",
+                            "plantLadder":  "floor-standing ladder, back close to wall, shelves hold pots",
+                            "trellis":  "wall-mounted trellis frame beside opening, with denser irregularly scattered green sphere clusters across timber intersections; each sphere has a short connector back to the nearest timber rail",
+                            "floorPlants":  "large plants on floor zone, not in opening path",
+                            "slidingDoorFrame":  "connected head, sill, side jambs, and center mullion share one frame plane",
+                            "fullHeightDrape":  "opening-mounted full-height fabric drape on interior side",
+                            "shortSillCurtain":  "short fabric panels mounted near the opening head, ending above sill/floor path",
+                            "romanShade":  "compact fabric shade mounted at opening head with fold lines",
+                            "venetianBlind":  "thin horizontal slats inside opening frame",
+                            "verticalBlind":  "thin vertical slats from wall-bracketed track",
+                            "solarControlGlazing":  "changes existing glass colour/material only; no extra pane is added",
+                            "externalAwning":  "exterior-side awning above opening with bracket arms",
+                            "ceilingFan":  "ceiling support, hub, and blades centered on one shared axis",
+                            "rectangularPlanter":  "long rectangular pot for continuous vegetation, placed clear of opening path"
+                        },
+    "plant_visual_types":  [
+                               "topiary_or_ball: simple green ball connected by a visible stem",
+                               "broadleaf: few clear stems from a crown with larger leaves",
+                               "fern_spider_grass: radial slender leaves connected to crown",
+                               "succulent: low rosette leaves connected to crown",
+                               "trailing: vine chain with leaves connected along the vine",
+                               "palm_tree: trunk with connected radial fronds"
+                           ]
+}

@@ -1,0 +1,320 @@
+{
+  "catalogue_id": "HVRA_STRATEGY_EVIDENCE_MAP_V1",
+  "source_metadata_file": "data/source_metadata.json",
+  "principles": [
+    "Use standards/codes for thresholds and comfort logic.",
+    "Use manuals and research papers for applicability and design rules.",
+    "Use screening assumptions only where dynamic simulation or product-specific data is unavailable.",
+    "Biophilic and urban-greening measures must not be presented as guaranteed room-temperature fixes unless supported by direct local modelling."
+  ],
+  "strategies": {
+    "external_shading_louvers": {
+      "evidence_level": "medium",
+      "evidence_role": "solar_gain_reduction_and_applicability",
+      "primary_source_ids": [
+        "CTE_DB_HE_AHORRO_DE_ENERGIA",
+        "SMART_CITIES_MARKETPLACE_ENVELOPE_RETROFIT_2023",
+        "IEA_EBC_ANNEX50_2011",
+        "SCIS_BUILDING_ENVELOPE_RETROFIT_2020",
+        "CIBSE_TM59_2017"
+      ],
+      "notes": "Supports external-first solar control logic, glazing/shading applicability, and overheating context.",
+      "gaps_or_review_flags": []
+    },
+    "internal_blinds": {
+      "evidence_level": "medium",
+      "evidence_role": "solar_gain_reduction_and_applicability",
+      "primary_source_ids": [
+        "CTE_DB_HE_AHORRO_DE_ENERGIA",
+        "SMART_CITIES_MARKETPLACE_ENVELOPE_RETROFIT_2023",
+        "IEA_EBC_ANNEX50_2011",
+        "SCIS_BUILDING_ENVELOPE_RETROFIT_2020",
+        "CIBSE_TM59_2017"
+      ],
+      "notes": "Supports external-first solar control logic, glazing/shading applicability, and overheating context.",
+      "gaps_or_review_flags": []
+    },
+    "solar_control_glazing": {
+      "evidence_level": "medium",
+      "evidence_role": "solar_gain_reduction_and_applicability",
+      "primary_source_ids": [
+        "CTE_DB_HE_AHORRO_DE_ENERGIA",
+        "SMART_CITIES_MARKETPLACE_ENVELOPE_RETROFIT_2023",
+        "IEA_EBC_ANNEX50_2011",
+        "SCIS_BUILDING_ENVELOPE_RETROFIT_2020",
+        "CIBSE_TM59_2017"
+      ],
+      "notes": "Supports external-first solar control logic, glazing/shading applicability, and overheating context.",
+      "gaps_or_review_flags": []
+    },
+    "green_pergola": {
+      "evidence_level": "low_medium",
+      "evidence_role": "biophilic_shading_and_microclimate_support",
+      "primary_source_ids": [
+        "SMART_CITIES_MARKETPLACE_ENVELOPE_RETROFIT_2023",
+        "SCIS_BUILDING_ENVELOPE_RETROFIT_2020",
+        "IEA_EBC_ANNEX50_2011"
+      ],
+      "notes": "Supports green/external shading concept. Exact thermal effect needs local solar geometry, maturity, irrigation, and maintenance assumptions.",
+      "gaps_or_review_flags": [
+        "Add more direct green facade / vegetation performance PDFs if final design relies on this measure."
+      ]
+    },
+    "window_enlargement": {
+      "evidence_level": "medium_low",
+      "evidence_role": "ventilation_and_nocturnal_recovery_screening",
+      "primary_source_ids": [
+        "ASHRAE_62_1_2013_ADDENDUM_P_2015",
+        "UNI_EN_16798_1_2019_NOTE",
+        "CIBSE_TM59_2017",
+        "LBNL_6131E_THERMAL_COMFORT_CRITERIA_2012"
+      ],
+      "notes": "Supports ventilation/overheating logic; exact ACH and wind-driven performance still require geometry/simulation.",
+      "gaps_or_review_flags": []
+    },
+    "interior_opening_improvement": {
+      "evidence_level": "medium_low",
+      "evidence_role": "ventilation_and_nocturnal_recovery_screening",
+      "primary_source_ids": [
+        "ASHRAE_62_1_2013_ADDENDUM_P_2015",
+        "UNI_EN_16798_1_2019_NOTE",
+        "CIBSE_TM59_2017",
+        "LBNL_6131E_THERMAL_COMFORT_CRITERIA_2012"
+      ],
+      "notes": "Supports ventilation/overheating logic; exact ACH and wind-driven performance still require geometry/simulation.",
+      "gaps_or_review_flags": []
+    },
+    "stack_effect_roof_vent": {
+      "evidence_level": "medium_low",
+      "evidence_role": "ventilation_and_nocturnal_recovery_screening",
+      "primary_source_ids": [
+        "ASHRAE_62_1_2013_ADDENDUM_P_2015",
+        "UNI_EN_16798_1_2019_NOTE",
+        "CIBSE_TM59_2017",
+        "LBNL_6131E_THERMAL_COMFORT_CRITERIA_2012"
+      ],
+      "notes": "Supports ventilation/overheating logic; exact ACH and wind-driven performance still require geometry/simulation.",
+      "gaps_or_review_flags": []
+    },
+    "night_purge_ventilation": {
+      "evidence_level": "medium_low",
+      "evidence_role": "ventilation_and_nocturnal_recovery_screening",
+      "primary_source_ids": [
+        "ASHRAE_62_1_2013_ADDENDUM_P_2015",
+        "UNI_EN_16798_1_2019_NOTE",
+        "CIBSE_TM59_2017",
+        "LBNL_6131E_THERMAL_COMFORT_CRITERIA_2012"
+      ],
+      "notes": "Supports ventilation/overheating logic; exact ACH and wind-driven performance still require geometry/simulation.",
+      "gaps_or_review_flags": []
+    },
+    "external_wall_insulation_etics": {
+      "evidence_level": "medium",
+      "evidence_role": "envelope_heat_transfer_or_reflectance_screening",
+      "primary_source_ids": [
+        "CTE_DB_HE_AHORRO_DE_ENERGIA",
+        "SMART_CITIES_MARKETPLACE_ENVELOPE_RETROFIT_2023",
+        "IEA_EBC_ANNEX50_2011",
+        "SCIS_BUILDING_ENVELOPE_RETROFIT_2020",
+        "PHI_ENERPHIT_RENOVATING_WITH_PASSIVE_HOUSE_COMPONENTS",
+        "EUROPHIT_DEEP_ENERGY_STEP_BY_STEP_RETROFITS",
+        "PASSIVHAUS_DESIGNERS_MANUAL"
+      ],
+      "notes": "Supports envelope retrofit, roof/facade treatment, U-value and renovation sequencing logic.",
+      "gaps_or_review_flags": []
+    },
+    "roof_insulation": {
+      "evidence_level": "medium",
+      "evidence_role": "envelope_heat_transfer_or_reflectance_screening",
+      "primary_source_ids": [
+        "CTE_DB_HE_AHORRO_DE_ENERGIA",
+        "SMART_CITIES_MARKETPLACE_ENVELOPE_RETROFIT_2023",
+        "IEA_EBC_ANNEX50_2011",
+        "SCIS_BUILDING_ENVELOPE_RETROFIT_2020",
+        "PHI_ENERPHIT_RENOVATING_WITH_PASSIVE_HOUSE_COMPONENTS",
+        "EUROPHIT_DEEP_ENERGY_STEP_BY_STEP_RETROFITS",
+        "PASSIVHAUS_DESIGNERS_MANUAL"
+      ],
+      "notes": "Supports envelope retrofit, roof/facade treatment, U-value and renovation sequencing logic.",
+      "gaps_or_review_flags": []
+    },
+    "cool_roof_coating": {
+      "evidence_level": "medium",
+      "evidence_role": "envelope_heat_transfer_or_reflectance_screening",
+      "primary_source_ids": [
+        "CTE_DB_HE_AHORRO_DE_ENERGIA",
+        "SMART_CITIES_MARKETPLACE_ENVELOPE_RETROFIT_2023",
+        "IEA_EBC_ANNEX50_2011",
+        "SCIS_BUILDING_ENVELOPE_RETROFIT_2020",
+        "PHI_ENERPHIT_RENOVATING_WITH_PASSIVE_HOUSE_COMPONENTS",
+        "EUROPHIT_DEEP_ENERGY_STEP_BY_STEP_RETROFITS",
+        "PASSIVHAUS_DESIGNERS_MANUAL"
+      ],
+      "notes": "Supports envelope retrofit, roof/facade treatment, U-value and renovation sequencing logic.",
+      "gaps_or_review_flags": []
+    },
+    "phase_change_materials": {
+      "evidence_level": "medium_low",
+      "evidence_role": "thermal_buffering_screening",
+      "primary_source_ids": [
+        "ASME_ES2010_90036_PASSIVE_HOUSE_EL_SALVADOR",
+        "IMC2014_HOLISTIC_RETROFIT_STRATEGIES",
+        "CIBSE_TM59_2017"
+      ],
+      "notes": "PCM/thermal mass can shift peaks but needs dynamic modelling to verify charge/discharge cycle.",
+      "gaps_or_review_flags": []
+    },
+    "courtyard_greening": {
+      "evidence_level": "contextual",
+      "evidence_role": "urban_context_or_shared_microclimate_support",
+      "primary_source_ids": [
+        "SMART_CITIES_MARKETPLACE_ENVELOPE_RETROFIT_2023",
+        "SPAIN_ERESEE_2020"
+      ],
+      "notes": "Contextual cooling/resilience measure, not a direct room benchmark fix.",
+      "gaps_or_review_flags": [
+        "Needs municipal/local intervention evidence for final implementation."
+      ]
+    },
+    "shared_cooling_refuge": {
+      "evidence_level": "low",
+      "evidence_role": "catalogue_screening",
+      "primary_source_ids": [
+        "SPAIN_ERESEE_2020",
+        "JRC_LONG_TERM_RENOVATION_STRATEGIES_2022",
+        "BPIE_RENOVATION_STRATEGIES_EU_2014",
+        "RETROFIT_POLICY_PLAYBOOK_2021"
+      ],
+      "notes": "General catalogue evidence only; review before using as a primary recommendation.",
+      "gaps_or_review_flags": []
+    },
+    "street_tree_canopy": {
+      "evidence_level": "contextual",
+      "evidence_role": "urban_context_or_shared_microclimate_support",
+      "primary_source_ids": [
+        "SMART_CITIES_MARKETPLACE_ENVELOPE_RETROFIT_2023",
+        "SPAIN_ERESEE_2020"
+      ],
+      "notes": "Contextual cooling/resilience measure, not a direct room benchmark fix.",
+      "gaps_or_review_flags": [
+        "Needs municipal/local intervention evidence for final implementation."
+      ]
+    },
+    "internal_wall_insulation": {
+      "evidence_level": "medium",
+      "evidence_role": "envelope_heat_transfer_or_reflectance_screening",
+      "primary_source_ids": [
+        "CTE_DB_HE_AHORRO_DE_ENERGIA",
+        "SMART_CITIES_MARKETPLACE_ENVELOPE_RETROFIT_2023",
+        "IEA_EBC_ANNEX50_2011",
+        "SCIS_BUILDING_ENVELOPE_RETROFIT_2020",
+        "PHI_ENERPHIT_RENOVATING_WITH_PASSIVE_HOUSE_COMPONENTS",
+        "EUROPHIT_DEEP_ENERGY_STEP_BY_STEP_RETROFITS",
+        "PASSIVHAUS_DESIGNERS_MANUAL"
+      ],
+      "notes": "Supports envelope retrofit, roof/facade treatment, U-value and renovation sequencing logic.",
+      "gaps_or_review_flags": []
+    },
+    "wall_insulation_reinforcement_layer": {
+      "evidence_level": "medium",
+      "evidence_role": "envelope_heat_transfer_or_reflectance_screening",
+      "primary_source_ids": [
+        "CTE_DB_HE_AHORRO_DE_ENERGIA",
+        "SMART_CITIES_MARKETPLACE_ENVELOPE_RETROFIT_2023",
+        "IEA_EBC_ANNEX50_2011",
+        "SCIS_BUILDING_ENVELOPE_RETROFIT_2020",
+        "PHI_ENERPHIT_RENOVATING_WITH_PASSIVE_HOUSE_COMPONENTS",
+        "EUROPHIT_DEEP_ENERGY_STEP_BY_STEP_RETROFITS",
+        "PASSIVHAUS_DESIGNERS_MANUAL"
+      ],
+      "notes": "Supports envelope retrofit, roof/facade treatment, U-value and renovation sequencing logic.",
+      "gaps_or_review_flags": []
+    },
+    "cool_facade_paint": {
+      "evidence_level": "medium",
+      "evidence_role": "envelope_heat_transfer_or_reflectance_screening",
+      "primary_source_ids": [
+        "CTE_DB_HE_AHORRO_DE_ENERGIA",
+        "SMART_CITIES_MARKETPLACE_ENVELOPE_RETROFIT_2023",
+        "IEA_EBC_ANNEX50_2011",
+        "SCIS_BUILDING_ENVELOPE_RETROFIT_2020",
+        "PHI_ENERPHIT_RENOVATING_WITH_PASSIVE_HOUSE_COMPONENTS",
+        "EUROPHIT_DEEP_ENERGY_STEP_BY_STEP_RETROFITS",
+        "PASSIVHAUS_DESIGNERS_MANUAL"
+      ],
+      "notes": "Supports envelope retrofit, roof/facade treatment, U-value and renovation sequencing logic.",
+      "gaps_or_review_flags": []
+    },
+    "window_external_shutters": {
+      "evidence_level": "medium",
+      "evidence_role": "solar_gain_reduction_and_applicability",
+      "primary_source_ids": [
+        "CTE_DB_HE_AHORRO_DE_ENERGIA",
+        "SMART_CITIES_MARKETPLACE_ENVELOPE_RETROFIT_2023",
+        "IEA_EBC_ANNEX50_2011",
+        "SCIS_BUILDING_ENVELOPE_RETROFIT_2020",
+        "CIBSE_TM59_2017"
+      ],
+      "notes": "Supports external-first solar control logic, glazing/shading applicability, and overheating context.",
+      "gaps_or_review_flags": []
+    },
+    "cross_ventilation_behaviour": {
+      "evidence_level": "medium_low",
+      "evidence_role": "ventilation_and_nocturnal_recovery_screening",
+      "primary_source_ids": [
+        "ASHRAE_62_1_2013_ADDENDUM_P_2015",
+        "UNI_EN_16798_1_2019_NOTE",
+        "CIBSE_TM59_2017",
+        "LBNL_6131E_THERMAL_COMFORT_CRITERIA_2012"
+      ],
+      "notes": "Supports ventilation/overheating logic; exact ACH and wind-driven performance still require geometry/simulation.",
+      "gaps_or_review_flags": []
+    },
+    "ceiling_fan_air_movement": {
+      "evidence_level": "medium",
+      "evidence_role": "thermal_comfort_air_speed_support",
+      "primary_source_ids": [
+        "ASHRAE_55_2023",
+        "LBNL_6131E_THERMAL_COMFORT_CRITERIA_2012"
+      ],
+      "notes": "Supports elevated air-speed comfort effect. Treat as perceived comfort improvement, not temperature removal.",
+      "gaps_or_review_flags": []
+    },
+    "secure_night_vent_limiter": {
+      "evidence_level": "medium_low",
+      "evidence_role": "ventilation_and_nocturnal_recovery_screening",
+      "primary_source_ids": [
+        "ASHRAE_62_1_2013_ADDENDUM_P_2015",
+        "UNI_EN_16798_1_2019_NOTE",
+        "CIBSE_TM59_2017",
+        "LBNL_6131E_THERMAL_COMFORT_CRITERIA_2012"
+      ],
+      "notes": "Supports ventilation/overheating logic; exact ACH and wind-driven performance still require geometry/simulation.",
+      "gaps_or_review_flags": []
+    },
+    "balcony_planter_shading": {
+      "evidence_level": "low_medium",
+      "evidence_role": "biophilic_shading_and_microclimate_support",
+      "primary_source_ids": [
+        "SMART_CITIES_MARKETPLACE_ENVELOPE_RETROFIT_2023",
+        "SCIS_BUILDING_ENVELOPE_RETROFIT_2020",
+        "IEA_EBC_ANNEX50_2011"
+      ],
+      "notes": "Supports green/external shading concept. Exact thermal effect needs local solar geometry, maturity, irrigation, and maintenance assumptions.",
+      "gaps_or_review_flags": [
+        "Add more direct green facade / vegetation performance PDFs if final design relies on this measure."
+      ]
+    },
+    "interior_biophilic_cooling_zone": {
+      "evidence_level": "low",
+      "evidence_role": "visual_acceptability_and_resilience_support",
+      "primary_source_ids": [
+        "LBNL_6131E_THERMAL_COMFORT_CRITERIA_2012"
+      ],
+      "notes": "Use as user-facing supportive design, not as a benchmark-passing thermal measure.",
+      "gaps_or_review_flags": [
+        "Add direct indoor biophilic comfort/heat adaptation sources if this becomes a primary option."
+      ]
+    }
+  }
+}

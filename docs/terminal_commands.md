@@ -99,6 +99,12 @@ Continue with Gemini mocked and local/mock KG mode:
 .\.venv\Scripts\python.exe continue_from_checkpoint.py --llm --apply --mock-gemini --mock-neo4j
 ```
 
+Fast full checkpoint smoke test with all expensive external calls mocked:
+
+```powershell
+.\.venv\Scripts\python.exe continue_from_checkpoint.py --llm --apply --mock-llm --mock-gemini --mock-neo4j
+```
+
 ## Spatial Room Check
 
 Regenerate the room viewer from the latest spatial index:
@@ -131,7 +137,13 @@ http://127.0.0.1:8010/static-views/kg/kg_view.html
 
 ## RAG
 
-Rebuild the RAG index:
+Clean and rebuild the semantic GraphRAG index. This deletes only generated RAG outputs, not raw PDFs or metadata:
+
+```powershell
+.\.venv\Scripts\python.exe -m rag_engine.build_index --clean
+```
+
+Rebuild without cleaning generated files:
 
 ```powershell
 .\.venv\Scripts\python.exe -m rag_engine.build_index
@@ -149,14 +161,14 @@ Main RAG source files:
 data/raw_pdfs/
 data/source_metadata.json
 data/processed/corpus_pages.jsonl
-data/processed/corpus_chunks.jsonl
-data/vector_db/chroma/
+data/processed/corpus_chunks.jsonl   semantic chunks
+data/vector_db/chroma/              rebuilt vector index
 docs/rag_sources_inventory.md
 ```
 
 ## Risk Map
 
-Run the risk map integration test:
+Run the risk map integration test. This checks cached/live Infrared City availability, normalized sky-view factor units, and diagnosis propagation:
 
 ```powershell
 .\.venv\Scripts\python.exe tests\test_risk_map_integration.py
@@ -175,6 +187,64 @@ risk_map/dataset/
 risk_map/dataset/source_metadata.json
 docs/risk_map_data_inventory.md
 ```
+
+Risk-map visualisation is deactivated from the user-facing phase checker. The standalone visual experiment remains available only for development when the backend is running:
+
+```text
+http://127.0.0.1:8010/risk-map-3d-test/
+```
+
+## 3D Retrofit Test
+
+Build the Phase 3 procedural 3D retrofit test view:
+
+```powershell
+cd C:\Users\Morris\OneDrive\Desktop\hvra_test_run
+.\.venv\Scripts\python.exe 3D_test\test\build_retrofit_room_test.py --biophilic-test --opening-type sliding_glass_door
+```
+
+When the backend API server is running, open the embedded route directly:
+
+```text
+http://127.0.0.1:8010/3d-test/test/retrofit_room_test.html
+```
+
+For standalone local viewing without the backend:
+
+```powershell
+.\.venv\Scripts\python.exe -m http.server 8123 -d .
+```
+
+```text
+http://127.0.0.1:8123/3D_test/test/retrofit_room_test.html
+```
+
+Advanced GLB-ready asset planning and visualizer:
+
+```powershell
+.\.venv\Scripts\python.exe 3D_test\advanced\build_advanced_asset_plan.py --opening-type sliding_glass_door
+.\.venv\Scripts\python.exe 3D_test\advanced\build_advanced_asset_view.py
+```
+
+```text
+http://127.0.0.1:8123/3D_test/advanced/advanced_asset_view.html
+```
+
+3D test catalogue files:
+
+```text
+3D_test/catalogues/retrofit_strategy_visual_catalogue.json
+3D_test/catalogues/plant_visual_catalogue.json
+3D_test/test/retrofit_visual_plan.json
+3D_test/test/retrofit_room_test.html
+3D_test/advanced/advanced_asset_plan.json
+```
+
+## Perspective Image Test
+
+Paused/deactivated for the current workflow. The final visual should come from the Phase 3 textured 3D room/component preview, not from a separate image-regeneration service.
+
+Keep `perspective_test/` only as an experimental archive unless the project later reopens cloud image generation.
 
 ## Code Checks
 
@@ -214,7 +284,4 @@ Start the backend first, then start the frontend.
 Backend:  http://127.0.0.1:8010
 Frontend: http://127.0.0.1:5173
 ```
-
-
-
 

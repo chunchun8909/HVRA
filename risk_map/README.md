@@ -55,7 +55,7 @@ The normalizer can use Infrared City grids/results for:
 - wind speed
 - UTCI / outdoor thermal comfort
 
-These values update `risk_map.json` and are passed to the diagnosis engine as urban context. EPW and local datasets remain the traceable fallback.
+These values update `risk_map.json` and are passed to the diagnosis engine as urban context. Sky-view factor is normalized to a `0-1` fraction because Infrared City/cache exports may provide it as a `0-100` percent value. EPW and local datasets remain the traceable fallback.
 
 When `INFRARED_CITY_FORCE_REFRESH=false`, the pipeline uses the cached JSON first and only calls the live API if no valid cache exists. Set it to `true` when you intentionally want to spend API tokens and refresh the cache.
 
@@ -215,16 +215,24 @@ Current geometry behavior:
 - 3D buildings use real local OSM footprints with estimated heights because this shapefile has no height attribute.
 - Infrared City mesh geometry is preferred when available, but the current API response returned `SUBSCRIPTION_INACTIVE`, so the viewer falls back to local OSM geometry.
 - Infrared City analysis is still represented numerically from the cached summary: wind speed, sky view factor, direct sun hours, solar radiation, and UTCI.
-- True Infrared raster heat maps require cached raw `merged_grid` cells, not only min/mean/max summaries.
+- True Infrared raster heat maps require a successful live Infrared refresh. The provider now caches compact downsampled cells from `result.merged_grid`, but the current active cache still has summary-only values because the latest live refresh returned `SUBSCRIPTION_INACTIVE`.
 
-## Risk Map Checkpoint Stage
+## Risk Map Visualization Status
 
-The Risk Map visual is treated as a precomputed checkpoint between Phase 1 case setup and Phase 2 room/spatial verification. The backend prepares a simplified visual payload first, then the interface only displays the result: simple local map geometry, separate heat-analysis layers, and optional aligned 3D buildings after the site is chosen. This avoids live browser-side analysis and keeps map, boundary, and building geometry in one consistent coordinate frame.
+The Risk Map visual checkpoint is currently deactivated in the phase-check interface. The backend prepares a simplified visual payload first, then the interface only displays the result: simple local map geometry, separate heat-analysis layers, and optional aligned 3D buildings after the site is chosen. This avoids live browser-side analysis and keeps map, boundary, and building geometry in one consistent coordinate frame.
 
 Current display contract:
 
 ```text
-risk map backend/cache -> risk_map_context.json -> risk map checkpoint viewer
+risk map backend/cache -> risk_map_context.json -> standalone risk-map development viewer
 ```
 
-The checkpoint uses local OSM footprints for visual alignment and Infrared City for analysis values. True pixel-accurate Infrared raster layers still require storing raw merged-grid cells from the Infrared SDK output; the current cache provides summary statistics, bounds, and grid shape.
+The standalone test view can still use local OSM footprints for visual alignment and Infrared City for analysis values. The viewer does not draw synthetic heat-map pixels from summary values. When a live Infrared run succeeds, the provider stores compact downsampled cells from `result.merged_grid` and the viewer can render true analysis rasters. The current cache remains summary-only because the latest live refresh returned `SUBSCRIPTION_INACTIVE`.
+
+
+
+
+
+
+
+

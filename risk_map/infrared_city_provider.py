@@ -36,11 +36,15 @@ def _grid_stats(value: Any) -> dict:
             "mean": value.get("mean"),
             "max": value.get("max"),
             "grid_shape": value.get("grid_shape"),
+            "raw_grid_shape": value.get("raw_grid_shape"),
             "legend_min": value.get("legend_min"),
             "legend_max": value.get("legend_max"),
             "succeeded_jobs": value.get("succeeded_jobs"),
             "total_jobs": value.get("total_jobs"),
             "bounds": value.get("bounds"),
+            "cells": value.get("cells", []),
+            "cell_source": value.get("cell_source"),
+            "downsample_step": value.get("downsample_step"),
         }
     numbers = [number for number in _flatten_numbers(value) if number == number]
     if not numbers:
@@ -51,6 +55,116 @@ def _grid_stats(value: Any) -> dict:
         "mean": round(mean(numbers), 3),
         "max": round(max(numbers), 3),
     }
+
+def _grid_to_normalized_cells(value: Any, max_size: int = 64) -> dict:
+    """Return a compact viewer-ready raster from an Infrared merged_grid.
+
+    Infrared results can be dense 2D arrays. The risk-map checkpoint only needs
+    enough cells to show the spatial pattern, so we keep a downsampled normalized
+    grid and preserve the raw value on each cell for inspection.
+    """
+    if hasattr(value, "tolist"):
+        value = value.tolist()
+    if not isinstance(value, list) or not value or not isinstance(value[0], list):
+        return {"cells": [], "raw_grid_shape": []}
+
+    rows = len(value)
+    cols = max((len(row) for row in value), default=0)
+    if not rows or not cols:
+        return {"cells": [], "raw_grid_shape": [rows, cols]}
+
+    y_step = max(1, math.ceil(rows / max_size))
+    x_step = max(1, math.ceil(cols / max_size))
+    sampled: list[tuple[int, int, float]] = []
+    for y in range(0, rows, y_step):
+        row = value[y]
+        if not isinstance(row, list):
+            continue
+        for x in range(0, len(row), x_step):
+            try:
+                number = float(row[x])
+            except (TypeError, ValueError):
+                continue
+            if number == number:
+                sampled.append((x // x_step, y // y_step, number))
+
+    if not sampled:
+        return {"cells": [], "raw_grid_shape": [rows, cols]}
+
+    minimum = min(number for _, _, number in sampled)
+    maximum = max(number for _, _, number in sampled)
+    spread = maximum - minimum or 1.0
+    cells = [
+        {
+            "x": x,
+            "y": y,
+            "value": round((number - minimum) / spread, 3),
+            "raw_value": round(number, 3),
+        }
+        for x, y, number in sampled
+    ]
+    return {
+        "cells": cells,
+        "raw_grid_shape": [rows, cols],
+        "grid_size": max(max(cell["x"] for cell in cells), max(cell["y"] for cell in cells)) + 1,
+        "downsample_step": [y_step, x_step],
+        "cell_source": "infrared_result.merged_grid",
+    }
+
+def _as_fraction(value: Any) -> float | None:
+    if value is None:
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    if number > 1.0 and number <= 100.0:
+        number = number / 100.0
+    return round(max(0.0, min(1.0, number)), 3)
+
+
+def _normalize_fraction_stats(stats: dict) -> dict:
+    normalized = dict(stats or {})
+    for key in ("min", "mean", "max", "legend_min", "legend_max"):
+        value = _as_fraction(normalized.get(key))
+        if value is not None:
+            normalized[key] = value
+    return normalized
+
+
+def _normalized_heat_score(metrics: dict) -> float | None:
+    solar_score = _score_from_stats(metrics.get("solar_radiation", {}), high_value=850.0)
+    utci_score = _score_from_stats(metrics.get("utci", {}), high_value=42.0, low_value=26.0)
+    svf_score = None
+    sky_view = metrics.get("sky_view_factor", {})
+    if sky_view.get("available"):
+        mean_svf = _as_fraction(sky_view.get("mean"))
+        if mean_svf is not None:
+            svf_score = round(1.0 - mean_svf, 3)
+    available_scores = [score for score in [solar_score, utci_score, svf_score] if score is not None]
+    return round(sum(available_scores) / len(available_scores), 3) if available_scores else None
+
+
+def normalize_existing_infrared_context(payload: dict) -> dict:
+    """Normalize already-cached Infrared City summaries into project units."""
+    normalized = json.loads(json.dumps(payload))
+    metrics = normalized.setdefault("metrics", {})
+    if "sky_view_factor" in metrics:
+        metrics["sky_view_factor"] = _normalize_fraction_stats(metrics["sky_view_factor"])
+
+    sky_view_mean = metrics.get("sky_view_factor", {}).get("mean")
+    urban_updates = normalized.setdefault("urban_context_updates", {})
+    if sky_view_mean is not None:
+        urban_updates["sky_view_factor"] = sky_view_mean
+
+    heat_score = _normalized_heat_score(metrics)
+    if heat_score is not None:
+        normalized["heat_exposure_score"] = heat_score
+    normalized["unit_normalization"] = {
+        "sky_view_factor": "fraction_0_to_1",
+        "note": "Infrared City exports can provide sky-view as percent; HVRA stores it as a fraction.",
+    }
+    return normalized
 
 
 def _first_grid(payload: dict, key_options: tuple[str, ...]) -> Any:
@@ -97,14 +211,19 @@ def polygon_from_center_size(latitude: float, longitude: float, width_m: float, 
 def _stats_from_area_result(result: Any) -> dict:
     grid = getattr(result, "merged_grid", None)
     stats = _grid_stats(grid.tolist() if hasattr(grid, "tolist") else grid)
+    raster = _grid_to_normalized_cells(grid)
     stats.update(
         {
             "grid_shape": list(getattr(result, "grid_shape", []) or []),
+            "raw_grid_shape": raster.get("raw_grid_shape"),
             "legend_min": getattr(result, "min_legend", None),
             "legend_max": getattr(result, "max_legend", None),
             "succeeded_jobs": getattr(result, "succeeded_jobs", None),
             "total_jobs": getattr(result, "total_jobs", None),
             "bounds": list(getattr(result, "bounds", []) or []),
+            "cells": raster.get("cells", []),
+            "cell_source": raster.get("cell_source"),
+            "downsample_step": raster.get("downsample_step"),
         }
     )
     return stats
@@ -116,17 +235,11 @@ def normalize_infrared_payload(payload: dict, source: str) -> dict:
     for metric_name, key_options in GRID_KEYS.items():
         metrics[metric_name] = _grid_stats(_first_grid(payload, key_options))
 
-    solar_score = _score_from_stats(metrics["solar_radiation"], high_value=850.0)
-    utci_score = _score_from_stats(metrics["utci"], high_value=42.0, low_value=26.0)
-    svf_score = None
-    if metrics["sky_view_factor"].get("available"):
-        svf_score = round(1.0 - max(0.0, min(1.0, float(metrics["sky_view_factor"].get("mean", 0.5)))), 3)
-
-    available_scores = [score for score in [solar_score, utci_score, svf_score] if score is not None]
-    heat_score = round(sum(available_scores) / len(available_scores), 3) if available_scores else None
+    metrics["sky_view_factor"] = _normalize_fraction_stats(metrics.get("sky_view_factor", {}))
+    heat_score = _normalized_heat_score(metrics)
 
     return {
-        "available": bool(available_scores),
+        "available": heat_score is not None,
         "source": source,
         "provider": "infrared_city",
         "metrics": metrics,
@@ -159,8 +272,8 @@ def run_live_infrared_city_context(
 
     The live run uses a single-month July afternoon window to respect current
     Infrared SDK constraints for UTCI, solar radiation, and sun-hours analyses.
-    Results are saved as normalized statistics, not full grids, to keep the
-    Risk Map JSON light.
+    Results are saved as normalized statistics plus compact downsampled grid
+    cells so the Risk Map can draw real analysis rasters without huge JSON.
     """
     if not api_key:
         return {"available": False, "source": "infrared_city_live", "reason": "Missing API key."}
@@ -333,5 +446,9 @@ def load_infrared_city_context(cache_json: str | None) -> dict:
         return {"available": False, "source": "infrared_city", "reason": f"Invalid JSON: {error}"}
 
     if payload.get("provider") == "infrared_city" and payload.get("metrics"):
-        return payload
+        return normalize_existing_infrared_context(payload)
     return normalize_infrared_payload(payload, str(path))
+
+
+
+

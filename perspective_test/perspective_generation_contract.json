@@ -1,0 +1,28 @@
+{
+  "contract_id": "HVRA_PERSPECTIVE_REGENERATION_CONTRACT_V1",
+  "principles": [
+    "Use 3D component placement as a spatial guide, not as literal final geometry.",
+    "Preserve the original perspective image composition, camera angle, room scale, and main materials unless the selected strategy requires a visible change.",
+    "Show only the selected strategy or selected strategy bundle, not every possible intervention.",
+    "Keep the retrofit intervention attached to the correct wall, window, floor, or ceiling zone.",
+    "Do not show diagnostic labels, colored masks, bounding boxes, or procedural support placeholders in the final perspective image.",
+    "If an intervention is exterior but the image is interior-facing, show its visible indoor consequence where plausible: shade line, tinted glazing, filtered daylight, or edge of awning/louver."
+  ],
+  "strategy_visual_translation": {
+    "external_shading_layer": "subtle exterior shading device aligned with the selected opening; filtered daylight on interior surfaces",
+    "solar_control_glazing_layer": "slightly cooler/tinted glass appearance while retaining transparency and original frame geometry",
+    "interior_window_covering_layer": "natural fabric/blind/shade mounted on the interior opening head with correct scale and clearance",
+    "ceiling_air_movement_layer": "ceiling fan centered in the occupied zone, sized to the room and clear of curtains",
+    "wall_inner_lining_layer": "thin interior wall finish layer, visually subtle and not protruding outside the facade",
+    "biophilic_floor_cluster": "plant cluster in daylight corner or beside opening without blocking circulation",
+    "biophilic_wall_adjacent_layer": "wall-adjacent planting support beside the opening, attached to interior wall face",
+    "hanging_lightweight_greenery": "small hanging plants from a safe rail/bracket, not blocking the active opening"
+  },
+  "negative_prompt_rules": [
+    "no floating supports",
+    "no disconnected frames",
+    "no plants blocking sliding door operation",
+    "no cartoon diagnostic overlay",
+    "no unrealistic structural facade change unless selected and permitted"
+  ]
+}

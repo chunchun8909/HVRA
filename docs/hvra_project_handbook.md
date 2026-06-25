@@ -30,7 +30,7 @@ HVRA is a backend-first Heat Vulnerability Retrofit Assistant. It helps inspect 
 | --- | --- | --- | --- |
 | Interface API | `app.py` | FastAPI backend for the React interface and checkpoint save/continue routes. | API responses, saved overrides |
 | LLM Agent | `llm_agent/` | Ollama-backed or mock JSON generation for case interpretation, strategy ranking, and consistency review. | `interpreted_case.json`, `strategy_options.json`, `llm_review.json` |
-| Spatial Engine | `spatial_engine/` | Pano image processing, LGTNet layout, scaling, SAM3 wall-fragment segmentation, wall/floor/ceiling textures, 3D room view. | `spatial_index.json`, `room_3d_view.html` |
+| Spatial Engine | `spatial_engine/` | Pano image processing, LGTNet layout, scaling, SAM3 wall-fragment segmentation, wall/floor/ceiling textures, 3D room view and second strategy-component room view. | `spatial_index.json`, `room_3d_view.html`, `room_3d_component_view.html` |
 | Risk Map | `risk_map/` | EPW and urban-context extraction, optional Infrared City context, site/environmental context for diagnosis. | `risk_map.json` |
 | Diagnosis Engine | `diagnosis_engine/` | Deterministic heat-risk calculations. No hidden LLM scoring. | `diagnosis_result.json` |
 | Problem Map | `diagnosis_engine/problem_map_builder.py` | Assigns calculated problems to room/surface targets. | `problem_map.json` |
@@ -38,7 +38,7 @@ HVRA is a backend-first Heat Vulnerability Retrofit Assistant. It helps inspect 
 | Validation Engine | `validation_engine/` | Baseline/proposed indicator comparison, benchmark pass/fail, confidence gate, combo screening method. | `retrofit_validation_options.json`, `retrofit_validation.json` |
 | Checkpoint Engine | `checkpoint_engine/` | Creates stage checkpoint packages and routes decisions. | `data/checkpoints/*` |
 | Knowledge Graph | `knowledge_graph/` | local KG JSON/HTML generation; optional Neo4j graph writing. | `kg_view_data.json`, `kg_view.html` |
-| Gemini Engine | `gemini_engine/` | Visual prompt/result layer for future generated design images. | `gemini_prompt.json`, `gemini_result.json` |
+| Gemini Engine | `gemini_engine/` | Visual prompt/result layer using controlled retrofit placement rules for future generated design images. | `gemini_prompt.json`, `gemini_result.json` |
 | Report Engine | `report_engine/` | Final JSON, Markdown, and HTML report compilation. | `final_report.json`, `final_report.md`, `final_report_view.html` |
 
 ### ML / AI Models and External Systems
@@ -57,9 +57,9 @@ HVRA is a backend-first Heat Vulnerability Retrofit Assistant. It helps inspect 
 
 ```text
 Phase 1: user input through chat/instructions
-Phase 1.5: site context / risk-map checkpoint
+Risk map context is backend-only for now; no separate visual phase.
 Phase 2: spatial V&V, wall orientation, window inclusion check
-Phase 3: top three retrofit options, room/KG/check/report review
+Phase 3: three retrofit packages, room/component/check/report review
 ```
 
 The system is designed so each checkpoint can update three synchronized views: canonical JSON, generated KG view, and HTML/3D review views. The interface now uses a compact 60 percent production scale, while `phase_check.html` keeps 50/60/75/100 scale buttons only for QA.
@@ -148,8 +148,8 @@ Diagnosis KG Export
         |
         v
 RAG Manual Check
-- local PDFs and source metadata
-- keyword/vector/hybrid retrieval
+- local PDFs, source metadata, and strategy_evidence_map.json
+- keyword/vector/hybrid retrieval plus catalogue evidence confidence
 - outputs manual_check_result.json
         |
         v
@@ -170,7 +170,7 @@ Retrofit Validation Engine
 Strategy Validation Checkpoint
 - data/checkpoints/08_strategy_validation
 - LLM/user chooses, combines, revises, reruns, accepts, or stops
-- interface exposes the top three validated options as phase 3 buttons
+- interface exposes three packaged retrofit options as phase 3 buttons
         |
         v
 Selected Retrofit Validation
@@ -185,7 +185,7 @@ Decision and Checkpoint KG Export
         |
         v
 Gemini Engine
-- builds visual prompt
+- builds visual prompt using visual_retrofit_catalogue.json placement rules
 - mock or real image generation
         |
         v
@@ -406,10 +406,10 @@ room_3d_view.html?viewer_mode=review
 
 Phase progression is automatic once each required checkpoint is satisfied:
 
-- Phase 1 input gathering collects address or coordinates, room basics, resident context, and the two images.
-- Phase 1.5 site-context review displays the backend-precomputed risk-map checkpoint before room verification.
+- Phase 1 input gathering collects address or coordinates, room basics, resident context, constraints, and the room/pano image.
+- Risk-map context is currently used as backend data for diagnosis; the separate visual checkpoint is deactivated.
 - Phase 2 room review saves spatial overrides, confirms wall orientation/window inclusion, runs the remaining pipeline, and moves to Phase 3.
-- Phase 3 shows the top three retrofit options, room overlays, knowledge-graph links, numerical validation, and the final report.
+- Phase 3 shows three retrofit packages, the original room view, the 3D component preview, numerical validation, and the final report.
 
 `review` mode hides the phase 2 spatial edit controls:
 
@@ -479,9 +479,11 @@ HVRA uses file-based JSON as the canonical backend state during the prototype ph
 | `data/input/building_info.json` | Room dimensions, building context, glazing, floor/height, baseline info. |
 | `data/input/region_context.json` | Address/coordinates, city, neighbourhood, climate context. |
 | `data/input/retrofit_constraints.json` | Budget, disruption, permission, ownership, preferred/excluded strategy types. |
-| `data/input/strategy_catalogue.json` | Static retrofit strategy source of truth. |
+| data/input/strategy_catalogue.json | Static retrofit strategy source of truth. |
+| data/input/strategy_evidence_map.json | Evidence role, confidence, and source IDs for each strategy. |
+| data/input/visual_retrofit_catalogue.json | 3D placement, asset type, material, and render-layer rules for each strategy. |
 | `data/input/images/pano_image/` | Pano images for LGTNet layout extraction. |
-| `data/input/images/perspective_image/` | Perspective/reference images for final visual/report workflows. |
+| `data/input/images/room_3d_component_preview/` | Legacy folder only; current report visuals come from the 3D retrofit preview. |
 
 ### RAG Data
 
@@ -547,7 +549,7 @@ This document gives a project-level source inventory. Detailed source tables liv
 | Segment | Current source/input | Use |
 | --- | --- | --- |
 | Pano image | `data/input/images/pano_image/` | LGTNet room layout, wall count, floor/ceiling/wall texture extraction. |
-| Perspective image | `data/input/images/perspective_image/` | Final visual reference and future generated perspective comparison. |
+| Perspective image | `data/input/images/room_3d_component_preview/` | Legacy/deactivated for the current workflow; final visuals use the 3D component preview. |
 | LGTNet output | `data/output/spatial/lgtnet/` | Room polygon/layout used by scaling and viewer. |
 | SAM3 output | `data/output/spatial/sam3/` | Window segmentation on wall fragments. Furniture/door are not required for calculation. |
 
@@ -576,8 +578,8 @@ This document gives a project-level source inventory. Detailed source tables liv
 
 | Segment | Current source/input | Use |
 | --- | --- | --- |
-| Static catalogue | `data/input/strategy_catalogue.json` | Source of truth for strategy IDs, names, categories, constraints, cost/carbon ranges, and effect-profile mapping. |
-| Catalogue documentation | [Strategy Catalogue](strategy_catalogue.md) | Human-readable list of the 20 strategy entries. |
+| Static catalogue | `data/input/strategy_catalogue.json` | Source of truth for strategy IDs, names, categories, constraints, cost/carbon ranges, evidence profiles, visual profiles, and effect-profile mapping. |
+| Catalogue documentation | [Strategy Catalogue](strategy_catalogue.md) | Human-readable list of the 24 strategy entries plus evidence/visual catalogue links. |
 | Combo method | [Thermal Combo Screening](thermal_combo_screening.md) | Screening formula for future combined strategy packages. |
 
 ### Generated Views
@@ -871,6 +873,11 @@ Compile check:
 
 ---
 
+## Retrofit Feasibility Boundaries
+
+Retrofit options are constrained before final ranking and visualization. Roof or ceiling-roof strategies require top-floor/roof-exposed status and approval feasibility, while older-building facade, roof, structural, and full-window works remain conditional until permission and building-physics checks are satisfied.
+
+Wall insulation reinforcement is treated as an interior-side lining over the existing wall surface. The system should not visualize or calculate it as an outward extension beyond the facade unless a separate external-insulation strategy is selected and permitted.
 ## Retrofit Strategy Catalogue
 
 
@@ -912,7 +919,7 @@ Compile check:
 
 ### Notes
 
-The catalogue currently contains 20 strategies. The delta-T, cost, and carbon fields are screening assumptions from the reference library. They are not a substitute for dynamic simulation or product-specific design data.
+The catalogue currently contains 24 strategies. The delta-T, cost, carbon, and multiplier fields are screening assumptions supported by source categories, not a substitute for dynamic simulation or product-specific design data. Biophilic measures are included for visual design and comfort-resilience support, but should not be presented as guaranteed benchmark-passing thermal fixes unless paired with stronger solar, envelope, ventilation, or air-movement measures.
 
 
 
@@ -1162,10 +1169,10 @@ Generated HTML/KG views are views. JSON remains canonical. Neo4j is optional and
 ```text
 phase 1: input
   chat-first case setup
-  collects address or coordinates, room type, area, height, pano image, window view, resident profile, and comfort note
+  collects address or coordinates, room type, area, height, room/pano image, resident profile, constraints, and comfort note through chat
 
-phase 1.5: site context
-  chat + precomputed risk-map view
+risk-map context: backend-only
+  site data is collected in phase 1 and passed to diagnosis without a separate visual phase
   user checks the selected location, map context, and environmental layers before room verification
 
 phase 2: spatial check
@@ -1176,7 +1183,7 @@ phase 2: spatial check
   no wall diagnosis panel
 
 phase 3: review
-  top three retrofit option buttons + chat + room / links / check / report views
+  three package buttons + chat + room / components / links / check / report views
   diagnosis, problem map, KG, retrofit validation, and report review are visible
   orientation and room check controls are hidden
 ```
@@ -1267,7 +1274,7 @@ chat input box
 image upload controls
 spatial review iframe/embed
 strategy option buttons
-site context view, room / links / check / report view switching
+room / links / check / report view switching
 loading/progress messaging
 calling backend API endpoints
 ```
@@ -1365,7 +1372,7 @@ facing_direction
 room_area_m2
 room_height_m
 pano_image
-perspective_image
+room_3d_component_preview
 ```
 
 Behavior:
@@ -1399,7 +1406,7 @@ Used by `room_3d_view.html` when the user clicks `save` or `continue`.
 
 #### `GET /api/strategy-options`
 
-Returns the top three validated retrofit options for phase 3:
+Returns the three packaged retrofit options for phase 3:
 
 ```json
 {
@@ -1416,7 +1423,7 @@ Returns the top three validated retrofit options for phase 3:
 }
 ```
 
-The phase 3 visualization bar renders these as three buttons on the top-left. The `room`, `links`, `check`, and `report` buttons remain on the top-right, and each view updates according to the selected strategy option.
+The phase 3 visualization bar renders the dynamically ranked top three package buttons for the current case. The package names come from the optimiser, while the `room` view remains the original room viewer and the `components` view shows the full textured 3D retrofit preview with tested components, effects, benchmark checks, and clickable wall diagnosis.
 
 #### `POST /api/checkpoint/action`
 
@@ -1574,3 +1581,11 @@ Do not run Vite through the `Desktop\Test` junction. Rollup may emit invalid rel
 
 
 
+
+
+
+
+
+## RAG Update
+
+The evidence layer now rebuilds raw PDFs into semantic chunks, then retrieves with BM25, vector search, strategy graph context, source boosting, reranking, and a sufficiency flag. Use `python -m rag_engine.build_index --clean` when raw PDFs, metadata, or chunking settings change.

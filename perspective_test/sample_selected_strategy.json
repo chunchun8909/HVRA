@@ -1,0 +1,21 @@
+{
+  "selection_id": "PERSPECTIVE_TEST_001",
+  "room_id": "ROOM_001",
+  "selected_strategy": {
+    "strategy_id": "external_shading_layer",
+    "visual_asset": "fabric_awning",
+    "target_component_id": "ROOM_001_WINDOW_01",
+    "target_wall_id": "ROOM_001_WALL_07",
+    "expected_effect": {
+      "metric": "peak_indoor_operative_temperature_delta_c",
+      "delta_t_min_c": 2.0,
+      "delta_t_max_c": 4.0,
+      "confidence": "medium"
+    }
+  },
+  "spatial_hint": {
+    "host_type": "external_window_head",
+    "placement": "above selected sliding glass door/window, exterior side",
+    "visibility_in_perspective": "visible through/around window edge if exterior is seen; otherwise communicate by shading effect and edge detail"
+  }
+}

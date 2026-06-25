@@ -6,6 +6,9 @@ from utils.config import INPUT_DIR, SPATIAL_OUTPUT_DIR, Settings, load_settings
 from .lgtnet_runner import run_lgtnet
 from .mock_spatial_output import build_mock_spatial_index
 from .room_decomposer import decompose_room
+from .host_geometry import build_host_geometry
+from .room_component_viewer import export_room_component_view
+from .textured_component_viewer import export_textured_component_view
 from .room_viewer import export_room_view
 from .sam3_runner import run_sam3
 from .scaling_engine import build_scaling_report, scale_layout_to_room
@@ -116,6 +119,19 @@ def create_spatial_index(building_info: dict, settings: Settings | None = None) 
     room_model["surface_textures"] = surface_textures
     room_model["scale_source"] = scaled_layout.get("scale", {}).get("scale_source")
 
+    host_geometry = build_host_geometry(room_model)
+    host_geometry_path = write_json(SPATIAL_OUTPUT_DIR / "host_geometry.json", host_geometry)
+
     view_path = export_room_view(room_model, SPATIAL_OUTPUT_DIR / "room_3d_view.html")
+    component_view_path = export_room_component_view(room_model, SPATIAL_OUTPUT_DIR / "room_3d_component_view.html")
+    textured_component_view_path = export_textured_component_view(SPATIAL_OUTPUT_DIR / "room_3d_textured_component_test.html")
     room_model["view_3d_html"] = view_path
+    room_model["component_view_3d_html"] = component_view_path
+    room_model["textured_component_view_3d_html"] = textured_component_view_path
+    room_model["host_geometry_json"] = str(SPATIAL_OUTPUT_DIR / "host_geometry.json")
     return room_model
+
+
+
+
+

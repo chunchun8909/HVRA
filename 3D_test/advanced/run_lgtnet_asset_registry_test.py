@@ -1,4 +1,4 @@
-﻿"""Non-interactive LGTNet asset-registry integration smoke test.
+"""Non-interactive LGTNet asset-registry integration smoke test.
 
 This script reads an LGTNet prediction JSON, derives simple room/wall geometry,
 optionally calls an external 3D asset registry with an API key from .env, and
@@ -22,7 +22,7 @@ import requests
 from dotenv import load_dotenv
 
 
-ROOT_DIR = Path(__file__).resolve().parents[1]
+ROOT_DIR = Path(__file__).resolve().parents[2]
 DEFAULT_LGTNET_JSON = ROOT_DIR / "data" / "output" / "spatial" / "lgtnet" / "demo1_pred.json"
 DEFAULT_OUTPUT = Path(__file__).resolve().parent / "lgtnet_asset_manifest.json"
 

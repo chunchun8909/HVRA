@@ -14,12 +14,9 @@ if (IS_PHASE_CHECK_PREVIEW) {
 
 const stageLabels = {
   input_gathering: 'getting details',
-  site_context: 'check site',
   processing: 'working',
   strategy_validation: 'review upgrades',
   spatial_vv: 'check layout',
-  phase_1_to_site: 'checking site',
-  phase_site_to_2: 'building room',
   phase_1_to_2: 'building room',
   phase_2_to_3: 'running review',
 }
@@ -30,15 +27,14 @@ const initialTasks = [
   { key: 'room_type', label: 'room type', done: false },
   { key: 'room_area_m2', label: 'area', done: false },
   { key: 'room_height_m', label: 'height', done: false },
-  { key: 'pano_image', label: 'pano image', done: false },
-  { key: 'perspective_image', label: 'window view', done: false },
+  { key: 'pano_image', label: 'room image', done: false },
   { key: 'occupant_profile', label: 'resident profile', done: false },
 ]
 
 const initialMessages = [
   {
     role: 'agent',
-    text: 'welcome to hvra. describe the room in the chat and add the two images to begin.',
+    text: 'welcome to hvra. describe the room in the chat and add the room image to begin.',
   },
   {
     role: 'agent',
@@ -53,7 +49,6 @@ const initialMessages = [
 
 const phaseStageMap = {
   input: 'input_gathering',
-  site: 'site_context',
   spatial: 'spatial_vv',
   review: 'processing',
 }
@@ -78,19 +73,15 @@ function App() {
   const kgRef = useRef(null)
   const reportRef = useRef(null)
   const phase =
-    transition === 'phase_1_to_site'
-      ? 'site'
-      : transition === 'phase_site_to_2' || transition === 'phase_1_to_2'
-        ? 'spatial'
+    transition === 'phase_1_to_2'
+      ? 'spatial'
       : transition === 'phase_2_to_3'
         ? 'review'
         : currentStage === 'input_gathering'
           ? 'input'
-          : currentStage === 'site_context'
-            ? 'site'
-            : currentStage === 'spatial_vv'
-              ? 'spatial'
-              : 'review'
+          : currentStage === 'spatial_vv'
+            ? 'spatial'
+            : 'review'
 
   const appendMessage = (message) => {
     setMessages((prev) => [...prev, message])
@@ -105,7 +96,7 @@ function App() {
     const interval = window.setInterval(() => {
       setProgress((value) => {
         if (value >= 94) return value
-        const step = transition === 'phase_1_to_site' ? 8 : transition === 'phase_site_to_2' || transition === 'phase_1_to_2' ? 7 : 5
+        const step = transition === 'phase_1_to_2' ? 7 : 5
         return Math.min(94, value + step)
       })
     }, 420)
@@ -194,7 +185,7 @@ function App() {
         })
         window.setTimeout(() => {
           setTransition(null)
-          setCurrentStage(event.data.stage || 'processing')
+          setCurrentStage('processing')
           setRefreshSignal((value) => value + 1)
           appendMessage({
             role: 'agent',
@@ -225,15 +216,15 @@ function App() {
     )
   }
 
-  const handleSend = async ({ text, panoFile, perspectiveFile, buildingInfo }) => {
+  const handleSend = async ({ text, panoFile, buildingInfo }) => {
     const hasBuildingInfo = Object.values(buildingInfo || {}).some((value) => String(value || '').trim())
-    if (!text && !panoFile && !perspectiveFile && !hasBuildingInfo) {
+    if (!text && !panoFile && !hasBuildingInfo) {
       return
     }
 
     appendMessage({ role: 'user', text: text || (hasBuildingInfo ? 'updated room basics' : 'uploaded new asset') })
     setIsSubmitting(true)
-    setTransition(currentStage === 'site_context' ? 'phase_site_to_2' : 'phase_1_to_site')
+    setTransition('phase_1_to_2')
 
     try {
       const formData = new FormData()
@@ -243,9 +234,6 @@ function App() {
       }
       if (panoFile) {
         formData.append('pano_image', panoFile)
-      }
-      if (perspectiveFile) {
-        formData.append('perspective_image', perspectiveFile)
       }
       Object.entries(buildingInfo || {}).forEach(([key, value]) => {
         if (String(value || '').trim()) {
@@ -276,23 +264,13 @@ function App() {
       if (payload.current_stage === 'spatial_vv') {
         setProgress(100)
         window.setTimeout(() => {
-          setCurrentStage('site_context')
+          setTransition(null)
+          setCurrentStage('spatial_vv')
           appendMessage({
             role: 'agent',
             text:
-              'Site context is ready. I am using the precomputed heat, shading, vegetation, wind, and surrounding-building context to prepare the room check.',
+              'Please confirm the main window wall, wall directions, and detected window segments in the room view. Press save when it looks right, then continue to the diagnosis review.',
           })
-          setTransition('phase_site_to_2')
-          setProgress(8)
-          window.setTimeout(() => {
-            setTransition(null)
-            setCurrentStage('spatial_vv')
-            appendMessage({
-              role: 'agent',
-              text:
-                'Please confirm the main window wall, wall directions, and detected window segments in the room view. Press save when it looks right, then continue to the diagnosis review.',
-            })
-          }, 900)
         }, 650)
       } else {
         setTransition(null)
@@ -311,7 +289,7 @@ function App() {
       <div className="flex flex-col h-full overflow-hidden">
         <InstructionBanner tasks={tasks} currentStage={stageLabels[transition || currentStage] || currentStage.replaceAll('_', ' ')} />
         <ChatStream messages={messages} />
-        <ActionInputBar onSend={handleSend} disabled={isSubmitting} />
+        <ActionInputBar onSend={handleSend} disabled={isSubmitting} showSetupInputs={false} />
       </div>
     </div>
   )
@@ -322,7 +300,7 @@ function App() {
         <div className="mx-auto flex h-full max-w-3xl flex-col border-x border-DEFAULT bg-surface-primary">
           <InstructionBanner tasks={tasks} currentStage={stageLabels[currentStage] || currentStage.replaceAll('_', ' ')} />
           <ChatStream messages={messages} />
-          <ActionInputBar onSend={handleSend} disabled={isSubmitting} />
+          <ActionInputBar onSend={handleSend} disabled={isSubmitting} showSetupInputs />
         </div>
       </div>
     )
@@ -346,19 +324,18 @@ function App() {
             roomRef={roomRef}
             kgRef={kgRef}
             reportRef={reportRef}
-            enabledViews={phase === 'site' ? ['site'] : phase === 'spatial' ? ['room'] : ['room', 'links', 'validation', 'report']}
-            viewerMode={phase === 'site' ? 'site_context' : phase === 'spatial' ? 'spatial_vv' : 'review'}
+            enabledViews={phase === 'spatial' ? ['room'] : ['components', 'report']}
+            viewerMode={phase === 'spatial' ? 'spatial_vv' : 'review'}
             isLoading={Boolean(transition)}
             loadingLabel={
-              transition === 'phase_1_to_site'
-                ? 'checking site context'
-                : transition === 'phase_site_to_2' || transition === 'phase_1_to_2'
-                  ? 'building room model'
+              transition === 'phase_1_to_2'
+                ? 'building room model'
                 : transition === 'phase_2_to_3'
                   ? 'running diagnosis and upgrades'
                   : ''
             }
             loadingProgress={progress}
+            refreshSignal={refreshSignal}
           />
         </div>
       </div>
@@ -367,9 +344,6 @@ function App() {
 }
 
 export default App
-
-
-
 
 
 

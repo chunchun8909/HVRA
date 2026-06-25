@@ -1,4 +1,4 @@
-# RAG Source Inventory
+﻿# RAG Source Inventory
 
 This file tracks the current raw PDF sources for the HVRA RAG engine.
 
@@ -16,14 +16,14 @@ data/raw_pdfs/
 
 ## Validation Summary
 
-Checked on 2026-06-02. The current folder contains 23 PDFs. All 23 sources extract successfully. `ISO-7726-1998.pdf` requires the `pdfminer.six` fallback because `pypdf` cannot parse that local copy.
+Checked on 2026-06-20 after the semantic GraphRAG rebuild. The current folder contains 23 PDFs. All 23 sources extract successfully. `ISO-7726-1998.pdf` requires the `pdfminer.six` fallback because `pypdf` cannot parse that local copy.
 
 The latest ingestion produced:
 
 ```text
 data/processed/corpus_pages.jsonl   1,882 records
-data/processed/corpus_chunks.jsonl  1,895 records
-data/vector_db/chroma/              rebuilt
+data/processed/corpus_chunks.jsonl  3,115 semantic chunk records
+data/vector_db/chroma/              rebuilt with 3,115 indexed chunks
 ```
 
 | Status | Count | Notes |
@@ -111,11 +111,33 @@ Each source should have this shape in `data/source_metadata.json`:
 }
 ```
 
+
+## Strategy Evidence Mapping
+
+The retrofit strategy layer now uses `data/input/strategy_evidence_map.json` to connect each strategy ID to source IDs, evidence role, confidence, and review flags. No new raw PDFs were added in this pass; the evidence map uses the current 23-source RAG corpus and marks biophilic/green measures as lower-confidence support or contextual measures unless stronger source PDFs are added later.
+
+## Current Retrieval Mechanism
+
+The RAG engine now uses semantic chunking and a lightweight GraphRAG retrieval path:
+
+```text
+query
+-> strategy/topic graph context
+-> BM25 keyword retrieval
+-> Chroma vector retrieval
+-> graph/source boost
+-> reranking
+-> sufficiency flag
+```
+
+The old word-window chunks were replaced by semantic chunks. Generated outputs can be safely rebuilt with `python -m rag_engine.build_index --clean`; raw PDFs and `data/source_metadata.json` are the source of truth.
 ## Priority Gaps
 
 1. Add exact source URLs where currently blank.
-2. Keep sources grouped conceptually during retrieval: standards, thermal comfort, ventilation, overheating, retrofit manuals, policy, and research evidence.
-3. Rebuild the RAG index after adding, replacing, or removing any raw PDF.
+2. Add direct green facade / living wall / vegetation performance papers if biophilic measures become primary recommendations.
+3. Add direct indoor biophilic comfort evidence if interior planting is used as more than a supportive visual/resilience measure.
+4. Keep sources grouped conceptually during retrieval: standards, thermal comfort, ventilation, overheating, retrofit manuals, policy, and research evidence.
+5. Rebuild the RAG index after adding, replacing, or removing any raw PDF.
 
 ## Validation Commands
 
@@ -136,5 +158,18 @@ for source in discover_sources():
 Rebuild RAG index:
 
 ```powershell
-.\.venv\Scripts\python.exe -m rag_engine.build_index
+.\.venv\Scripts\python.exe -m rag_engine.build_index --clean
 ```
+
+
+
+## Candidate Source Additions
+
+These are not ingested yet. Add PDFs or stable full-text records only if the project starts using green/biophilic measures as primary recommendations rather than support measures.
+
+| Evidence gap | Candidate source | Why it matters |
+| --- | --- | --- |
+| Green wall system properties | Manso & Castro-Gomes, 2015, Green wall systems: A review of their characteristics | Helps classify green wall / planter systems, maintenance, weight, irrigation, and construction constraints. |
+| Green wall thermal behavior | Perini et al., 2011, Vertical greening systems and the effect on air flow and temperature on the building envelope | Directly supports facade vegetation effects on envelope air flow and temperature. |
+| Green roof/wall quantitative evidence | Manso et al., 2021, Green roof and green wall benefits and costs: A review of the quantitative evidence | Useful for cost/benefit and confidence bounds for green infrastructure strategies. |
+| Indoor living wall context | Gunawardena & Steemers, 2019, Living walls in indoor environments | Useful only if interior biophilic cooling is promoted beyond visual/resilience support. |

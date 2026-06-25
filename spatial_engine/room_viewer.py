@@ -219,6 +219,7 @@ def export_room_view(room_model: dict, output_path: Path) -> str:
     const wallDiagnosisFactor = document.getElementById("wallDiagnosisFactor");
     const wallDiagnosisAction = document.getElementById("wallDiagnosisAction");
     const wallDiagnosisStrategy = document.getElementById("wallDiagnosisStrategy");
+    const apiBase = new URLSearchParams(window.location.search).get("api_base") || "http://127.0.0.1:8010";
     const selectedStrategyId = new URLSearchParams(window.location.search).get("strategy_id") || strategyState.recommended_strategy_id || "";
     meta.textContent = ` | ${{model.room.area_m2}} m2 | ${{model.room.height_m}} m | ${{model.walls.length}} walls`;
     if (viewerMode === "spatial_vv") {{
@@ -1018,6 +1019,7 @@ def export_room_view(room_model: dict, output_path: Path) -> str:
 """
     output_path.write_text(html, encoding="utf-8")
     return str(output_path)
+
 
 
 

@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
@@ -82,7 +82,7 @@ def load_settings() -> Settings:
         use_mock_neo4j=_bool_env("USE_MOCK_NEO4J", True),
         neo4j_uri=os.getenv("NEO4J_URI", "neo4j://127.0.0.1:7687"),
         neo4j_username=os.getenv("NEO4J_USERNAME", os.getenv("NEO4J_USER", "neo4j")),
-        neo4j_password=os.getenv("NEO4J_PASSWORD", "DN2ApZmL_35GzayHj_Wx0xu7MOTg48ShaTq-gZTpkkY"),
+        neo4j_password=os.getenv("NEO4J_PASSWORD", ""),
         neo4j_database=os.getenv("NEO4J_DATABASE", "neo4j"),
         use_mock_llm=_bool_env("USE_MOCK_LLM", True),
         ollama_base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/"),
@@ -123,3 +123,4 @@ def load_settings() -> Settings:
         ),
         infrared_force_refresh=_bool_env("INFRARED_CITY_FORCE_REFRESH", False),
     )
+

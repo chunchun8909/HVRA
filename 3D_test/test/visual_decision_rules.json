@@ -1,0 +1,141 @@
+﻿{
+    "ruleset_id":  "HVRA_3D_VISUAL_DECISION_RULES_V1",
+    "purpose":  "Suitability gates for test-only 3D retrofit visual variants before rendering.",
+    "opening_types":  {
+                          "window":  "standard window or uncertain opening",
+                          "sliding_glass_door":  "full-height sliding glazed door or balcony door",
+                          "balcony_door":  "operable glazed door with balcony or external threshold"
+                      },
+    "global_rules":  [
+                         "Exterior shading, awnings, trellis, vegetation-on-window, and facade-mounted systems require an external wall and facade permission/owner approval.",
+                         "Balcony or planter-based strategies require confirmed balcony/outdoor maintenance access.",
+                         "Interior curtains, drapes, roller shades, and plant corners are renter-friendlier because they do not alter the facade.",
+                         "For sliding glass doors, avoid small slatted systems that obstruct sliding operation or frequent passage unless a product-specific track detail is confirmed."
+                     ],
+    "variant_rules":  {
+                          "curtain_drapes":  {
+                                                 "allowed_opening_types":  [
+                                                                               "window",
+                                                                               "sliding_glass_door",
+                                                                               "balcony_door"
+                                                                           ],
+                                                 "placement_side":  "interior",
+                                                 "suitability":  "good_for_sliding_glass_door",
+                                                 "notes":  "Soft drapes can cover large glazed doors without modifying the facade."
+                                             },
+                          "sheer_curtain":  {
+                                                "allowed_opening_types":  [
+                                                                              "window",
+                                                                              "sliding_glass_door",
+                                                                              "balcony_door"
+                                                                          ],
+                                                "placement_side":  "interior",
+                                                "suitability":  "good_for_daylight_diffusion",
+                                                "notes":  "Useful for visual comfort, but thermal benefit is limited unless paired with solar-control strategy."
+                                            },
+                          "roller_shade":  {
+                                               "allowed_opening_types":  [
+                                                                             "window",
+                                                                             "sliding_glass_door",
+                                                                             "balcony_door"
+                                                                         ],
+                                               "placement_side":  "interior",
+                                               "suitability":  "conditional_for_large_doors",
+                                               "notes":  "For sliding doors, render as a wide or split shade and keep the passage side clear."
+                                           },
+                          "venetian_blind":  {
+                                                 "allowed_opening_types":  [
+                                                                               "window"
+                                                                           ],
+                                                 "blocked_opening_types":  [
+                                                                               "sliding_glass_door",
+                                                                               "balcony_door"
+                                                                           ],
+                                                 "placement_side":  "interior",
+                                                 "suitability":  "poor_for_sliding_glass_door",
+                                                 "notes":  "Horizontal slatted blind is not the preferred visual for a full-height sliding glass door in this test."
+                                             },
+                          "horizontal_fixed_shade":  {
+                                                         "allowed_opening_types":  [
+                                                                                       "window",
+                                                                                       "sliding_glass_door",
+                                                                                       "balcony_door"
+                                                                                   ],
+                                                         "placement_side":  "exterior",
+                                                         "requires_external_wall":  true,
+                                                         "requires_facade_permission":  true,
+                                                         "suitability":  "conditional_external_work",
+                                                         "notes":  "Good solar-control concept, but not allowed for renter/facade-restricted cases without approval."
+                                                     },
+                          "vertical_movable_shade":  {
+                                                         "allowed_opening_types":  [
+                                                                                       "window",
+                                                                                       "sliding_glass_door",
+                                                                                       "balcony_door"
+                                                                                   ],
+                                                         "placement_side":  "exterior",
+                                                         "requires_external_wall":  true,
+                                                         "requires_facade_permission":  true,
+                                                         "suitability":  "conditional_external_work",
+                                                         "notes":  "Can suit tall glazed openings if installed externally and approved."
+                                                     },
+                          "awning_shade":  {
+                                               "allowed_opening_types":  [
+                                                                             "window",
+                                                                             "sliding_glass_door",
+                                                                             "balcony_door"
+                                                                         ],
+                                               "placement_side":  "exterior",
+                                               "requires_external_wall":  true,
+                                               "requires_facade_permission":  true,
+                                               "suitability":  "conditional_external_work",
+                                               "notes":  "Render only as a conditional exterior option for old/renter/facade-restricted buildings."
+                                           },
+                          "trellis_shade":  {
+                                                "allowed_opening_types":  [
+                                                                              "window",
+                                                                              "sliding_glass_door",
+                                                                              "balcony_door"
+                                                                          ],
+                                                "placement_side":  "exterior",
+                                                "requires_external_wall":  true,
+                                                "requires_facade_permission":  true,
+                                                "requires_balcony_or_outdoor_access":  true,
+                                                "suitability":  "conditional_biophilic_shading",
+                                                "notes":  "Needs outdoor access, maintenance, and approval; not a direct indoor-only retrofit."
+                                            },
+                          "vegetation_window":  {
+                                                    "allowed_opening_types":  [
+                                                                                  "window",
+                                                                                  "sliding_glass_door",
+                                                                                  "balcony_door"
+                                                                              ],
+                                                    "placement_side":  "exterior",
+                                                    "requires_external_wall":  true,
+                                                    "requires_facade_permission":  true,
+                                                    "requires_balcony_or_outdoor_access":  true,
+                                                    "suitability":  "conditional_biophilic_shading",
+                                                    "notes":  "Do not render as feasible when there is no confirmed balcony/outdoor maintenance access."
+                                                },
+                          "plant_corner_dense":  {
+                                                     "allowed_opening_types":  [
+                                                                                   "window",
+                                                                                   "sliding_glass_door",
+                                                                                   "balcony_door"
+                                                                               ],
+                                                     "placement_side":  "interior",
+                                                     "suitability":  "supportive_visual_comfort_only",
+                                                     "notes":  "Interior plant corner is allowed as a supportive wellbeing/visual option, not a benchmark-passing thermal fix."
+                                                 },
+                          "vertical_blind":  {
+                                                 "allowed_opening_types":  [
+                                                                               "window",
+                                                                               "sliding_glass_door",
+                                                                               "balcony_door"
+                                                                           ],
+                                                 "placement_side":  "interior",
+                                                 "suitability":  "good_for_sliding_glass_door",
+                                                 "notes":  "Vertical blinds are suitable for full-height sliding glazed openings because panels can move parallel to the door operation."
+                                             }
+                      }
+}

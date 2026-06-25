@@ -32,11 +32,12 @@ def _default_user_decision(stage: str, stage_result: dict) -> dict:
         }
 
     if stage == "strategy_validation":
-        recommended_id = stage_result.get("recommended_option_id")
+        recommended_id = stage_result.get("recommended_package_id") or stage_result.get("recommended_option_id")
         return {
             "stage": stage,
             "status": "waiting_for_user",
             "action": None,
+            "selected_package_ids": [recommended_id] if recommended_id else [],
             "selected_strategy_ids": [recommended_id] if recommended_id else [],
             "combine_strategy_ids": [],
             "intent_revision": "",
@@ -200,13 +201,23 @@ def create_checkpoint_package(
 
 
 def create_strategy_validation_checkpoint(retrofit_validation_options: dict) -> dict:
+    has_packages = bool(
+        retrofit_validation_options.get("packages")
+        or retrofit_validation_options.get("phase3_strategy_packages", {}).get("packages")
+    )
+    canonical_source = (
+        "data/intermediate/phase3_strategy_packages.json"
+        if has_packages
+        else "data/intermediate/retrofit_validation_options.json"
+    )
     return create_checkpoint_package(
         "strategy_validation",
         retrofit_validation_options,
         "08_strategy_validation",
         context={
-            "canonical_source": "data/intermediate/retrofit_validation_options.json",
-            "primary_output": "data/intermediate/retrofit_validation_options.json",
+            "canonical_source": canonical_source,
+            "primary_output": canonical_source,
+            "package_options_path": "data/intermediate/phase3_strategy_packages.json",
             "validation_options_path": "data/intermediate/retrofit_validation_options.json",
             "problem_map_path": "data/intermediate/problem_map.json",
             "spatial_index_path": "data/intermediate/spatial_index.json",

@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
 import json
@@ -20,6 +20,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--pixels-per-meter", type=float, default=220.0)
     parser.add_argument("--min-size", type=int, default=256)
     parser.add_argument("--max-size", type=int, default=1600)
+    parser.add_argument("--sample-offset-x-m", type=float, default=0.0, help="Shift horizontal surface sampling in LGTNet X before remap; positive moves sampling east/right.")
+    parser.add_argument("--sample-offset-z-m", type=float, default=0.0, help="Shift horizontal surface sampling in LGTNet Z before remap; use negative values to sample closer to wall 08 for the current room.")
     return parser.parse_args()
 
 
@@ -108,6 +110,8 @@ def unwrap_horizontal_surface(
     pixels_per_meter: float,
     min_size: int,
     max_size: int,
+    sample_offset_x_m: float = 0.0,
+    sample_offset_z_m: float = 0.0,
 ) -> tuple[np.ndarray, dict]:
     min_x, max_x = float(floor[:, 0].min()), float(floor[:, 0].max())
     min_z, max_z = float(floor[:, 2].min()), float(floor[:, 2].max())
@@ -121,7 +125,9 @@ def unwrap_horizontal_surface(
     grid_x = np.repeat(xs[None, :], out_h, axis=0)
     grid_z = np.repeat(zs[:, None], out_w, axis=1)
     grid_y = np.full_like(grid_x, y_value)
-    surface_xyz = np.stack([grid_x, grid_y, grid_z], axis=-1)
+    sample_x = grid_x + float(sample_offset_x_m)
+    sample_z = grid_z + float(sample_offset_z_m)
+    surface_xyz = np.stack([sample_x, grid_y, sample_z], axis=-1)
 
     map_x, map_y = project_xyz_to_pano_pixels(surface_xyz, pano.shape[1], pano.shape[0])
     texture = cv2.remap(pano, map_x, map_y, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_WRAP)
@@ -145,6 +151,8 @@ def unwrap_horizontal_surface(
         "masked_pixel_count": int(np.count_nonzero(mask)),
         "total_pixel_count": int(mask.size),
         "mask_coverage_pct": round(float(np.count_nonzero(mask) / mask.size * 100), 3),
+        "sample_offset_x_m": round(float(sample_offset_x_m), 4),
+        "sample_offset_z_m": round(float(sample_offset_z_m), 4),
         "rgba_texture": texture_rgba,
     }
 
@@ -163,10 +171,10 @@ def main() -> None:
     floor, camera_height, ceiling_height = load_layout(args.json)
 
     floor_texture, floor_meta = unwrap_horizontal_surface(
-        pano, floor, camera_height, args.pixels_per_meter, args.min_size, args.max_size
+        pano, floor, camera_height, args.pixels_per_meter, args.min_size, args.max_size, args.sample_offset_x_m, args.sample_offset_z_m
     )
     ceiling_texture, ceiling_meta = unwrap_horizontal_surface(
-        pano, floor, -ceiling_height, args.pixels_per_meter, args.min_size, args.max_size
+        pano, floor, -ceiling_height, args.pixels_per_meter, args.min_size, args.max_size, args.sample_offset_x_m, args.sample_offset_z_m
     )
 
     floor_path = output_dir / "floor.png"
@@ -191,3 +199,7 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+
+

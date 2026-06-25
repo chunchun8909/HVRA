@@ -26,7 +26,9 @@ OUTPUT_DIR = DATA_DIR / "output"
 INTERMEDIATE_DIR = DATA_DIR / "intermediate"
 RISK_MAP_DATASET_DIR = ROOT_DIR / "risk_map" / "dataset"
 RISK_MAP_TEST_DIR = ROOT_DIR / "interface" / "public" / "interface" / "risk_map_3d_test"
+THREE_D_TEST_DIR = ROOT_DIR / "3D_test"
 THREE_DIR = ROOT_DIR / "interface" / "node_modules" / "three"
+THREE_PUBLIC_DIR = ROOT_DIR / "interface" / "public" / "vendor" / "three"
 
 INPUT_DIR.mkdir(parents=True, exist_ok=True)
 IMAGES_DIR.mkdir(parents=True, exist_ok=True)
@@ -44,8 +46,12 @@ app.mount("/static-views", StaticFiles(directory=OUTPUT_DIR), name="static-views
 app.mount("/input-assets", StaticFiles(directory=INPUT_DIR), name="input-assets")
 if RISK_MAP_TEST_DIR.exists():
     app.mount("/risk-map-3d-test", StaticFiles(directory=RISK_MAP_TEST_DIR, html=True), name="risk-map-3d-test")
+if THREE_D_TEST_DIR.exists():
+    app.mount("/3d-test", StaticFiles(directory=THREE_D_TEST_DIR, html=True), name="three-d-test")
 if THREE_DIR.exists():
     app.mount("/vendor/three", StaticFiles(directory=THREE_DIR), name="three-js")
+elif THREE_PUBLIC_DIR.exists():
+    app.mount("/vendor/three", StaticFiles(directory=THREE_PUBLIC_DIR), name="three-js")
 
 
 
@@ -451,6 +457,38 @@ def _barcelona_city_contours() -> dict:
     }
 
 
+
+def _detected_wall_count() -> int:
+    for candidate in [INTERMEDIATE_DIR / "spatial_index.json", INTERMEDIATE_DIR / "spatial_index_with_overrides.json"]:
+        try:
+            if candidate.exists():
+                payload = json.loads(candidate.read_text(encoding="utf-8"))
+                walls = payload.get("walls", [])
+                if walls:
+                    return len(walls)
+        except Exception:
+            continue
+    return 0
+
+
+def _normalize_display_wall_ids(payload: Any, wall_count: int | None = None) -> Any:
+    """Convert UI display wall ids such as WALL_08 to zero-based engine ids WALL_07."""
+    count = wall_count if wall_count is not None else _detected_wall_count()
+    if isinstance(payload, list):
+        return [_normalize_display_wall_ids(item, count) for item in payload]
+    if isinstance(payload, dict):
+        return {key: _normalize_display_wall_ids(value, count) for key, value in payload.items()}
+    if not isinstance(payload, str) or count <= 0:
+        return payload
+
+    def repl(match: re.Match) -> str:
+        ordinal = int(match.group(1))
+        if ordinal >= count and 1 <= ordinal <= count:
+            return f"ROOM_001_WALL_{ordinal - 1:02d}"
+        return match.group(0)
+
+    return re.sub(r"ROOM_001_WALL_(\d{2})(?!\d)", repl, payload)
+
 class CheckpointAction(BaseModel):
     checkpoint: str = "08_strategy_validation"
     llm: bool = False
@@ -463,6 +501,7 @@ class CheckpointAction(BaseModel):
 @app.post("/api/spatial/overrides")
 async def save_spatial_overrides(payload: dict = Body(...)) -> JSONResponse:
     INTERMEDIATE_DIR.mkdir(parents=True, exist_ok=True)
+    payload = _normalize_display_wall_ids(payload)
     destination = INTERMEDIATE_DIR / "spatial_user_overrides.json"
     destination.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     return JSONResponse(
@@ -477,13 +516,17 @@ async def save_spatial_overrides(payload: dict = Body(...)) -> JSONResponse:
 @app.post("/api/spatial/continue")
 async def continue_from_spatial(payload: dict = Body(...)) -> JSONResponse:
     INTERMEDIATE_DIR.mkdir(parents=True, exist_ok=True)
+    payload = _normalize_display_wall_ids(payload)
     destination = INTERMEDIATE_DIR / "spatial_user_overrides.json"
     destination.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
     try:
         _run_main_pipeline()
+        _refresh_component_view_from_overrides()
     except subprocess.CalledProcessError as error:
         raise HTTPException(status_code=500, detail=error.stderr or error.stdout or str(error))
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error))
 
     pipeline_status = _read_pipeline_status()
     current_stage = pipeline_status.get("current_stage", "processing")
@@ -515,6 +558,31 @@ async def api_status() -> JSONResponse:
 
 @app.get("/api/strategy-options")
 async def api_strategy_options() -> JSONResponse:
+    package_path = INTERMEDIATE_DIR / "phase3_strategy_packages.json"
+    if package_path.exists():
+        try:
+            payload = json.loads(package_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            payload = {}
+        packages = payload.get("packages", [])
+        if packages:
+            return JSONResponse(
+                {
+                    "options": [
+                        {
+                            "rank": index,
+                            "id": package.get("package_id") or f"package_{index}",
+                            "label": f"option {index}",
+                            "name": package.get("package_name") or f"option {index}",
+                            "status": package.get("benchmark_status"),
+                            "confidence": package.get("confidence_level"),
+                            "component_ids": package.get("visual_generation", {}).get("component_ids", []),
+                        }
+                        for index, package in enumerate(packages[:3], start=1)
+                    ]
+                }
+            )
+
     options_path = INTERMEDIATE_DIR / "retrofit_validation_options.json"
     if not options_path.exists():
         return JSONResponse({"options": []})
@@ -632,6 +700,45 @@ def _extract_location_text(text: str) -> str | None:
     return None
 
 
+def _extract_room_details(text: str) -> dict:
+    details: dict[str, Any] = {}
+    clean = text.lower()
+
+    room_types = [
+        "bedroom",
+        "living room",
+        "kitchen",
+        "bathroom",
+        "office",
+        "study",
+        "studio",
+    ]
+    for room_type in room_types:
+        if re.search(rf"\b{re.escape(room_type)}\b", clean):
+            details["room_type"] = room_type
+            break
+
+    area_match = re.search(r"(\d+(?:\.\d+)?)\s*(?:m2|m\^2|sqm|sq\.?\s*m|square\s*met(?:er|re)s?)\b", clean)
+    if area_match:
+        details["room_area_m2"] = float(area_match.group(1))
+
+    height_match = re.search(r"(\d+(?:\.\d+)?)\s*m\s*(?:high|height|ceiling)", clean)
+    if not height_match:
+        height_match = re.search(r"(?:height|ceiling)\D{0,12}(\d+(?:\.\d+)?)\s*m\b", clean)
+    if height_match:
+        details["room_height_m"] = float(height_match.group(1))
+
+    if re.search(r"\b(pre[- ]?1980|before\s+1980|1960|1970|pre[- ]?80)\b", clean):
+        details["construction_era"] = "1960_1979"
+    elif re.search(r"\b(1980|1990)\b", clean):
+        details["construction_era"] = "1980_1999"
+    elif re.search(r"\b(2000|2010|2020|post[- ]?2000|after\s+2000)\b", clean):
+        details["construction_era"] = "post_2000"
+
+    if re.search(r"\b(no\s+ac|without\s+ac|no\s+air\s*conditioning|without\s+air\s*conditioning)\b", clean):
+        details["has_ac"] = False
+
+    return details
 def _read_json_object(path: Path) -> dict:
     if not path.exists():
         return {}
@@ -735,8 +842,50 @@ def _build_context_grid(name: str, base: float, mode: str, n: int = 50) -> dict:
     for y in range(n):
         for x in range(n):
             cells.append({"x": x, "y": y, "value": round(_grid_value(x, y, n, base, mode), 3)})
-    return {"id": name, "grid_size": n, "cell_size_m": round(500 / n, 2), "cells": cells}
+    return {"id": name, "grid_size": n, "cell_size_m": round(500 / n, 2), "cells": cells, "source": "synthetic_screening_surface"}
 
+
+
+def _raw_grid_cells(metric: dict, name: str) -> dict:
+    """Convert cached raw grid cells to viewer cells only when they exist."""
+    raw = metric.get("cells") or metric.get("grid") or metric.get("values")
+    empty = {"id": name, "grid_size": 0, "cell_size_m": None, "cells": [], "source": "summary_only_no_spatial_raster"}
+    if raw is None:
+        return empty
+    if isinstance(raw, dict):
+        raw = raw.get("cells") or raw.get("values") or raw.get("grid")
+    if not isinstance(raw, list) or not raw:
+        return empty
+
+    if isinstance(raw[0], dict):
+        cells = []
+        for item in raw:
+            if item.get("value") is None:
+                continue
+            cells.append({
+                "x": int(item.get("x", 0)),
+                "y": int(item.get("y", 0)),
+                "value": round(_clamp_number(float(item.get("value", 0.0)), 0, 1), 3),
+            })
+        n = int(max(max((cell["x"] for cell in cells), default=0), max((cell["y"] for cell in cells), default=0)) + 1)
+        return {"id": name, "grid_size": n, "cell_size_m": round(500 / max(n, 1), 2), "cells": cells, "source": "raw_spatial_raster"}
+
+    if isinstance(raw[0], list):
+        flat_values = [float(value) for row in raw for value in row if value is not None]
+        if not flat_values:
+            return empty
+        minimum = min(flat_values)
+        maximum = max(flat_values)
+        spread = maximum - minimum or 1.0
+        cells = []
+        for y, row in enumerate(raw):
+            for x, value in enumerate(row):
+                if value is not None:
+                    cells.append({"x": x, "y": y, "value": round((float(value) - minimum) / spread, 3)})
+        n = max(len(raw), max((len(row) for row in raw), default=0))
+        return {"id": name, "grid_size": n, "cell_size_m": round(500 / max(n, 1), 2), "cells": cells, "source": "raw_spatial_raster"}
+
+    return empty
 
 def _metric_normalized(metric: dict, fallback: float, invert: bool = False) -> float:
     value = _first_number(metric.get("mean"), fallback) or fallback
@@ -798,20 +947,20 @@ def _build_risk_visual_context(metrics: dict, urban: dict, climate: dict, infrar
 
     return {
         "contextual_grids": {
-            "temperature": _build_context_grid("temperature", temperature_base, "temperature"),
-            "solar": _build_context_grid("solar", solar_base, "solar"),
-            "wind_stagnation": _build_context_grid("wind_stagnation", wind_stagnation_base, "wind"),
-            "utci": _build_context_grid("utci", utci_base, "utci"),
-            "direct_sun": _build_context_grid("direct_sun", direct_sun_base, "direct_sun"),
-            "sky_view": _build_context_grid("sky_view", sky_view_base, "sky_view"),
-            "canopy": _build_context_grid("canopy", canopy_base, "canopy"),
+            "temperature": {"id": "temperature", "grid_size": 0, "cell_size_m": None, "cells": [], "source": "summary_only_no_spatial_raster"},
+            "solar": _raw_grid_cells(infrared_metrics.get("solar_radiation", {}), "solar"),
+            "wind_stagnation": _raw_grid_cells(infrared_metrics.get("wind_speed", {}), "wind_stagnation"),
+            "utci": _raw_grid_cells(infrared_metrics.get("utci", {}), "utci"),
+            "direct_sun": _raw_grid_cells(infrared_metrics.get("direct_sun_hours", {}), "direct_sun"),
+            "sky_view": _raw_grid_cells(infrared_metrics.get("sky_view_factor", {}), "sky_view"),
+            "canopy": {"id": "canopy", "grid_size": 0, "cell_size_m": None, "cells": [], "source": "summary_only_no_spatial_raster"},
         },
         "infrared_analysis": {
             "available": bool(infrared.get("available")),
             "source": infrared.get("source"),
             "heat_exposure_score": infrared.get("heat_exposure_score"),
             "raw_grid_status": raw_grid_status,
-            "raw_grid_note": "Current cache stores Infrared min/mean/max, bounds and grid shape. Raw merged grid cells are required for a true Infrared raster heat map.",
+            "raw_grid_note": "Current cache stores Infrared min/mean/max, bounds and grid shape. No heat-map raster is drawn unless raw merged-grid cells are cached.",
         },
         "tree_markers": tree_markers,
         "cooling_refuge": {
@@ -819,11 +968,11 @@ def _build_risk_visual_context(metrics: dict, urban: dict, climate: dict, infrar
             "x_pct": 86,
             "y_pct": 16,
         },
-        "visual_method": "separate_contextual_grids_from_risk_map_and_infrared_summaries",
+        "visual_method": "urban_geometry_plus_numerical_analysis_summary",
         "visual_limits": [
-            "The 500 m analysis square remains blank by default and is not a combined risk surface.",
-            "Climate, solar, direct sun, wind-stagnation, UTCI, sky-view obstruction, and canopy are separate screening grids.",
-            "Infrared City cache currently provides summary statistics and grid metadata. True raster heat maps require raw merged_grid cells.",
+            "The 500 m analysis square remains blank unless raw spatial raster cells are available.",
+            "Current analysis values are shown as numerical summaries, not fake spatial heat-map pixels.",
+            "Infrared City cache currently provides summary statistics and grid metadata. True urban-analysis heat maps require raw merged_grid cells.",
         ],
     }
 
@@ -984,8 +1133,7 @@ def _assess_inputs(
         "room_type": "room type",
         "room_area_m2": "room area",
         "room_height_m": "ceiling height",
-        "pano_image": "pano image",
-        "perspective_image": "window view",
+        "pano_image": "room image",
         "occupant_profile": "resident profile",
     }
 
@@ -1005,13 +1153,6 @@ def _assess_inputs(
     if not any("pano" in name.lower() or "panorama" in name.lower() for name in image_names):
         missing_inputs.append("pano_image")
 
-    if not any(
-        "perspective" in name.lower()
-        or "window" in name.lower()
-        or "view" in name.lower()
-        for name in image_names
-    ):
-        missing_inputs.append("perspective_image")
 
     if not user_case.get("occupant_profile"):
         missing_inputs.append("occupant_profile")
@@ -1021,7 +1162,7 @@ def _assess_inputs(
         message = (
             "I still need a few inputs to move forward. "
             f"Missing: {', '.join(missing_labels)}. "
-            "Please type the missing room/location details in the chat and add the remaining image assets."
+            "Please type the missing room/location details in the chat and add the room image if it is still missing."
         )
         return False, missing_inputs, message
 
@@ -1037,6 +1178,175 @@ def _run_main_pipeline() -> None:
         text=True,
     )
 
+
+def _refresh_component_view_from_overrides() -> None:
+    from spatial_engine.component_composition import write_component_composition
+    from spatial_engine.full_texture_component_refresher import refresh_full_texture_component_check
+    from spatial_engine.host_geometry import build_host_geometry
+    from spatial_engine.overrides import apply_spatial_overrides, load_spatial_overrides
+    from spatial_engine.room_component_viewer import export_room_component_view
+    from spatial_engine.textured_component_viewer import export_textured_component_view
+    from utils.file_io import write_json
+
+    base_spatial_index = _json_read(INTERMEDIATE_DIR / "spatial_index.json")
+    if not base_spatial_index:
+        return
+    spatial_index = apply_spatial_overrides(base_spatial_index, load_spatial_overrides())
+    _json_write(INTERMEDIATE_DIR / "spatial_index_with_overrides.json", spatial_index)
+
+    spatial_output_dir = OUTPUT_DIR / "spatial"
+    write_json(spatial_output_dir / "host_geometry.json", build_host_geometry(spatial_index))
+    export_room_component_view(spatial_index, spatial_output_dir / "room_3d_component_view.html")
+    if (INTERMEDIATE_DIR / "retrofit_validation_options.json").exists():
+        write_component_composition(spatial_output_dir / "component_composition.json")
+    export_textured_component_view(spatial_output_dir / "room_3d_textured_component_test.html")
+    refresh_full_texture_component_check(spatial_index)
+
+FAST_PHASE3_REQUIRED = [
+    "interpreted_case.json",
+    "diagnosis_result.json",
+    "problem_map.json",
+    "strategy_options.json",
+    "retrofit_validation_options.json",
+]
+
+
+def _json_read(path: Path) -> dict:
+    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+
+
+def _json_write(path: Path, payload: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+
+def _can_fast_phase3_continue() -> bool:
+    return all((INTERMEDIATE_DIR / name).exists() for name in FAST_PHASE3_REQUIRED)
+
+
+def _run_fast_phase3_refresh() -> None:
+    from checkpoint_engine import create_strategy_validation_checkpoint
+    from diagnosis_engine.environmental_diagnosis import compute_diagnosis
+    from diagnosis_engine.problem_map_builder import build_problem_map
+    from llm_agent.agent import rank_retrofit_options
+    from rag_engine.manual_checker import check_manuals
+    from report_engine.html_exporter import export_html
+    from report_engine.markdown_exporter import export_markdown
+    from report_engine.report_compiler import compile_report
+    from scripts.build_phase3_strategy_packages import build_packages
+    from spatial_engine.component_composition import write_component_composition
+    from spatial_engine.overrides import apply_spatial_overrides, load_spatial_overrides
+    from spatial_engine.room_component_viewer import export_room_component_view
+    from spatial_engine.wall_diagnosis_state import export_wall_diagnosis_state
+    from utils.config import load_settings
+    from validation_engine import validate_retrofit, validate_retrofit_options
+    from validation_engine.html_exporter import export_validation_html
+    from validation_engine.strategy_scenario_generator import generate_retrofit_generation_scenarios
+
+    settings = load_settings()
+    user_case = _read_user_case()
+    building_info = _read_building_info()
+    interpreted_case = _json_read(INTERMEDIATE_DIR / "interpreted_case.json")
+    constraints = _json_read(INPUT_DIR / "retrofit_constraints.json")
+    risk_map = _json_read(INTERMEDIATE_DIR / "risk_map.json")
+
+    base_spatial_index = _json_read(INTERMEDIATE_DIR / "spatial_index.json")
+    spatial_index = apply_spatial_overrides(base_spatial_index, load_spatial_overrides())
+    _json_write(INTERMEDIATE_DIR / "spatial_index_with_overrides.json", spatial_index)
+    export_room_component_view(spatial_index, OUTPUT_DIR / "spatial" / "room_3d_component_view.html")
+
+    diagnosis_result = compute_diagnosis(
+        interpreted_case,
+        building_info,
+        spatial_index,
+        user_case,
+        urban_context=risk_map,
+    )
+    _json_write(INTERMEDIATE_DIR / "diagnosis_result.json", diagnosis_result)
+
+    problem_map = build_problem_map(diagnosis_result, spatial_index)
+    _json_write(INTERMEDIATE_DIR / "problem_map.json", problem_map)
+    export_wall_diagnosis_state(problem_map, spatial_index)
+
+    manual_check = _json_read(INTERMEDIATE_DIR / "manual_check_result.json")
+    strategy_options = _json_read(INTERMEDIATE_DIR / "strategy_options.json")
+
+    retrofit_validation_options = validate_retrofit_options(diagnosis_result, problem_map, strategy_options, spatial_index)
+    _json_write(INTERMEDIATE_DIR / "retrofit_validation_options.json", retrofit_validation_options)
+    write_component_composition(OUTPUT_DIR / "spatial" / "component_composition.json")
+
+    retrofit_generation_scenarios = generate_retrofit_generation_scenarios(diagnosis_result, strategy_options, limit=9)
+    _json_write(INTERMEDIATE_DIR / "retrofit_generation_scenarios.json", retrofit_generation_scenarios)
+
+    phase3_strategy_packages = build_packages()
+    _json_write(INTERMEDIATE_DIR / "phase3_strategy_packages.json", phase3_strategy_packages)
+
+    validation_view_payload = dict(phase3_strategy_packages)
+    validation_view_payload["baseline"] = retrofit_validation_options.get("baseline", {})
+    (OUTPUT_DIR / "validation_view.html").write_text(export_validation_html(validation_view_payload), encoding="utf-8")
+
+    packages = phase3_strategy_packages.get("packages", [])
+    recommended_strategy = dict((retrofit_validation_options.get("validated_options") or [{}])[0].get("strategy", {}))
+    target_wall_id = next(
+        (
+            target.get("wall_id")
+            for problem in problem_map.get("problems", [])
+            for target in problem.get("spatial_targets", [])
+            if target.get("wall_id")
+        ),
+        None,
+    )
+    if target_wall_id:
+        target_problem = (problem_map.get("problems") or [{}])[0].get("id", "current diagnosis")
+        recommended_strategy["target_wall_id"] = target_wall_id
+        recommended_strategy["rationale"] = f"Responds to {target_problem} on wall {target_wall_id}."
+    user_selection = {
+        "id": f"{interpreted_case.get('case_id', 'CASE_001')}_SELECTION_001",
+        "case_id": interpreted_case.get("case_id", "CASE_001"),
+        "selected_strategy": recommended_strategy,
+        "responds_to_problem_ids": [problem.get("id") for problem in problem_map.get("problems", []) if problem.get("id")],
+        "selection_mode": "web_fast_phase3_refresh",
+        "recommended_package_id": packages[0].get("package_id") if packages else None,
+    }
+    _json_write(INTERMEDIATE_DIR / "user_selection.json", user_selection)
+
+    retrofit_validation = validate_retrofit(diagnosis_result, problem_map, user_selection, spatial_index)
+    _json_write(INTERMEDIATE_DIR / "retrofit_validation.json", retrofit_validation)
+
+    strategy_validation_stage_result = {
+        **retrofit_validation_options,
+        "phase3_strategy_packages": phase3_strategy_packages,
+        "packages": packages,
+        "recommended_package_id": packages[0].get("package_id") if packages else None,
+    }
+    report_payload = {
+        "interpreted_case": interpreted_case,
+        "spatial_index": spatial_index,
+        "risk_map": risk_map,
+        "diagnosis_result": diagnosis_result,
+        "problem_map": problem_map,
+        "manual_check": manual_check,
+        "strategy_options": strategy_options,
+        "retrofit_validation_options": retrofit_validation_options,
+        "retrofit_generation_scenarios": retrofit_generation_scenarios,
+        "phase3_strategy_packages": phase3_strategy_packages,
+        "strategy_validation_checkpoint": create_strategy_validation_checkpoint(strategy_validation_stage_result),
+        "user_selection": user_selection,
+        "retrofit_validation": retrofit_validation,
+        "gemini_prompt": _json_read(INTERMEDIATE_DIR / "gemini_prompt.json"),
+        "gemini_result": _json_read(INTERMEDIATE_DIR / "gemini_result.json") or {"status": "skipped", "reason": "web_fast_phase3_refresh"},
+        "llm_review": _json_read(INTERMEDIATE_DIR / "llm_review.json") or {"status": "skipped", "reason": "web_fast_phase3_refresh"},
+    }
+    final_report = compile_report(report_payload)
+    _json_write(OUTPUT_DIR / "final_report.json", final_report)
+    (OUTPUT_DIR / "final_report.md").write_text(export_markdown(final_report), encoding="utf-8")
+    (OUTPUT_DIR / "final_report_view.html").write_text(export_html(final_report), encoding="utf-8")
+    _json_write(INTERMEDIATE_DIR / "pipeline_status.json", {
+        "status": "complete",
+        "current_stage": "complete",
+        "message": "Diagnosis and Phase 3 refreshed using fast web-test mode.",
+        "primary_output": "data/output/final_report_view.html",
+    })
 
 @app.post("/api/chat")
 async def chat_endpoint(
@@ -1068,9 +1378,13 @@ async def chat_endpoint(
                 region_context.setdefault("region_id", "REGION_001")
                 region_context["location_source"] = "chat_message"
                 _write_region_context(region_context)
+        extracted_details = _extract_room_details(clean_text)
+        if extracted_details:
+            building_info.update(extracted_details)
+            _write_building_info(building_info)
         _write_user_case(user_case)
 
-    if room_type:
+    if room_type and len(room_type.strip()) >= 3:
         building_info["room_type"] = room_type.strip().lower()
     if facing_direction:
         building_info["facing_direction"] = facing_direction.strip().upper()
@@ -1081,7 +1395,7 @@ async def chat_endpoint(
     height_value = _to_float(room_height_m)
     if height_value is not None:
         building_info["room_height_m"] = height_value
-    if any([room_type, facing_direction, area_value is not None, height_value is not None]):
+    if any([room_type and len(room_type.strip()) >= 3, facing_direction, area_value is not None, height_value is not None]):
         _write_building_info(building_info)
 
     uploaded_names: List[str] = []
@@ -1180,6 +1494,12 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run("app:app", host="127.0.0.1", port=int(os.getenv("HVRA_API_PORT", "8010")), reload=False)
+
+
+
+
+
+
 
 
 

@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import json
 from pathlib import Path
@@ -42,6 +42,7 @@ def build_kg_view_data() -> dict:
     validation = _load_optional(INTERMEDIATE_DIR / "retrofit_validation.json")
     user_selection = _load_optional(INTERMEDIATE_DIR / "user_selection.json")
     user_decision = _load_optional(INTERMEDIATE_DIR / "user_decision.json")
+    phase3_packages = _load_optional(INTERMEDIATE_DIR / "phase3_strategy_packages.json")
 
     nodes: dict[str, dict] = {}
     edges: list[dict] = []
@@ -154,6 +155,46 @@ def build_kg_view_data() -> dict:
         for problem_id in option.get("problem_targets", {}).keys():
             _add_edge(edges, strategy_id, problem_id, "fixes")
 
+    for index, package in enumerate(phase3_packages.get("packages", []), start=1):
+        package_id = package.get("package_id")
+        if not package_id:
+            continue
+        effect = package.get("combined_effect_profile", {})
+        visual = package.get("visual_generation", {})
+        target = package.get("target", {})
+        _add_node(
+            nodes,
+            package_id,
+            f"option {index} | {package.get('package_name', 'strategy package')}",
+            "package",
+            rank=index,
+            optimizer_total=package.get("optimizer_score", {}).get("total_score"),
+            benchmark_status=package.get("benchmark_result", {}).get("overall"),
+            operative_temp_reduction_c=effect.get("operative_temp_reduction_c"),
+            overheating_hours_multiplier=effect.get("overheating_hours_multiplier"),
+            target_wall_policy=target.get("target_wall_policy"),
+        )
+        _add_edge(edges, checkpoint_id, package_id, "ranks option")
+        _add_edge(edges, room.get("id"), package_id, "review option")
+        for strategy_id in package.get("selected_strategy_ids", []):
+            _add_edge(edges, package_id, strategy_id, "includes strategy")
+        for component_id in visual.get("component_ids", []):
+            component_node_id = f"{package_id}_{component_id}"
+            _add_node(nodes, component_node_id, str(component_id).replace("_", " "), "component", package_id=package_id)
+            _add_edge(edges, package_id, component_node_id, "shows component")
+        for problem in problem_map.get("problems", []):
+            _add_edge(edges, package_id, problem.get("id"), "addresses")
+        if package.get("benchmark_result"):
+            result_id = f"{package_id}_RESULT"
+            _add_node(
+                nodes,
+                result_id,
+                str(package.get("benchmark_result", {}).get("overall", "review")).replace("_", " "),
+                "review",
+                package_id=package_id,
+                confidence=package.get("confidence", {}).get("level"),
+            )
+            _add_edge(edges, package_id, result_id, "has benchmark")
     selected_strategy = user_selection.get("selected_strategy", {})
     if selected_strategy:
         selection_id = user_selection.get("id", "USER_SELECTION")
@@ -200,7 +241,7 @@ def export_kg_view(output_path: Path = KG_OUTPUT_DIR / "kg_view.html") -> str:
     #panel {{ position: fixed; top: 60px; right: 14px; width: 300px; max-height: calc(100vh - 82px); overflow: auto; }}
     #filters {{ display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }}
     label {{ font: 400 13px "DM Sans", Arial, sans-serif; display: inline-flex; gap: 4px; align-items: center; color: #0a0a0a; }}
-    #details {{ font: 400 13px "DM Sans", Arial, sans-serif; white-space: pre-wrap; overflow-wrap: anywhere; color: #0a0a0a; }}
+    #details, #connections {{ font: 400 13px "DM Sans", Arial, sans-serif; white-space: pre-wrap; overflow-wrap: anywhere; color: #0a0a0a; }}
     button {{ border: 1px solid rgba(0,0,0,0.14); background: #fff; padding: 4px 8px; cursor: pointer; font: 400 10px "DM Mono", monospace; color: #b0b0b0; }}
     .section {{ width: 100%; margin-bottom: 8px; padding: 10px 12px; background: rgba(255,255,255,0.95); border: 1px solid rgba(0,0,0,0.08); }}
     .section.isCollapsed {{ width: 112px; padding: 7px 10px; background: rgba(255,255,255,0.95); border-color: rgba(0,0,0,0.08); }}
@@ -228,13 +269,17 @@ def export_kg_view(output_path: Path = KG_OUTPUT_DIR / "kg_view.html") -> str:
       <button class="sectionHeader" data-toggle="detailPanel"><span>selected item</span><span>&#9662;</span></button>
       <div id="detailPanel" class="sectionBody"><div id="details">click a node.</div></div>
     </section>
-  </aside>
+    <section class="section">
+      <button class="sectionHeader" data-toggle="connectionPanel"><span>connection path</span><span>&#9662;</span></button>
+      <div id="connectionPanel" class="sectionBody"><div id="connections">select an option or node.</div></div>
+    </section>  </aside>
   <script>
     const graph = {html_data};
     const canvas = document.getElementById("kg");
     const ctx = canvas.getContext("2d");
     const meta = document.getElementById("meta");
     const details = document.getElementById("details");
+    const connections = document.getElementById("connections");
     const filters = document.getElementById("filters");
     const selectedStrategyId = new URLSearchParams(window.location.search).get("strategy_id") || "";
     meta.textContent = selectedStrategyId ? `${{graph.nodes.length}} items | ${{graph.edges.length}} links | option focus` : `${{graph.nodes.length}} items | ${{graph.edges.length}} links`;
@@ -250,7 +295,9 @@ def export_kg_view(output_path: Path = KG_OUTPUT_DIR / "kg_view.html") -> str:
       risk: "#c37b2d",
       review: "#5d6fb7",
       fix: "#2f8062",
-      selection: "#4b8063"
+      selection: "#4b8063",
+      package: "#8a6f2a",
+      component: "#6b8f73"
     }};
     const visibleGroups = Object.fromEntries([...new Set(graph.nodes.map(n => n.group))].map(g => [g, true]));
     const nodeById = Object.fromEntries(graph.nodes.map((node, index) => {{
@@ -261,21 +308,40 @@ def export_kg_view(output_path: Path = KG_OUTPUT_DIR / "kg_view.html") -> str:
       node.vy = 0;
       return [node.id, node];
     }}));
+    function resolveFocusId(raw) {{
+      if (!raw) return "";
+      if (nodeById[raw]) return raw;
+      const compact = String(raw).replaceAll("_", "").toLowerCase();
+      const match = compact.match(/^option([0-9]+)$/);
+      if (match) {{
+        const packageNode = graph.nodes.find(node => node.group === "package" && Number(node.rank) === Number(match[1]));
+        if (packageNode) return packageNode.id;
+      }}
+      return raw;
+    }}
+    const selectedFocusId = resolveFocusId(selectedStrategyId);
     const focusedIds = new Set();
-    if (selectedStrategyId) {{
-      focusedIds.add(selectedStrategyId);
-      focusedIds.add(`${{selectedStrategyId}}_VALIDATION`);
+    const focusedEdgeKeys = new Set();
+    function edgeKey(edge) {{ return `${{edge.source}}->${{edge.target}}`; }}
+    function addFocusedEdge(edge) {{
+      focusedEdgeKeys.add(edgeKey(edge));
+      focusedIds.add(edge.source);
+      focusedIds.add(edge.target);
+    }}
+    if (selectedFocusId) {{
+      focusedIds.add(selectedFocusId);
+      focusedIds.add(`${{selectedFocusId}}_VALIDATION`);
+      focusedIds.add(`${{selectedFocusId}}_RESULT`);
       graph.edges.forEach(edge => {{
-        if (edge.source === selectedStrategyId || edge.target === selectedStrategyId || edge.source === `${{selectedStrategyId}}_VALIDATION` || edge.target === `${{selectedStrategyId}}_VALIDATION`) {{
-          focusedIds.add(edge.source);
-          focusedIds.add(edge.target);
-        }}
+        if (edge.source === selectedFocusId || edge.target === selectedFocusId || edge.source === `${{selectedFocusId}}_VALIDATION` || edge.target === `${{selectedFocusId}}_VALIDATION` || edge.source === `${{selectedFocusId}}_RESULT` || edge.target === `${{selectedFocusId}}_RESULT`) addFocusedEdge(edge);
+      }});
+      graph.edges.forEach(edge => {{
+        if ((focusedIds.has(edge.source) || focusedIds.has(edge.target)) && ["has result", "fixes", "has benchmark", "addresses"].includes(edge.label)) addFocusedEdge(edge);
       }});
     }}
-    function focusAlpha(node) {{
-      if (!selectedStrategyId || focusedIds.has(node.id) || ["building", "room", "wall", "window", "risk"].includes(node.group)) return 1;
-      return 0.22;
-    }}
+    function isVisibleNode(node) {{ return !selectedFocusId || focusedIds.has(node.id); }}
+    function isVisibleEdge(edge) {{ return !selectedFocusId || focusedEdgeKeys.has(edgeKey(edge)); }}
+    function focusAlpha(node) {{ return isVisibleNode(node) ? 1 : 0; }}
     const view = {{ x: 0, y: 0, zoom: 1 }};
     let selected = null;
     let drag = null;
@@ -292,6 +358,16 @@ def export_kg_view(output_path: Path = KG_OUTPUT_DIR / "kg_view.html") -> str:
       return String(value).replaceAll("_", " ");
     }}
 
+    function adjacentEdges(nodeId) {{
+      return graph.edges.filter(edge => edge.source === nodeId || edge.target === nodeId);
+    }}
+
+    function describeEdge(edge) {{
+      const source = nodeById[edge.source]?.label || edge.source;
+      const target = nodeById[edge.target]?.label || edge.target;
+      return `${{source}} -> ${{plainValue(edge.label)}} -> ${{target}}`;
+    }}
+
     function selectedDetails(node) {{
       if (!node) return "click a node.";
       const hidden = new Set(["id", "x", "y", "vx", "vy"]);
@@ -300,7 +376,21 @@ def export_kg_view(output_path: Path = KG_OUTPUT_DIR / "kg_view.html") -> str:
         if (hidden.has(key) || key === "label" || key === "group") return;
         lines.push(`${{plainKey(key)}}: ${{plainValue(value)}}`);
       }});
+      const links = adjacentEdges(node.id).slice(0, 8).map(describeEdge);
+      if (links.length) lines.push("", "linked by:", ...links);
       return lines.join("\\n");
+    }}
+
+    function connectionSummary() {{
+      if (!selectedFocusId) return "Choose a strategy option to focus its linked diagnosis, validation result, and target problem nodes.";
+      const strategy = nodeById[selectedFocusId];
+      const validation = nodeById[`${{selectedFocusId}}_VALIDATION`] || nodeById[`${{selectedFocusId}}_RESULT`];
+      const related = graph.edges
+        .filter(edge => isVisibleEdge(edge))
+        .map(describeEdge);
+      const header = strategy ? `${{strategy.label}}` : selectedFocusId;
+      const result = validation ? `benchmark: ${{validation.label}}` : "benchmark: not linked";
+      return [header, result, "", "connection logic:", ...related.slice(0, 12)].join("\\n");
     }}
 
     function resize() {{
@@ -334,11 +424,12 @@ def export_kg_view(output_path: Path = KG_OUTPUT_DIR / "kg_view.html") -> str:
     }}
 
     function tick() {{
-      const nodes = graph.nodes.filter(n => visibleGroups[n.group]);
+      const nodes = graph.nodes.filter(n => visibleGroups[n.group] && isVisibleNode(n));
+      if (selectedFocusId) return;
       graph.edges.forEach(edge => {{
         const a = nodeById[edge.source];
         const b = nodeById[edge.target];
-        if (!a || !b || !visibleGroups[a.group] || !visibleGroups[b.group]) return;
+        if (!a || !b || !visibleGroups[a.group] || !visibleGroups[b.group] || !isVisibleEdge(edge)) return;
         const dx = b.x - a.x;
         const dy = b.y - a.y;
         const distance = Math.max(1, Math.hypot(dx, dy));
@@ -378,23 +469,23 @@ def export_kg_view(output_path: Path = KG_OUTPUT_DIR / "kg_view.html") -> str:
       graph.edges.forEach(edge => {{
         const a = nodeById[edge.source];
         const b = nodeById[edge.target];
-        if (!a || !b || !visibleGroups[a.group] || !visibleGroups[b.group]) return;
+        if (!a || !b || !visibleGroups[a.group] || !visibleGroups[b.group] || !isVisibleEdge(edge)) return;
         const [x1, y1] = screen(a);
         const [x2, y2] = screen(b);
         const edgeFocused = !selectedStrategyId || focusedIds.has(edge.source) || focusedIds.has(edge.target);
-        ctx.globalAlpha = edgeFocused ? 1 : 0.18;
-        ctx.strokeStyle = "#b7afa5";
-        ctx.lineWidth = devicePixelRatio;
+        ctx.globalAlpha = edgeFocused ? 1 : 0.38;
+        ctx.strokeStyle = edgeFocused ? "#4d453d" : "#9d948a";
+        ctx.lineWidth = (edgeFocused ? 2.6 : 1.6) * devicePixelRatio;
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
         ctx.stroke();
-        ctx.fillStyle = "#6f675f";
+        ctx.fillStyle = edgeFocused ? "#2d2925" : "#8e867d";
         ctx.fillText(edge.label, (x1 + x2) / 2 + 4, (y1 + y2) / 2 - 4);
         ctx.globalAlpha = 1;
       }});
       graph.nodes.forEach(node => {{
-        if (!visibleGroups[node.group]) return;
+        if (!visibleGroups[node.group] || !isVisibleNode(node)) return;
         const [x, y] = screen(node);
         ctx.beginPath();
         ctx.arc(x, y, node === selected ? 12 * devicePixelRatio : 9 * devicePixelRatio, 0, Math.PI * 2);
@@ -501,6 +592,7 @@ def export_kg_view(output_path: Path = KG_OUTPUT_DIR / "kg_view.html") -> str:
     }});
 
     renderFilters();
+    if (connections) connections.textContent = connectionSummary();
     resize();
     addEventListener("resize", resize);
     setInterval(() => {{

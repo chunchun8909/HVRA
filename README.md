@@ -23,7 +23,7 @@ Key docs:
 | [Data Sources Inventory](docs/data_sources_inventory.md) | Data sources organized by implemented segment. |
 | [RAG Academic Sources](docs/rag_academic_sources.md) | Types of academic/professional sources feeding RAG. |
 | [Strategy Catalogue](docs/strategy_catalogue.md) | Retrofit strategy catalogue. |
-| [Terminal Commands](docs/terminal_commands.md) | Startup, testing, RAG, and recovery commands. |
+| [Terminal Commands](docs/terminal_commands.md) | Startup, testing, RAG, and recovery commands. |`r`n| [Security and Privacy](docs/security_privacy.md) | What stays local, secret handling, and pre-push checks. |
 
 ## Current Capability
 
@@ -36,7 +36,7 @@ Key docs:
 - Deterministic diagnosis calculations.
 - Problem map assignment to room surfaces.
 - Local RAG/manual checking.
-- Retrofit option validation against benchmark gates.
+- Retrofit option validation against benchmark gates, with strategy evidence and visual-placement mappings.
 - Combo retrofit screening method documented in [Thermal Combo Screening](docs/thermal_combo_screening.md).
 - Checkpoint packages for spatial V&V and strategy validation.
 - Interactive room viewer and KG viewer.
@@ -112,6 +112,10 @@ Continue after checkpoint:
 
 More commands are in [Terminal Commands](docs/terminal_commands.md).
 
+
+## Current Phase 3
+
+Phase 3 uses the full-room textured 3D component preview generated at `data/output/spatial/room_3d_full_texture_component_check.html`. The browser may display `wall 08`, but the engine stores walls zero-based, so the same detected wall is `ROOM_001_WALL_07`; the backend normalizes display-style wall IDs before saving Phase 2 settings and running diagnosis.
 ## Inputs
 
 Required JSON inputs:
@@ -128,7 +132,7 @@ Image inputs:
 
 ```text
 data/input/images/pano_image/
-data/input/images/perspective_image/
+data/input/images/perspective_image/  # legacy; current report visual uses the 3D component preview
 ```
 
 RAG inputs:
@@ -168,6 +172,8 @@ Before pushing:
 - Keep `.venv/` out of git.
 - Keep generated `data/intermediate/`, `data/checkpoints/`, `data/output/`, `data/vector_db/`, and `data/raw_pdfs/` out of git.
 - Commit source code, docs, config examples, and `.gitkeep` placeholders only.
+
+
 
 
 

@@ -38,18 +38,19 @@ def build_risk_map(
     
     infrared_context = {"available": False, "source": "infrared_city", "reason": "USE_INFRARED_CITY=false"}
     if use_infrared_city:
+        live_refresh_error = None
         if not infrared_force_refresh:
             cached_context = load_infrared_city_context(infrared_cache_json)
             if cached_context.get("available"):
                 infrared_context = cached_context
         coordinates = region_context.get("coordinates", {})
         if (
-            not infrared_context.get("available")
+            (infrared_force_refresh or not infrared_context.get("available"))
             and infrared_live
             and coordinates.get("lat") is not None
             and coordinates.get("lon") is not None
         ):
-            infrared_context = run_live_infrared_city_context(
+            live_context = run_live_infrared_city_context(
                 latitude=float(coordinates["lat"]),
                 longitude=float(coordinates["lon"]),
                 bbox_radius_m=bbox_radius_m,
@@ -57,10 +58,17 @@ def build_risk_map(
                 base_url=infrared_base_url,
                 cache_json=infrared_cache_json,
             )
+            if live_context.get("available"):
+                infrared_context = live_context
+            else:
+                live_refresh_error = live_context.get("reason") or "Live Infrared City refresh failed."
         if not infrared_context.get("available"):
             cached_context = load_infrared_city_context(infrared_cache_json)
             if cached_context.get("available"):
                 infrared_context = cached_context
+        if live_refresh_error and infrared_context.get("available"):
+            infrared_context["live_refresh_error"] = live_refresh_error
+            infrared_context["cache_fallback_reason"] = "Using cached Infrared summary because live refresh failed."
 
     # Load and prepare input
     risk_map_input = prepare_risk_map_input(
@@ -125,3 +133,5 @@ if __name__ == "__main__":
     }
     risk_map = build_risk_map(mock_building, mock_region)
     print(json.dumps(risk_map, indent=2))
+
+
